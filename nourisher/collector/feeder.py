@@ -99,13 +99,82 @@ def get_entries_info( entriesInfo ):
     ziskat to info, co predtim delal goose
     '''
 
-    import newspaper as nws
+    import newspaper as nwsp
     from bs4 import BeautifulSoup
+    from lxml.etree import tostring
+    import requests
 
-    for link in entriesInfo.links:
-        print()
+    links = entriesInfo.links
 
-def check_similarity( entriesInfo ):
+    dtb = defaultdict( list )
+    for plink in links:
+        # this is because requests follow redirects,
+        # hence it ends up on true address
+        artURL = requests.get( plink ).url
+        dtb["final_url"].append( artURL )
+
+        art = nwsp.Article( artURL )
+        art.download()
+        art.parse()
+
+        # get text of an article
+        artText = art.text
+        if artText == '':
+            artText = None
+        dtb["text"].append( artText )
+
+        # counts number of specific tags in the article html code
+        artHtm = tostring( art.top_node )
+        dtb["htmlText"].append( artHtm )
+        artSoup = BeautifulSoup( artHtm )
+        chtene = ["img", "div", "p"]
+        for tag in chtene:
+            nm = "nTagCountsEntries_" + tag
+            poc = len( artSoup.findAll( tag ) )
+            dtb[nm].append( poc )
+
+        # ratio length in characters of text vs. html code of the article
+        rat = len ( artText ) / len ( artHtm )
+        dtb["textHtmlArticleRatioChars"].append( rat )
+
+        # ratio number of words vs number of tags in an article
+        # this is IMHO better than characters, since tags can have long names
+        # or css styling attributes
+        ratW = len ( artText.split() ) / len ( artSoup.findAll() )
+        dtb["textHtmlArticleRatioWords"].append( ratW )
+
+        pageHtml = art.html
+        pageSoup = BeautifulSoup( pageHtml )
+        strSoup = str( pageSoup )
+        strSoupSplit = strSoup.split()
+
+        # length of code in chars normed to text
+        dtb["htmlCodeLengthChars"].append( len( strSoup ) )
+        # length of code splitted at whitespace
+        dtb["htmlCodeLengthwhite"].append( len( strSoupSplit ) )
+
+        # text words vs. number of tags
+        ratWT = len ( artText.split() ) / len ( pageSoup.findAll() )
+        dtb["textCodeHtmlRatioWT"].append( ratWT )
+
+        # number of uppercase letters vs words ratio
+        ratUT = sum( 1 for letter in artText if letter.isupper() ) / len( strSoupSplit )
+        dtb["uppercaseTextRatio"].append( ratUT )
+
+        # count all tags
+        dtb["nOfAllTagsHtml"].append( len( pageSoup.findAll() ) )
+
+        wanted_tags = ["meta", "script", "iframe", "div", "img", "p"]
+        for tag in wanted_tags:
+            nm = "nTagCountsWhole_" + tag
+            poc = len( pageSoup.findAll( tag ) )
+            dtb[nm].append( poc )
+
+        dtb["rawHtmlOfPage"].append( pageSoup )
+
+    return( pd.Series( dtb ) )
+
+def get_url_info( entriesInfo, titles ):
     """Zjistuje, zda se url shoduje s title clanku
     je tam primitivni ucelova funkce (delsi slova prispeji vice)
     jeste navic zjisti, zda url adresa obsahuje specialni znaky
@@ -121,15 +190,14 @@ def check_similarity( entriesInfo ):
     """
 
     import re
-    import numpy as np
+#    import numpy as np
     from difflib import SequenceMatcher
 
     check_let = lambda x: True if x.isalpha() == True else False
 
-    corespTitles = entriesInfo.titles
-    links = entriesInfo.links
-    artMath = []
-    d = defaultdict( list )
+    corespTitles = titles
+    links = entriesInfo.final_url
+    storeD = defaultdict( list )
 
     for title, link in zip( corespTitles, links ):
         lsp = " ".join( link.split( "/" )[3:] )
@@ -142,11 +210,10 @@ def check_similarity( entriesInfo ):
         rat = SequenceMatcher( None, title, " ".join( hled ) ).ratio()
 
         # print("Hledam: ", " ".join(hled), "\t", title, "\t", rat)
-        artMath.append( rat )
+        storeD["matchUrlTitle"].append( rat )
 
 
         # weird occurences vs textual
-
         numbAndWeird = re.findall( "[\W|\d]+", lsp )
         countDash = len( list( filter( lambda x: True if x == "-"else False, numbAndWeird ) ) )
         try:
@@ -168,23 +235,23 @@ def check_similarity( entriesInfo ):
             normAllWeirds = 0
 
         for dk, dv in zip( ["urlCountDash", "urlCountHash", "urlAllWeirds"], [normCountDash, normCountHash, normAllWeirds] ):
-            d[dk].append( dv )
+            storeD[dk].append( dv )
 
-    mns, std = np.mean( artMath ), np.std( artMath )
+#     mns, std = np.mean( artMath ), np.std( artMath )
+#
+#
+#     cd_m, cd_s = np.mean( storeD["urlCountDash"] ), np.std( storeD["urlCountDash"] )
+#     ch_m, ch_s = np.mean( storeD["urlCountHash"] ), np.std( storeD["urlCountHash"] )
+#     aw_m, aw_s = np.mean( storeD["urlAllWeirds"] ), np.std( storeD["urlAllWeirds"] )
+#
+#     cols = ["matchUrlTitle_Mean", "matchUrlTitle_Std",
+#              "urlCountDash_mean", "urlCountDash_std",
+#              "urlCountHash_mean", "urlCountHash_std",
+#              "urlAllWeirds_mean", "urlAllWeirds_std"]
+#     vals = [mns, std, cd_m, cd_s, ch_m, ch_s, aw_m, aw_s]
 
 
-    cd_m, cd_s = np.mean( d["urlCountDash"] ), np.std( d["urlCountDash"] )
-    ch_m, ch_s = np.mean( d["urlCountHash"] ), np.std( d["urlCountHash"] )
-    aw_m, aw_s = np.mean( d["urlAllWeirds"] ), np.std( d["urlAllWeirds"] )
-
-    cols = ["matchUrlTitle_Mean", "matchUrlTitle_Std",
-             "urlCountDash_mean", "urlCountDash_std",
-             "urlCountHash_mean", "urlCountHash_std",
-             "urlAllWeirds_mean", "urlAllWeirds_std"]
-    vals = [mns, std, cd_m, cd_s, ch_m, ch_s, aw_m, aw_s]
-
-
-    return( pd.Series( dict( zip( cols, vals ) ) ) )
+    return( pd.Series( storeD ) )
 
 def feed_that_all( url ):
     '''This collect everything from above
@@ -192,8 +259,10 @@ def feed_that_all( url ):
 
     defaultInfo = extract_feed_info( url )
 
-    entriesInfo = polish_entries_info( defaultInfo.entries )
-    entriesSim = check_similarity( entriesInfo )
-    total = defaultInfo.append( entriesSim )
+    entriesPolished = polish_entries_info( defaultInfo.entries )
+    entrieInfo = get_entries_info( entriesPolished )
+    entriesSim = get_url_info( entrieInfo, entriesPolished.titles )
 
-    return( total, entriesInfo )
+    total = defaultInfo.append( [entriesPolished, entrieInfo, entriesSim] )
+
+    return( total )

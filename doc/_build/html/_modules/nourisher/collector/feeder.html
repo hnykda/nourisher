@@ -50,7 +50,9 @@
   <h1>Source code for nourisher.collector.feeder</h1><div class="highlight"><pre>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">feedparser</span>
-
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">pip._vendor.pkg_resources</span> <span class="kn">import</span> <span class="n">get_entry_info</span>
+<span class="kn">from</span> <span class="nn">mock</span> <span class="kn">import</span> <span class="n">inplace</span>
 
 <span class="c"># atributy, co mě u feedu zajímají</span>
 <span class="c"># prvni uroven feedparser objectu, bozo je je kvalita formátování feedu</span>
@@ -116,8 +118,13 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">ifs</span> <span class="p">)</span> <span class="p">)</span>
 
 <span class="c"># Omezujeme se jen na prvni 25 clanku</span></div>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <div class="viewcode-block" id="vytahni_info_clanku"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.vytahni_info_clanku">[docs]</a><span class="k">def</span> <span class="nf">vytahni_info_clanku</span><span class="p">(</span> <span class="n">lc</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Vytahne info o clancich z dictu</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    Pozor! Jen 25 clanku!</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">lc</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
         <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[:</span><span class="mi">25</span><span class="p">]</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
@@ -135,6 +142,100 @@
                 <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="check_similarity"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.check_similarity">[docs]</a><span class="k">def</span> <span class="nf">check_similarity</span><span class="p">(</span> <span class="n">entriesInfo</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zjistuje, zda se url shoduje s title clanku</span>
+<span class="sd">    je tam primitivni ucelova funkce (delsi slova prispeji vice)</span>
+<span class="sd">    jeste navic zjisti, zda url adresa obsahuje specialni znaky</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    Zere Panda serii, kterou vyhazuje funkce vytahni_info_clanku()</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    </span>
+<span class="sd">    Pozor! Linky uz musi byt skutecne.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">re</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">difflib</span> <span class="kn">import</span> <span class="n">SequenceMatcher</span>
+
+    <span class="n">check_let</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span> <span class="k">else</span> <span class="bp">False</span>
+
+    <span class="n">corespTitles</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">titles</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">links</span>
+    <span class="n">artMath</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">link</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">corespTitles</span><span class="p">,</span> <span class="n">links</span> <span class="p">):</span>
+        <span class="n">lsp</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">link</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot;/&quot;</span> <span class="p">)[</span><span class="mi">3</span><span class="p">:]</span> <span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">hled</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&#39;_|/|-|\+&#39;</span><span class="p">,</span> <span class="n">lsp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">hled</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="n">check_let</span><span class="p">,</span> <span class="n">hled</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="c"># print(title, lsp, hled)</span>
+        <span class="c"># zjistim, zda je nebo neni obsazeno kazde slovo</span>
+
+        <span class="n">rat</span> <span class="o">=</span> <span class="n">SequenceMatcher</span><span class="p">(</span> <span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">hled</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">ratio</span><span class="p">()</span>
+
+        <span class="c"># print(&quot;Hledam: &quot;, &quot; &quot;.join(hled), &quot;\t&quot;, title, &quot;\t&quot;, rat)</span>
+        <span class="n">artMath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">rat</span> <span class="p">)</span>
+
+
+        <span class="c"># weird occurences vs textual</span>
+
+        <span class="n">numbAndWeird</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span> <span class="s">&quot;[\W|\d]+&quot;</span><span class="p">,</span> <span class="n">lsp</span> <span class="p">)</span>
+        <span class="n">countDash</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s">&quot;-&quot;</span><span class="k">else</span> <span class="bp">False</span><span class="p">,</span> <span class="n">numbAndWeird</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">normCountDash</span> <span class="o">=</span> <span class="n">countDash</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span> <span class="n">hled</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="n">normCountDash</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">countHash</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="s">&quot;#&quot;</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">else</span> <span class="bp">False</span><span class="p">,</span> <span class="n">numbAndWeird</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">normCountHash</span> <span class="o">=</span> <span class="n">countHash</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span> <span class="n">hled</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="n">normCountHash</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">allWe</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="p">(</span> <span class="p">(</span> <span class="s">&quot;-&quot;</span> <span class="o">!=</span> <span class="n">x</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="s">&quot;/&quot;</span> <span class="o">!=</span> <span class="n">x</span> <span class="p">)</span> <span class="p">)</span> <span class="k">else</span> <span class="bp">False</span><span class="p">,</span> <span class="n">numbAndWeird</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">countAllWeirds</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">allWe</span> <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">normAllWeirds</span> <span class="o">=</span> <span class="n">countAllWeirds</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span> <span class="n">hled</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="n">normAllWeirds</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">dk</span><span class="p">,</span> <span class="n">dv</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="p">[</span><span class="s">&quot;urlCountDash&quot;</span><span class="p">,</span> <span class="s">&quot;urlCountHash&quot;</span><span class="p">,</span> <span class="s">&quot;urlAllWeirds&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">normCountDash</span><span class="p">,</span> <span class="n">normCountHash</span><span class="p">,</span> <span class="n">normAllWeirds</span><span class="p">]</span> <span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">dk</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">dv</span> <span class="p">)</span>
+
+    <span class="n">mns</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">artMath</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">artMath</span> <span class="p">)</span>
+
+
+    <span class="n">cd_m</span><span class="p">,</span> <span class="n">cd_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountDash&quot;</span><span class="p">]</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountDash&quot;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">ch_m</span><span class="p">,</span> <span class="n">ch_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountHash&quot;</span><span class="p">]</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountHash&quot;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">aw_m</span><span class="p">,</span> <span class="n">aw_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlAllWeirds&quot;</span><span class="p">]</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlAllWeirds&quot;</span><span class="p">]</span> <span class="p">)</span>
+
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;matchUrlTitle_Mean&quot;</span><span class="p">,</span> <span class="s">&quot;matchUrlTitle_Std&quot;</span><span class="p">,</span>
+             <span class="s">&quot;urlCountDash_mean&quot;</span><span class="p">,</span> <span class="s">&quot;urlCountDash_std&quot;</span><span class="p">,</span>
+             <span class="s">&quot;urlCountHash_mean&quot;</span><span class="p">,</span> <span class="s">&quot;urlCountHash_std&quot;</span><span class="p">,</span>
+             <span class="s">&quot;urlAllWeirds_mean&quot;</span><span class="p">,</span> <span class="s">&quot;urlAllWeirds_std&quot;</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">mns</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">cd_m</span><span class="p">,</span> <span class="n">cd_s</span><span class="p">,</span> <span class="n">ch_m</span><span class="p">,</span> <span class="n">ch_s</span><span class="p">,</span> <span class="n">aw_m</span><span class="p">,</span> <span class="n">aw_s</span><span class="p">]</span>
+
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="nb">dict</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">cols</span><span class="p">,</span> <span class="n">vals</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="feed_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.feed_that_all">[docs]</a><span class="k">def</span> <span class="nf">feed_that_all</span><span class="p">(</span> <span class="n">url</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This collect everything from above</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">defaultInfo</span> <span class="o">=</span> <span class="n">extract_feed_info</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+
+    <span class="n">entriesInfo</span> <span class="o">=</span> <span class="n">vytahni_info_clanku</span><span class="p">(</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">entries</span> <span class="p">)</span>
+    <span class="n">entriesSim</span> <span class="o">=</span> <span class="n">check_similarity</span><span class="p">(</span> <span class="n">entriesInfo</span> <span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">entriesSim</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span>
 </pre></div></div>
 
           </div>

@@ -13,7 +13,7 @@ iaf = ["title", "subtitle", "info",
         "published_parsed", "updated_parsed", "tags"]
 
 
-def extract_entries_info( entries, n_of_entries ):
+def number_of_entries_per_day( entries, n_of_entries ):
     """Vrati kolik clanku dava feed za jeden den"""
 
     published_times = [pd.to_datetime( entry["published"] ) for entry in entries]
@@ -52,7 +52,7 @@ def extract_feed_info( url ):
         ifs["n_of_entries"] = None
 
     try:
-        ifs["pub_freq"] = extract_entries_info( entries, n_of_entries )
+        ifs["pub_freq"] = number_of_entries_per_day( entries, n_of_entries )
     except:
         ifs["pub_freq"] = None
 
@@ -65,8 +65,10 @@ def extract_feed_info( url ):
     ifs["entries"] = d["entries"]
     return( pd.Series( ifs ) )
 
+
+
 # Omezujeme se jen na prvni 25 clanku
-def vytahni_info_clanku( lc ):
+def polish_entries_info( lc ):
     '''Vytahne info o clancich z dictu
     
     Note
@@ -91,6 +93,17 @@ def vytahni_info_clanku( lc ):
 
     return( pd.Series( d ) )
 
+def get_entries_info( entriesInfo ):
+    ''' Zere to, co vyplyvne polish_entries_info()
+    
+    ziskat to info, co predtim delal goose
+    '''
+
+    import newspaper as nws
+    from bs4 import BeautifulSoup
+
+    for link in entriesInfo.links:
+        print()
 
 def check_similarity( entriesInfo ):
     """Zjistuje, zda se url shoduje s title clanku
@@ -99,8 +112,12 @@ def check_similarity( entriesInfo ):
     
     Parameters
     -----------
-    Zere Panda serii, kterou vyhazuje funkce vytahni_info_clanku()
+    ASI NE! - Zere Panda serii, kterou vyhazuje funkce polish_entries_info()
+
+    Note
+    -----
     
+    Pozor! Linky uz musi byt skutecne.
     """
 
     import re
@@ -108,10 +125,7 @@ def check_similarity( entriesInfo ):
     from difflib import SequenceMatcher
 
     check_let = lambda x: True if x.isalpha() == True else False
-    docas_opr = pd.DataFrame( columns = ["matchUrlTitle_Mean", "matchUrlTitle_Std",
-                                  "urlCountDash_mean", "urlCountDash_std", "urlCountHash_mean", "urlCountHash_std",
-                                  "urlAllWeirds_mean", "urlAllWeirds_std"] )
-    # for ix, links in df.final_url.items():
+
     corespTitles = entriesInfo.titles
     links = entriesInfo.links
     artMath = []
@@ -158,12 +172,19 @@ def check_similarity( entriesInfo ):
 
     mns, std = np.mean( artMath ), np.std( artMath )
 
-    tores = [mns, std, normCountDash, normCountHash, normAllWeirds]
-    ntor = ["matchUrlTitle_Mean", "matchUrlTitle_Std", "urlCountDash", "urlCountHash", "urlAllWeirds"]
+
     cd_m, cd_s = np.mean( d["urlCountDash"] ), np.std( d["urlCountDash"] )
     ch_m, ch_s = np.mean( d["urlCountHash"] ), np.std( d["urlCountHash"] )
     aw_m, aw_s = np.mean( d["urlAllWeirds"] ), np.std( d["urlAllWeirds"] )
-    return( [mns, std, cd_m, cd_s, ch_m, ch_s, aw_m, aw_s] )
+
+    cols = ["matchUrlTitle_Mean", "matchUrlTitle_Std",
+             "urlCountDash_mean", "urlCountDash_std",
+             "urlCountHash_mean", "urlCountHash_std",
+             "urlAllWeirds_mean", "urlAllWeirds_std"]
+    vals = [mns, std, cd_m, cd_s, ch_m, ch_s, aw_m, aw_s]
+
+
+    return( pd.Series( dict( zip( cols, vals ) ) ) )
 
 def feed_that_all( url ):
     '''This collect everything from above
@@ -171,5 +192,8 @@ def feed_that_all( url ):
 
     defaultInfo = extract_feed_info( url )
 
-    return( defaultInfo )
+    entriesInfo = polish_entries_info( defaultInfo.entries )
+    entriesSim = check_similarity( entriesInfo )
+    total = defaultInfo.append( entriesSim )
 
+    return( total, entriesInfo )

@@ -8,7 +8,7 @@ class Nourisher:
     '''
 
     origFeedUrl = None
-    databaseIndex = None
+    data = None
 
     def __init__( self, _origUrlofFeed ):
         self.origFeedUrl = _origUrlofFeed
@@ -62,4 +62,8 @@ class Nourisher:
 
         from .collector import collector
 
-        return( collector.collect_all( self.origFeedUrl ) )
+        harve = collector.collect_all( self.origFeedUrl )
+
+        self.data = harve
+
+        return()

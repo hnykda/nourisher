@@ -60,7 +60,7 @@
 <span id="nourisher-collector-collector-module"></span><h2>nourisher.collector.collector module<a class="headerlink" href="#module-nourisher.collector.collector" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="nourisher.collector.collector.collect_all">
-<tt class="descclassname">nourisher.collector.collector.</tt><tt class="descname">collect_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/collector/collector.html#collect_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.collector.collect_all" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">nourisher.collector.collector.</tt><tt class="descname">collect_all</tt><big>(</big><em>origUrl</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/collector.html#collect_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.collector.collect_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collects maximum informations about feed,
 saves them inside database and return info</p>
 </dd></dl>
@@ -68,6 +68,22 @@ saves them inside database and return info</p>
 </div>
 <div class="section" id="module-nourisher.collector.feeder">
 <span id="nourisher-collector-feeder-module"></span><h2>nourisher.collector.feeder module<a class="headerlink" href="#module-nourisher.collector.feeder" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nourisher.collector.feeder.check_similarity">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">check_similarity</tt><big>(</big><em>entriesInfo</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#check_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.check_similarity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zjistuje, zda se url shoduje s title clanku
+je tam primitivni ucelova funkce (delsi slova prispeji vice)
+jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Zere Panda serii, kterou vyhazuje funkce vytahni_info_clanku()</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="nourisher.collector.feeder.extract_entries_info">
 <tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">extract_entries_info</tt><big>(</big><em>entries</em>, <em>n_of_entries</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#extract_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.extract_entries_info" title="Permalink to this definition">¶</a></dt>
@@ -80,9 +96,16 @@ saves them inside database and return info</p>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="nourisher.collector.feeder.feed_that_all">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">feed_that_all</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#feed_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.feed_that_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>This collect everything from above</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="nourisher.collector.feeder.vytahni_info_clanku">
 <tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">vytahni_info_clanku</tt><big>(</big><em>lc</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#vytahni_info_clanku"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.vytahni_info_clanku" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Vytahne info o clancich z dictu</p>
+</dd></dl>
 
 </div>
 <div class="section" id="module-nourisher.collector">

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nourisher.collector.feeder &mdash; nourisher  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="nourisher  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">nourisher  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for nourisher.collector.feeder</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">feedparser</span>
+
+
+<span class="c"># atributy, co mě u feedu zajímají</span>
+<span class="c"># prvni uroven feedparser objectu, bozo je je kvalita formátování feedu</span>
+<span class="n">iafl</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;version&quot;</span><span class="p">,</span> <span class="s">&quot;status&quot;</span><span class="p">,</span> <span class="s">&quot;bozo&quot;</span><span class="p">,</span> <span class="s">&quot;href&quot;</span><span class="p">]</span>
+<span class="c"># entries, frequence nejak nadefinovat</span>
+<span class="n">iae</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">]</span>
+<span class="c"># feed uroven</span>
+<span class="n">iaf</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;subtitle&quot;</span><span class="p">,</span> <span class="s">&quot;info&quot;</span><span class="p">,</span>
+        <span class="s">&quot;language&quot;</span><span class="p">,</span> <span class="s">&quot;link&quot;</span><span class="p">,</span> <span class="s">&quot;author&quot;</span><span class="p">,</span>
+        <span class="s">&quot;published_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;updated_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;tags&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="extract_entries_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.extract_entries_info">[docs]</a><span class="k">def</span> <span class="nf">extract_entries_info</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Vrati kolik clanku dava feed za jeden den&quot;&quot;&quot;</span>
+
+    <span class="n">published_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;published&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">]</span>
+    <span class="n">pub_t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">TimeSeries</span><span class="p">(</span> <span class="n">published_times</span> <span class="p">)</span>
+    <span class="n">pub_freq</span> <span class="o">=</span> <span class="p">(</span> <span class="n">pub_t</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">pub_t</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="p">)</span> <span class="o">/</span> <span class="n">n_of_entries</span>
+    <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span> <span class="p">)</span> <span class="o">/</span> <span class="n">pub_freq</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="extract_feed_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.extract_feed_info">[docs]</a><span class="k">def</span> <span class="nf">extract_feed_info</span><span class="p">(</span> <span class="n">url</span> <span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+    <span class="n">ifs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">iaf</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">atrib</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">feed</span><span class="p">[</span><span class="n">att</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">atrib</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">):</span>
+                <span class="n">ifs</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="n">atrib</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ifs</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">ifs</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">iafl</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">atrib</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">att</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">atrib</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">):</span>
+                <span class="n">ifs</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="n">atrib</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ifs</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">ifs</span><span class="p">[</span><span class="n">att</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">]</span>
+        <span class="n">n_of_entries</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">entries</span> <span class="p">)</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_of_entries</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;pub_freq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_entries_info</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;pub_freq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;tags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s">&quot;term&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;tags&quot;</span><span class="p">]]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;tags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c"># save whole feedparser object</span>
+    <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">]</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">ifs</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="c"># Omezujeme se jen na prvni 25 clanku</span></div>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<div class="viewcode-block" id="vytahni_info_clanku"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.vytahni_info_clanku">[docs]</a><span class="k">def</span> <span class="nf">vytahni_info_clanku</span><span class="p">(</span> <span class="n">lc</span> <span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">lc</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[:</span><span class="mi">25</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
+    <span class="n">chtene</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;authors&quot;</span> <span class="p">:</span> <span class="s">&quot;author&quot;</span><span class="p">,</span>
+              <span class="s">&quot;links&quot;</span> <span class="p">:</span> <span class="s">&quot;link&quot;</span><span class="p">,</span>
+              <span class="s">&quot;titles&quot;</span> <span class="p">:</span> <span class="s">&quot;title&quot;</span><span class="p">,</span>
+              <span class="s">&quot;summaries&quot;</span> <span class="p">:</span> <span class="s">&quot;summary&quot;</span><span class="p">,</span>
+              <span class="s">&quot;tagsOfEntries&quot;</span> <span class="p">:</span> <span class="s">&quot;tags&quot;</span>
+            <span class="p">}</span>
+    <span class="k">for</span> <span class="n">clanek</span> <span class="ow">in</span> <span class="n">lc</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">chtene</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">clanek</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span> <span class="p">)</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">nourisher  documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

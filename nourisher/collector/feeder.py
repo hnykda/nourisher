@@ -22,8 +22,16 @@ def number_of_entries_per_day( entries, n_of_entries ):
     return( ( 24 * 3600 ) / pub_freq.total_seconds() )
 
 def extract_feed_info( url ):
+
+    import datetime
+
     d = feedparser.parse( url )
+
     ifs = {}
+
+    # when we started parsing?
+    ifs["feedparsingTime"] = tuple( datetime.datetime.now().timetuple() )
+
     for att in iaf:
         try:
             atrib = d.feed[att]
@@ -63,6 +71,8 @@ def extract_feed_info( url ):
 
     # save whole feedparser object
     ifs["entries"] = d["entries"]
+
+
     return( pd.Series( ifs ) )
 
 
@@ -82,7 +92,10 @@ def polish_entries_info( lc ):
               "links" : "link",
               "titles" : "title",
               "summaries" : "summary",
-              "tagsOfEntries" : "tags"
+              "tagsOfEntries" : "tags",
+              "publishedParsed" : "published_parsed",
+              "updatedParsed" : "updated_parsed",
+              "baseHtmls" : "base"
             }
     for clanek in lc:
         for key, val in chtene.items():
@@ -170,7 +183,7 @@ def get_entries_info( entriesInfo ):
             poc = len( pageSoup.findAll( tag ) )
             dtb[nm].append( poc )
 
-        dtb["rawHtmlOfPage"].append( pageSoup )
+        dtb["rawHtmlOfPage"].append( str( pageSoup ) )
 
     return( pd.Series( dtb ) )
 
@@ -263,6 +276,12 @@ def feed_that_all( url ):
     entrieInfo = get_entries_info( entriesPolished )
     entriesSim = get_url_info( entrieInfo, entriesPolished.titles )
 
-    total = defaultInfo.append( [entriesPolished, entrieInfo, entriesSim] )
+    # feedparser object of entries is no longer needed
+    defaultInfo.drop( "entries", inplace = True )
+
+    entriesTotal = pd.Series( [entriesPolished, entrieInfo, entriesSim] )
+
+    # thanks to mongo we do not feer structured data
+    total = defaultInfo.append( pd.Series ( {"entries" : entriesTotal } ) )
 
     return( total )

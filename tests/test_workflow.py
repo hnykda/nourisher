@@ -19,13 +19,8 @@ from nourisher.collector.feeder import get_entries_info
 
 print( nour.data )
 
-nour.data
+print( type( nour.data ) )
+print( nour.data.shape )
 
-#
-# with open( "exp.json", "w" ) as ofile:
-#     try:
-#         import json
-#         json.dump( nour.data, ofile )
-#     except:
-#         import pickle
-#         pickle.dump( nour.data, ofile )
+with open( "exp.json", "w" ) as ofile:
+    ofile.write( nour.data.to_json() )

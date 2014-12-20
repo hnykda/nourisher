@@ -57,13 +57,11 @@ class Nourisher:
         if self.check_response( self.origFeedUrl ) == True:
             pass
         else:
-            print( "Page is not responding! Returning None! - sorry for that" )
+            print( "Page is not responding! Returning None!" )
             return( None )
 
         from .collector import collector
 
-        harve = collector.collect_all( self.origFeedUrl )
-
-        self.data = harve
+        self.data = collector.collect_all( self.origFeedUrl )
 
         return()

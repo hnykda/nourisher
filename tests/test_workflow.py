@@ -23,6 +23,8 @@ class TestWorkflow( unittest.TestCase ):
         self.assertEqual( nour.data.shape, ( 17, ) )
 
     def test_db_save_and_load( self ):
+
+        """Tohle predelat pomoci push/get db"""
         from pymongo import MongoClient
 
         client = MongoClient( "localhost", 5432 )

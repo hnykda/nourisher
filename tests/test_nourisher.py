@@ -6,7 +6,7 @@ Created on Dec 19, 2014
 import unittest
 
 from nourisher.nourisher import  Nourisher
-from urllib.error import URLError
+
 testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
 fakeBadUrl = 'http://nonexistingurljustfortests.badass'
 

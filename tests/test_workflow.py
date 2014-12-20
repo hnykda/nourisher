@@ -29,18 +29,15 @@ class TestWorkflow( unittest.TestCase ):
         db = client.testdb
         feeds = db.feeds
 
-        jsoned = nour.data.to_json()
+        dictator = nour.data.to_dict()
 
-        with open( "jsoned.json", "w" ) as ofile:
-            ofile.write( jsoned )
-
-        with open( "jsoned.json", "r" ) as ifile:
-            import json
-            r = json.loads( ifile.read() )
-
-        insid = feeds.insert( r )
+        insid = feeds.insert( dictator )
 
         retr = feeds.find( {"_id":insid } )[0]
         client.disconnect()
 
         self.assertEqual( retr["href"], nour.data["href"] )
+        # self.assertEqual( retr["entries"], nour.data["entries"] )
+
+# TestWorkflow().test_Flow()
+# TestWorkflow().test_db_save_and_load()

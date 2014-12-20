@@ -124,11 +124,17 @@ def get_entries_info( entriesInfo ):
         # this is because requests follow redirects,
         # hence it ends up on true address
         artURL = requests.get( plink ).url
-        dtb["final_url"].append( artURL )
+        dtb["finalUrl"].append( artURL )
+
+
 
         art = nwsp.Article( artURL )
         art.download()
         art.parse()
+        art.nlp()
+
+        dtb["sourceURL"].append( art.source_url )
+        dtb["aerticleKeywords"].append( art.keywords )
 
         # get text of an article
         artText = art.text
@@ -209,7 +215,7 @@ def get_url_info( entriesInfo, titles ):
     check_let = lambda x: True if x.isalpha() == True else False
 
     corespTitles = titles
-    links = entriesInfo.final_url
+    links = entriesInfo.finalUrl
     storeD = defaultdict( list )
 
     for title, link in zip( corespTitles, links ):
@@ -279,9 +285,9 @@ def feed_that_all( url ):
     # feedparser object of entries is no longer needed
     defaultInfo.drop( "entries", inplace = True )
 
-    entriesTotal = pd.Series( [entriesPolished, entrieInfo, entriesSim] )
+    entriesTotal = pd.concat( [entriesPolished, entrieInfo, entriesSim] )
 
     # thanks to mongo we do not feer structured data
-    total = defaultInfo.append( pd.Series ( {"entries" : entriesTotal } ) )
+    total = defaultInfo.append( pd.Series ( {"entries" : entriesTotal.to_dict() } ) )
 
     return( total )

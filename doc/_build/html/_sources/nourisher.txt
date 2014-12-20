@@ -19,6 +19,14 @@ nourisher.nourisher module
     :undoc-members:
     :show-inheritance:
 
+nourisher.utiliser module
+-------------------------
+
+.. automodule:: nourisher.utiliser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

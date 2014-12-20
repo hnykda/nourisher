@@ -69,28 +69,6 @@ saves them inside database and return info</p>
 <div class="section" id="module-nourisher.collector.feeder">
 <span id="nourisher-collector-feeder-module"></span><h2>nourisher.collector.feeder module<a class="headerlink" href="#module-nourisher.collector.feeder" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="nourisher.collector.feeder.check_similarity">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">check_similarity</tt><big>(</big><em>entriesInfo</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#check_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.check_similarity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Zjistuje, zda se url shoduje s title clanku
-je tam primitivni ucelova funkce (delsi slova prispeji vice)
-jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Zere Panda serii, kterou vyhazuje funkce vytahni_info_clanku()</strong></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="nourisher.collector.feeder.extract_entries_info">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">extract_entries_info</tt><big>(</big><em>entries</em>, <em>n_of_entries</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#extract_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.extract_entries_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vrati kolik clanku dava feed za jeden den</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="nourisher.collector.feeder.extract_feed_info">
 <tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">extract_feed_info</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#extract_feed_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.extract_feed_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -102,8 +80,37 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="nourisher.collector.feeder.vytahni_info_clanku">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">vytahni_info_clanku</tt><big>(</big><em>lc</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#vytahni_info_clanku"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.vytahni_info_clanku" title="Permalink to this definition">¶</a></dt>
+<dt id="nourisher.collector.feeder.get_entries_info">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_entries_info</tt><big>(</big><em>entriesInfo</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_entries_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zere to, co vyplyvne polish_entries_info()</p>
+<p>ziskat to info, co predtim delal goose</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.collector.feeder.get_url_info">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_url_info</tt><big>(</big><em>entriesInfo</em>, <em>titles</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_url_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_url_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zjistuje, zda se url shoduje s title clanku
+je tam primitivni ucelova funkce (delsi slova prispeji vice)
+jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ASI NE! - Zere Panda serii, kterou vyhazuje funkce polish_entries_info()</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.collector.feeder.number_of_entries_per_day">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">number_of_entries_per_day</tt><big>(</big><em>entries</em>, <em>n_of_entries</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#number_of_entries_per_day"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.number_of_entries_per_day" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vrati kolik clanku dava feed za jeden den</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.collector.feeder.polish_entries_info">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">polish_entries_info</tt><big>(</big><em>lc</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#polish_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.polish_entries_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vytahne info o clancich z dictu</p>
 </dd></dl>
 

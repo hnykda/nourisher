@@ -51,8 +51,6 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">feedparser</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">pip._vendor.pkg_resources</span> <span class="kn">import</span> <span class="n">get_entry_info</span>
-<span class="kn">from</span> <span class="nn">mock</span> <span class="kn">import</span> <span class="n">inplace</span>
 
 <span class="c"># atributy, co mě u feedu zajímají</span>
 <span class="c"># prvni uroven feedparser objectu, bozo je je kvalita formátování feedu</span>
@@ -65,7 +63,7 @@
         <span class="s">&quot;published_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;updated_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;tags&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="extract_entries_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.extract_entries_info">[docs]</a><span class="k">def</span> <span class="nf">extract_entries_info</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">):</span>
+<div class="viewcode-block" id="number_of_entries_per_day"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.number_of_entries_per_day">[docs]</a><span class="k">def</span> <span class="nf">number_of_entries_per_day</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Vrati kolik clanku dava feed za jeden den&quot;&quot;&quot;</span>
 
     <span class="n">published_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span> <span class="n">entry</span><span class="p">[</span><span class="s">&quot;published&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">]</span>
@@ -74,8 +72,16 @@
     <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span> <span class="p">)</span> <span class="o">/</span> <span class="n">pub_freq</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="extract_feed_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.extract_feed_info">[docs]</a><span class="k">def</span> <span class="nf">extract_feed_info</span><span class="p">(</span> <span class="n">url</span> <span class="p">):</span>
+
+    <span class="kn">import</span> <span class="nn">datetime</span>
+
     <span class="n">d</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+
     <span class="n">ifs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c"># when we started parsing?</span>
+    <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;feedparsingTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span> <span class="p">)</span>
+
     <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">iaf</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">atrib</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">feed</span><span class="p">[</span><span class="n">att</span><span class="p">]</span>
@@ -104,7 +110,7 @@
         <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;pub_freq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_entries_info</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">)</span>
+        <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;pub_freq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">number_of_entries_per_day</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;pub_freq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -115,10 +121,14 @@
 
     <span class="c"># save whole feedparser object</span>
     <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">]</span>
+
+
     <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">ifs</span> <span class="p">)</span> <span class="p">)</span>
 
+
+
 <span class="c"># Omezujeme se jen na prvni 25 clanku</span></div>
-<div class="viewcode-block" id="vytahni_info_clanku"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.vytahni_info_clanku">[docs]</a><span class="k">def</span> <span class="nf">vytahni_info_clanku</span><span class="p">(</span> <span class="n">lc</span> <span class="p">):</span>
+<div class="viewcode-block" id="polish_entries_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.polish_entries_info">[docs]</a><span class="k">def</span> <span class="nf">polish_entries_info</span><span class="p">(</span> <span class="n">lc</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Vytahne info o clancich z dictu</span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>
@@ -132,7 +142,10 @@
               <span class="s">&quot;links&quot;</span> <span class="p">:</span> <span class="s">&quot;link&quot;</span><span class="p">,</span>
               <span class="s">&quot;titles&quot;</span> <span class="p">:</span> <span class="s">&quot;title&quot;</span><span class="p">,</span>
               <span class="s">&quot;summaries&quot;</span> <span class="p">:</span> <span class="s">&quot;summary&quot;</span><span class="p">,</span>
-              <span class="s">&quot;tagsOfEntries&quot;</span> <span class="p">:</span> <span class="s">&quot;tags&quot;</span>
+              <span class="s">&quot;tagsOfEntries&quot;</span> <span class="p">:</span> <span class="s">&quot;tags&quot;</span><span class="p">,</span>
+              <span class="s">&quot;publishedParsed&quot;</span> <span class="p">:</span> <span class="s">&quot;published_parsed&quot;</span><span class="p">,</span>
+              <span class="s">&quot;updatedParsed&quot;</span> <span class="p">:</span> <span class="s">&quot;updated_parsed&quot;</span><span class="p">,</span>
+              <span class="s">&quot;baseHtmls&quot;</span> <span class="p">:</span> <span class="s">&quot;base&quot;</span>
             <span class="p">}</span>
     <span class="k">for</span> <span class="n">clanek</span> <span class="ow">in</span> <span class="n">lc</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">chtene</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -142,16 +155,96 @@
                 <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span> <span class="p">)</span>
-
 </div>
-<div class="viewcode-block" id="check_similarity"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.check_similarity">[docs]</a><span class="k">def</span> <span class="nf">check_similarity</span><span class="p">(</span> <span class="n">entriesInfo</span> <span class="p">):</span>
+<div class="viewcode-block" id="get_entries_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.get_entries_info">[docs]</a><span class="k">def</span> <span class="nf">get_entries_info</span><span class="p">(</span> <span class="n">entriesInfo</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Zere to, co vyplyvne polish_entries_info()</span>
+<span class="sd">    </span>
+<span class="sd">    ziskat to info, co predtim delal goose</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">import</span> <span class="nn">newspaper</span> <span class="kn">as</span> <span class="nn">nwsp</span>
+    <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+    <span class="kn">from</span> <span class="nn">lxml.etree</span> <span class="kn">import</span> <span class="n">tostring</span>
+    <span class="kn">import</span> <span class="nn">requests</span>
+
+    <span class="n">links</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">links</span>
+
+    <span class="n">dtb</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">plink</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+        <span class="c"># this is because requests follow redirects,</span>
+        <span class="c"># hence it ends up on true address</span>
+        <span class="n">artURL</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">plink</span> <span class="p">)</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;final_url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">artURL</span> <span class="p">)</span>
+
+        <span class="n">art</span> <span class="o">=</span> <span class="n">nwsp</span><span class="o">.</span><span class="n">Article</span><span class="p">(</span> <span class="n">artURL</span> <span class="p">)</span>
+        <span class="n">art</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+        <span class="n">art</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+
+        <span class="c"># get text of an article</span>
+        <span class="n">artText</span> <span class="o">=</span> <span class="n">art</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="n">artText</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">artText</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">artText</span> <span class="p">)</span>
+
+        <span class="c"># counts number of specific tags in the article html code</span>
+        <span class="n">artHtm</span> <span class="o">=</span> <span class="n">tostring</span><span class="p">(</span> <span class="n">art</span><span class="o">.</span><span class="n">top_node</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;htmlText&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">artHtm</span> <span class="p">)</span>
+        <span class="n">artSoup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span> <span class="n">artHtm</span> <span class="p">)</span>
+        <span class="n">chtene</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;img&quot;</span><span class="p">,</span> <span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="s">&quot;p&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">chtene</span><span class="p">:</span>
+            <span class="n">nm</span> <span class="o">=</span> <span class="s">&quot;nTagCountsEntries_&quot;</span> <span class="o">+</span> <span class="n">tag</span>
+            <span class="n">poc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">artSoup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span> <span class="n">tag</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">dtb</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">poc</span> <span class="p">)</span>
+
+        <span class="c"># ratio length in characters of text vs. html code of the article</span>
+        <span class="n">rat</span> <span class="o">=</span> <span class="nb">len</span> <span class="p">(</span> <span class="n">artText</span> <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span> <span class="p">(</span> <span class="n">artHtm</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;textHtmlArticleRatioChars&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">rat</span> <span class="p">)</span>
+
+        <span class="c"># ratio number of words vs number of tags in an article</span>
+        <span class="c"># this is IMHO better than characters, since tags can have long names</span>
+        <span class="c"># or css styling attributes</span>
+        <span class="n">ratW</span> <span class="o">=</span> <span class="nb">len</span> <span class="p">(</span> <span class="n">artText</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span> <span class="p">(</span> <span class="n">artSoup</span><span class="o">.</span><span class="n">findAll</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;textHtmlArticleRatioWords&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">ratW</span> <span class="p">)</span>
+
+        <span class="n">pageHtml</span> <span class="o">=</span> <span class="n">art</span><span class="o">.</span><span class="n">html</span>
+        <span class="n">pageSoup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span> <span class="n">pageHtml</span> <span class="p">)</span>
+        <span class="n">strSoup</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">pageSoup</span> <span class="p">)</span>
+        <span class="n">strSoupSplit</span> <span class="o">=</span> <span class="n">strSoup</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+        <span class="c"># length of code in chars normed to text</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;htmlCodeLengthChars&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">strSoup</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="c"># length of code splitted at whitespace</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;htmlCodeLengthwhite&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">strSoupSplit</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="c"># text words vs. number of tags</span>
+        <span class="n">ratWT</span> <span class="o">=</span> <span class="nb">len</span> <span class="p">(</span> <span class="n">artText</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span> <span class="p">(</span> <span class="n">pageSoup</span><span class="o">.</span><span class="n">findAll</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;textCodeHtmlRatioWT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">ratWT</span> <span class="p">)</span>
+
+        <span class="c"># number of uppercase letters vs words ratio</span>
+        <span class="n">ratUT</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">artText</span> <span class="k">if</span> <span class="n">letter</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span> <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span> <span class="n">strSoupSplit</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;uppercaseTextRatio&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">ratUT</span> <span class="p">)</span>
+
+        <span class="c"># count all tags</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;nOfAllTagsHtml&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">pageSoup</span><span class="o">.</span><span class="n">findAll</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">wanted_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;meta&quot;</span><span class="p">,</span> <span class="s">&quot;script&quot;</span><span class="p">,</span> <span class="s">&quot;iframe&quot;</span><span class="p">,</span> <span class="s">&quot;div&quot;</span><span class="p">,</span> <span class="s">&quot;img&quot;</span><span class="p">,</span> <span class="s">&quot;p&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">wanted_tags</span><span class="p">:</span>
+            <span class="n">nm</span> <span class="o">=</span> <span class="s">&quot;nTagCountsWhole_&quot;</span> <span class="o">+</span> <span class="n">tag</span>
+            <span class="n">poc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">pageSoup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span> <span class="n">tag</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">dtb</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">poc</span> <span class="p">)</span>
+
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;rawHtmlOfPage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">pageSoup</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">dtb</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="get_url_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.get_url_info">[docs]</a><span class="k">def</span> <span class="nf">get_url_info</span><span class="p">(</span> <span class="n">entriesInfo</span><span class="p">,</span> <span class="n">titles</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Zjistuje, zda se url shoduje s title clanku</span>
 <span class="sd">    je tam primitivni ucelova funkce (delsi slova prispeji vice)</span>
 <span class="sd">    jeste navic zjisti, zda url adresa obsahuje specialni znaky</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
-<span class="sd">    Zere Panda serii, kterou vyhazuje funkce vytahni_info_clanku()</span>
+<span class="sd">    ASI NE! - Zere Panda serii, kterou vyhazuje funkce polish_entries_info()</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    -----</span>
@@ -160,15 +253,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">import</span> <span class="nn">re</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="c">#    import numpy as np</span>
     <span class="kn">from</span> <span class="nn">difflib</span> <span class="kn">import</span> <span class="n">SequenceMatcher</span>
 
     <span class="n">check_let</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span> <span class="k">else</span> <span class="bp">False</span>
 
-    <span class="n">corespTitles</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">titles</span>
-    <span class="n">links</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">links</span>
-    <span class="n">artMath</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
+    <span class="n">corespTitles</span> <span class="o">=</span> <span class="n">titles</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">final_url</span>
+    <span class="n">storeD</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">link</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">corespTitles</span><span class="p">,</span> <span class="n">links</span> <span class="p">):</span>
         <span class="n">lsp</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">link</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot;/&quot;</span> <span class="p">)[</span><span class="mi">3</span><span class="p">:]</span> <span class="p">)</span>
@@ -181,11 +273,10 @@
         <span class="n">rat</span> <span class="o">=</span> <span class="n">SequenceMatcher</span><span class="p">(</span> <span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">hled</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">ratio</span><span class="p">()</span>
 
         <span class="c"># print(&quot;Hledam: &quot;, &quot; &quot;.join(hled), &quot;\t&quot;, title, &quot;\t&quot;, rat)</span>
-        <span class="n">artMath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">rat</span> <span class="p">)</span>
+        <span class="n">storeD</span><span class="p">[</span><span class="s">&quot;matchUrlTitle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">rat</span> <span class="p">)</span>
 
 
         <span class="c"># weird occurences vs textual</span>
-
         <span class="n">numbAndWeird</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span> <span class="s">&quot;[\W|\d]+&quot;</span><span class="p">,</span> <span class="n">lsp</span> <span class="p">)</span>
         <span class="n">countDash</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s">&quot;-&quot;</span><span class="k">else</span> <span class="bp">False</span><span class="p">,</span> <span class="n">numbAndWeird</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -207,23 +298,23 @@
             <span class="n">normAllWeirds</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">for</span> <span class="n">dk</span><span class="p">,</span> <span class="n">dv</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="p">[</span><span class="s">&quot;urlCountDash&quot;</span><span class="p">,</span> <span class="s">&quot;urlCountHash&quot;</span><span class="p">,</span> <span class="s">&quot;urlAllWeirds&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">normCountDash</span><span class="p">,</span> <span class="n">normCountHash</span><span class="p">,</span> <span class="n">normAllWeirds</span><span class="p">]</span> <span class="p">):</span>
-            <span class="n">d</span><span class="p">[</span><span class="n">dk</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">dv</span> <span class="p">)</span>
+            <span class="n">storeD</span><span class="p">[</span><span class="n">dk</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">dv</span> <span class="p">)</span>
 
-    <span class="n">mns</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">artMath</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">artMath</span> <span class="p">)</span>
+<span class="c">#     mns, std = np.mean( artMath ), np.std( artMath )</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c">#     cd_m, cd_s = np.mean( storeD[&quot;urlCountDash&quot;] ), np.std( storeD[&quot;urlCountDash&quot;] )</span>
+<span class="c">#     ch_m, ch_s = np.mean( storeD[&quot;urlCountHash&quot;] ), np.std( storeD[&quot;urlCountHash&quot;] )</span>
+<span class="c">#     aw_m, aw_s = np.mean( storeD[&quot;urlAllWeirds&quot;] ), np.std( storeD[&quot;urlAllWeirds&quot;] )</span>
+<span class="c">#</span>
+<span class="c">#     cols = [&quot;matchUrlTitle_Mean&quot;, &quot;matchUrlTitle_Std&quot;,</span>
+<span class="c">#              &quot;urlCountDash_mean&quot;, &quot;urlCountDash_std&quot;,</span>
+<span class="c">#              &quot;urlCountHash_mean&quot;, &quot;urlCountHash_std&quot;,</span>
+<span class="c">#              &quot;urlAllWeirds_mean&quot;, &quot;urlAllWeirds_std&quot;]</span>
+<span class="c">#     vals = [mns, std, cd_m, cd_s, ch_m, ch_s, aw_m, aw_s]</span>
 
 
-    <span class="n">cd_m</span><span class="p">,</span> <span class="n">cd_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountDash&quot;</span><span class="p">]</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountDash&quot;</span><span class="p">]</span> <span class="p">)</span>
-    <span class="n">ch_m</span><span class="p">,</span> <span class="n">ch_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountHash&quot;</span><span class="p">]</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlCountHash&quot;</span><span class="p">]</span> <span class="p">)</span>
-    <span class="n">aw_m</span><span class="p">,</span> <span class="n">aw_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlAllWeirds&quot;</span><span class="p">]</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;urlAllWeirds&quot;</span><span class="p">]</span> <span class="p">)</span>
-
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;matchUrlTitle_Mean&quot;</span><span class="p">,</span> <span class="s">&quot;matchUrlTitle_Std&quot;</span><span class="p">,</span>
-             <span class="s">&quot;urlCountDash_mean&quot;</span><span class="p">,</span> <span class="s">&quot;urlCountDash_std&quot;</span><span class="p">,</span>
-             <span class="s">&quot;urlCountHash_mean&quot;</span><span class="p">,</span> <span class="s">&quot;urlCountHash_std&quot;</span><span class="p">,</span>
-             <span class="s">&quot;urlAllWeirds_mean&quot;</span><span class="p">,</span> <span class="s">&quot;urlAllWeirds_std&quot;</span><span class="p">]</span>
-    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">mns</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">cd_m</span><span class="p">,</span> <span class="n">cd_s</span><span class="p">,</span> <span class="n">ch_m</span><span class="p">,</span> <span class="n">ch_s</span><span class="p">,</span> <span class="n">aw_m</span><span class="p">,</span> <span class="n">aw_s</span><span class="p">]</span>
-
-
-    <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="nb">dict</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">cols</span><span class="p">,</span> <span class="n">vals</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">storeD</span> <span class="p">)</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="feed_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.feed_that_all">[docs]</a><span class="k">def</span> <span class="nf">feed_that_all</span><span class="p">(</span> <span class="n">url</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;This collect everything from above</span>
@@ -231,12 +322,20 @@
 
     <span class="n">defaultInfo</span> <span class="o">=</span> <span class="n">extract_feed_info</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
 
-    <span class="n">entriesInfo</span> <span class="o">=</span> <span class="n">vytahni_info_clanku</span><span class="p">(</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">entries</span> <span class="p">)</span>
-    <span class="n">entriesSim</span> <span class="o">=</span> <span class="n">check_similarity</span><span class="p">(</span> <span class="n">entriesInfo</span> <span class="p">)</span>
-    <span class="n">total</span> <span class="o">=</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">entriesSim</span> <span class="p">)</span>
+    <span class="n">entriesPolished</span> <span class="o">=</span> <span class="n">polish_entries_info</span><span class="p">(</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">entries</span> <span class="p">)</span>
+    <span class="n">entrieInfo</span> <span class="o">=</span> <span class="n">get_entries_info</span><span class="p">(</span> <span class="n">entriesPolished</span> <span class="p">)</span>
+    <span class="n">entriesSim</span> <span class="o">=</span> <span class="n">get_url_info</span><span class="p">(</span> <span class="n">entrieInfo</span><span class="p">,</span> <span class="n">entriesPolished</span><span class="o">.</span><span class="n">titles</span> <span class="p">)</span>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span>
-</pre></div></div>
+    <span class="c"># feedparser object of entries is no longer needed</span>
+    <span class="n">defaultInfo</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span> <span class="s">&quot;entries&quot;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+
+    <span class="n">entriesTotal</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="p">[</span><span class="n">entriesPolished</span><span class="p">,</span> <span class="n">entrieInfo</span><span class="p">,</span> <span class="n">entriesSim</span><span class="p">]</span> <span class="p">)</span>
+
+    <span class="c"># thanks to mongo we do not feer structured data</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="p">(</span> <span class="p">{</span><span class="s">&quot;entries&quot;</span> <span class="p">:</span> <span class="n">entriesTotal</span> <span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span></div>
+</pre></div>
 
           </div>
         </div>

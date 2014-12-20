@@ -16,7 +16,7 @@ class Nourisher:
         if self.check_response( _origUrlofFeed ) == True:
             pass
         else:
-            print( "Page is not responding! Do not continue!" )
+            raise URLError
 
 
     def check_response( self, origUrl ):
@@ -34,7 +34,7 @@ class Nourisher:
         from urllib.request import urlopen
 
         try:
-            urlopen( origUrl )
+            urlopen( origUrl ).status
             return( True )
         except URLError:
             return( False )

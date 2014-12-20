@@ -1,17 +1,5 @@
 import pandas as pd
-import feedparser
 from collections import defaultdict
-
-# atributy, co mě u feedu zajímají
-# prvni uroven feedparser objectu, bozo je je kvalita formátování feedu
-iafl = [ "version", "status", "bozo", "href"]
-# entries, frequence nejak nadefinovat
-iae = ["n_of_entries", "freq"]
-# feed uroven
-iaf = ["title", "subtitle", "info",
-        "language", "link", "author",
-        "published_parsed", "updated_parsed", "tags"]
-
 
 def number_of_entries_per_day( entries, n_of_entries ):
     """Vrati kolik clanku dava feed za jeden den"""
@@ -24,6 +12,7 @@ def number_of_entries_per_day( entries, n_of_entries ):
 def extract_feed_info( url ):
 
     import datetime
+    import feedparser
 
     d = feedparser.parse( url )
 
@@ -31,6 +20,14 @@ def extract_feed_info( url ):
 
     # when we started parsing?
     ifs["feedparsingTime"] = tuple( datetime.datetime.now().timetuple() )
+
+    # atributy, co mě u feedu zajímají
+    # prvni uroven feedparser objectu, bozo je je kvalita formátování feedu
+    iafl = [ "version", "status", "bozo", "href"]
+    # feed uroven
+    iaf = ["title", "subtitle", "info",
+            "language", "link", "author",
+            "published_parsed", "updated_parsed", "tags"]
 
     for att in iaf:
         try:
@@ -106,18 +103,23 @@ def polish_entries_info( lc ):
 
     return( pd.Series( d ) )
 
-def get_entries_info( entriesInfo ):
-    ''' Zere to, co vyplyvne polish_entries_info()
+def get_entries_info( links ):
+    ''' Collect all informations about entries as a list
     
-    ziskat to info, co predtim delal goose
+    Parameters
+    -----------
+    links: list of links
+    
+    Returns
+    -------
+    Informations about entries in lists
+    
     '''
 
     import newspaper as nwsp
     from bs4 import BeautifulSoup
     from lxml.etree import tostring
     import requests
-
-    links = entriesInfo.links
 
     dtb = defaultdict( list )
     for plink in links:
@@ -127,14 +129,13 @@ def get_entries_info( entriesInfo ):
         dtb["finalUrl"].append( artURL )
 
 
-
         art = nwsp.Article( artURL )
         art.download()
         art.parse()
         art.nlp()
 
         dtb["sourceURL"].append( art.source_url )
-        dtb["aerticleKeywords"].append( art.keywords )
+        dtb["articleKeywords"].append( art.keywords )
 
         # get text of an article
         artText = art.text
@@ -193,19 +194,20 @@ def get_entries_info( entriesInfo ):
 
     return( pd.Series( dtb ) )
 
-def get_url_info( entriesInfo, titles ):
+def get_url_info( links, corespTitles ):
     """Zjistuje, zda se url shoduje s title clanku
     je tam primitivni ucelova funkce (delsi slova prispeji vice)
     jeste navic zjisti, zda url adresa obsahuje specialni znaky
     
     Parameters
     -----------
-    ASI NE! - Zere Panda serii, kterou vyhazuje funkce polish_entries_info()
+    links: corresponding links of titles
+    corespTitles: corresponding titles to links
 
     Note
     -----
-    
-    Pozor! Linky uz musi byt skutecne.
+    Links comes from true end address where they were parsered by newspaper, 
+    not from the original feed
     """
 
     import re
@@ -214,8 +216,6 @@ def get_url_info( entriesInfo, titles ):
 
     check_let = lambda x: True if x.isalpha() == True else False
 
-    corespTitles = titles
-    links = entriesInfo.finalUrl
     storeD = defaultdict( list )
 
     for title, link in zip( corespTitles, links ):
@@ -223,14 +223,10 @@ def get_url_info( entriesInfo, titles ):
         title = title.lower()
         hled = re.split( '_|/|-|\+', lsp.lower() )
         hled = list( filter( check_let, hled ) )
-        # print(title, lsp, hled)
-        # zjistim, zda je nebo neni obsazeno kazde slovo
 
         rat = SequenceMatcher( None, title, " ".join( hled ) ).ratio()
 
-        # print("Hledam: ", " ".join(hled), "\t", title, "\t", rat)
         storeD["matchUrlTitle"].append( rat )
-
 
         # weird occurences vs textual
         numbAndWeird = re.findall( "[\W|\d]+", lsp )
@@ -279,8 +275,8 @@ def feed_that_all( url ):
     defaultInfo = extract_feed_info( url )
 
     entriesPolished = polish_entries_info( defaultInfo.entries )
-    entrieInfo = get_entries_info( entriesPolished )
-    entriesSim = get_url_info( entrieInfo, entriesPolished.titles )
+    entrieInfo = get_entries_info( entriesPolished.links )
+    entriesSim = get_url_info( entrieInfo.finalUrl, entriesPolished.titles )
 
     # feedparser object of entries is no longer needed
     defaultInfo.drop( "entries", inplace = True )

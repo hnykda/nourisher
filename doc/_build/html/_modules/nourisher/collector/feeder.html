@@ -156,10 +156,17 @@
 
     <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="get_entries_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.get_entries_info">[docs]</a><span class="k">def</span> <span class="nf">get_entries_info</span><span class="p">(</span> <span class="n">entriesInfo</span> <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Zere to, co vyplyvne polish_entries_info()</span>
+<div class="viewcode-block" id="get_entries_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.get_entries_info">[docs]</a><span class="k">def</span> <span class="nf">get_entries_info</span><span class="p">(</span> <span class="n">links</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Collect all informations about entries as a list</span>
 <span class="sd">    </span>
-<span class="sd">    ziskat to info, co predtim delal goose</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    links: list of links</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Informations about entries in lists</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="kn">import</span> <span class="nn">newspaper</span> <span class="kn">as</span> <span class="nn">nwsp</span>
@@ -167,18 +174,21 @@
     <span class="kn">from</span> <span class="nn">lxml.etree</span> <span class="kn">import</span> <span class="n">tostring</span>
     <span class="kn">import</span> <span class="nn">requests</span>
 
-    <span class="n">links</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">links</span>
-
     <span class="n">dtb</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
     <span class="k">for</span> <span class="n">plink</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
         <span class="c"># this is because requests follow redirects,</span>
         <span class="c"># hence it ends up on true address</span>
         <span class="n">artURL</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">plink</span> <span class="p">)</span><span class="o">.</span><span class="n">url</span>
-        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;final_url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">artURL</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;finalUrl&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">artURL</span> <span class="p">)</span>
+
 
         <span class="n">art</span> <span class="o">=</span> <span class="n">nwsp</span><span class="o">.</span><span class="n">Article</span><span class="p">(</span> <span class="n">artURL</span> <span class="p">)</span>
         <span class="n">art</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
         <span class="n">art</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+        <span class="n">art</span><span class="o">.</span><span class="n">nlp</span><span class="p">()</span>
+
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;sourceURL&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">art</span><span class="o">.</span><span class="n">source_url</span> <span class="p">)</span>
+        <span class="n">dtb</span><span class="p">[</span><span class="s">&quot;articleKeywords&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">art</span><span class="o">.</span><span class="n">keywords</span> <span class="p">)</span>
 
         <span class="c"># get text of an article</span>
         <span class="n">artText</span> <span class="o">=</span> <span class="n">art</span><span class="o">.</span><span class="n">text</span>
@@ -237,7 +247,7 @@
 
     <span class="k">return</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="n">dtb</span> <span class="p">)</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="get_url_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.get_url_info">[docs]</a><span class="k">def</span> <span class="nf">get_url_info</span><span class="p">(</span> <span class="n">entriesInfo</span><span class="p">,</span> <span class="n">titles</span> <span class="p">):</span>
+<div class="viewcode-block" id="get_url_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.get_url_info">[docs]</a><span class="k">def</span> <span class="nf">get_url_info</span><span class="p">(</span> <span class="n">links</span><span class="p">,</span> <span class="n">corespTitles</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Zjistuje, zda se url shoduje s title clanku</span>
 <span class="sd">    je tam primitivni ucelova funkce (delsi slova prispeji vice)</span>
 <span class="sd">    jeste navic zjisti, zda url adresa obsahuje specialni znaky</span>
@@ -258,8 +268,8 @@
 
     <span class="n">check_let</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span> <span class="k">else</span> <span class="bp">False</span>
 
-    <span class="n">corespTitles</span> <span class="o">=</span> <span class="n">titles</span>
-    <span class="n">links</span> <span class="o">=</span> <span class="n">entriesInfo</span><span class="o">.</span><span class="n">final_url</span>
+    <span class="c"># corespTitles = titles</span>
+    <span class="c"># links = entriesInfo.finalUrl</span>
     <span class="n">storeD</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">link</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">corespTitles</span><span class="p">,</span> <span class="n">links</span> <span class="p">):</span>
@@ -323,16 +333,16 @@
     <span class="n">defaultInfo</span> <span class="o">=</span> <span class="n">extract_feed_info</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
 
     <span class="n">entriesPolished</span> <span class="o">=</span> <span class="n">polish_entries_info</span><span class="p">(</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">entries</span> <span class="p">)</span>
-    <span class="n">entrieInfo</span> <span class="o">=</span> <span class="n">get_entries_info</span><span class="p">(</span> <span class="n">entriesPolished</span> <span class="p">)</span>
-    <span class="n">entriesSim</span> <span class="o">=</span> <span class="n">get_url_info</span><span class="p">(</span> <span class="n">entrieInfo</span><span class="p">,</span> <span class="n">entriesPolished</span><span class="o">.</span><span class="n">titles</span> <span class="p">)</span>
+    <span class="n">entrieInfo</span> <span class="o">=</span> <span class="n">get_entries_info</span><span class="p">(</span> <span class="n">entriesPolished</span><span class="o">.</span><span class="n">links</span> <span class="p">)</span>
+    <span class="n">entriesSim</span> <span class="o">=</span> <span class="n">get_url_info</span><span class="p">(</span> <span class="n">entrieInfo</span><span class="o">.</span><span class="n">finalUrl</span><span class="p">,</span> <span class="n">entriesPolished</span><span class="o">.</span><span class="n">titles</span> <span class="p">)</span>
 
     <span class="c"># feedparser object of entries is no longer needed</span>
     <span class="n">defaultInfo</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span> <span class="s">&quot;entries&quot;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
 
-    <span class="n">entriesTotal</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span> <span class="p">[</span><span class="n">entriesPolished</span><span class="p">,</span> <span class="n">entrieInfo</span><span class="p">,</span> <span class="n">entriesSim</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">entriesTotal</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span> <span class="p">[</span><span class="n">entriesPolished</span><span class="p">,</span> <span class="n">entrieInfo</span><span class="p">,</span> <span class="n">entriesSim</span><span class="p">]</span> <span class="p">)</span>
 
     <span class="c"># thanks to mongo we do not feer structured data</span>
-    <span class="n">total</span> <span class="o">=</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="p">(</span> <span class="p">{</span><span class="s">&quot;entries&quot;</span> <span class="p">:</span> <span class="n">entriesTotal</span> <span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">defaultInfo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="p">(</span> <span class="p">{</span><span class="s">&quot;entries&quot;</span> <span class="p">:</span> <span class="n">entriesTotal</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span></div>
 </pre></div>

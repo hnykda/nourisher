@@ -81,14 +81,23 @@ saves them inside database and return info</p>
 
 <dl class="function">
 <dt id="nourisher.collector.feeder.get_entries_info">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_entries_info</tt><big>(</big><em>entriesInfo</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_entries_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Zere to, co vyplyvne polish_entries_info()</p>
-<p>ziskat to info, co predtim delal goose</p>
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_entries_info</tt><big>(</big><em>links</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_entries_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect all informations about entries as a list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>links: list of links</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Informations about entries in lists</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="nourisher.collector.feeder.get_url_info">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_url_info</tt><big>(</big><em>entriesInfo</em>, <em>titles</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_url_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_url_info" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_url_info</tt><big>(</big><em>links</em>, <em>corespTitles</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_url_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_url_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Zjistuje, zda se url shoduje s title clanku
 je tam primitivni ucelova funkce (delsi slova prispeji vice)
 jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>

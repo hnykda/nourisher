@@ -36,8 +36,11 @@ class TestWorkflow( unittest.TestCase ):
         retr = feeds.find( {"_id":insid } )[0]
         client.disconnect()
 
-        self.assertEqual( retr["href"], nour.data["href"] )
-        # self.assertEqual( retr["entries"], nour.data["entries"] )
+        check_list = ['author', 'bozo', 'href', 'info', 'language', 'version',
+                      'link', 'n_of_entries', 'pub_freq', 'status', 'title',
+                     ]
+        for chck in check_list:
+            self.assertEqual( retr[chck], nour.data[chck] )
 
 # TestWorkflow().test_Flow()
 # TestWorkflow().test_db_save_and_load()

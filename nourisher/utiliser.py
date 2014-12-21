@@ -157,3 +157,71 @@ def time_to_dec( time ):
     except:
         print( "Nelze: ", time )
         return( None )
+
+def maternal_url_extractor( finalLinks ):
+    ''' Try to find out most probable maternal URL 
+    based on entries
+    
+    Parameters
+    ----------
+    True entries finalUrls
+    
+    Returns
+    -------
+    string: maternal URL (in www.maternalurl.*)
+    
+    Note
+    -----
+    Alexa is maybe better!
+    
+    '''
+
+    # beru adresu prvniho clanku
+    testUrl = finalLinks[0]
+
+    from selenium import webdriver
+
+    wdriver = webdriver.PhantomJS()
+    # wdriver = webdriver.Firefox()
+    wdriver.get( r'http://www.alexa.com/' )
+    inputField = wdriver.find_element_by_xpath( '//*[@id="alx-content"]/div/div/span/form/input' )
+    inputField.clear()
+    inputField.send_keys( testUrl )
+    inputField.submit()
+
+    text = wdriver.find_element_by_xpath( '//*[@id="js-li-last"]/span[1]/a' ).text
+
+    return( 'www.' + text )
+
+    # OK, NECHAME TO NA ALEXE!
+#     from tldextract import tldextract
+#
+#     # these are domains, which host another websites - for them
+#     # there must be added subdomain
+#     stopSites = ["blogpost.com", "wordpress.com"]
+#
+#     # these are stop words which are boring - like feeds, feed
+#     stopWords = ["feed", "feeds"]
+#
+#     regDom = []
+#     subDom = []
+#     origDom = []
+#
+#     for link in finalLinks:
+#         extr = tldextract.extract( link )
+#         reg = extr.registered_domain
+#         regDom.append( reg )
+#
+#         _sub = extr.subdomain.split( "." )
+#         subDom.append( _sub )
+#
+#
+#         if _sub[-1] == 'www':
+#             origDom = 'www' + reg
+#         # this is bad - maybe even lower higher domains should be joined
+#         elif reg in stopSites:
+#             origDom = _sub[-1] + reg
+#         elif _sub[-1] in stopWords:
+#             origDom = 'www' + reg
+#         else:
+

@@ -6,6 +6,10 @@ Created on Dec 20, 2014
 Here are some utilities that might be useful
 '''
 
+from locale import setlocale, LC_ALL
+from locale import atof
+setlocale( LC_ALL, "en_US.UTF8" )
+
 def mean_a_var_z_listu( lentry ):
     """Returns mean and std from list of numbers
     
@@ -67,3 +71,65 @@ def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
 
     return( outData )
 
+def wrangle_numbers( vst ):
+    ''' Converts string to numbers, if possible
+    
+    Handle even percents and also 
+    
+    Parameters
+    ----------
+    vst: string in form D%, D, D in en_US local, empty
+    
+    Returns
+    -------
+    float
+    
+    Note
+    -----
+    It will probably give some errors, but they can be handled 
+    by IFs (better for debugging)
+    '''
+
+    if len( vst ) > 0:
+        numb = vst[0]
+
+        # percents to [0,1]
+        if numb[-1] == "%":
+            vysl = atof( numb[:-1] ) / 100
+
+        # some webs return slash when no information are provided
+        elif numb == "-":
+            vysl = None
+
+        # the rest should work normally - this will give errors
+        else:
+            vysl = atof( numb )
+            # this was before -
+            # try:
+            #    vysl = atof(numb)
+            # except:
+            #    vysl = None
+
+    elif vst == "":
+        vysl = None
+
+
+    return( vysl )
+
+def time_to_dec( time ):
+    try:
+        t = time
+
+        # no information provided
+        if t == "-":
+            return( None )
+
+        pl = t.split( ":" )
+        minutes = atof( pl[0] )
+        secs = ( atof( pl[1] ) / 60 )
+        ttime = minutes + secs
+        return( ttime )
+
+    except:
+        print( "Nelze: ", time )
+        return( None )

@@ -1,6 +1,8 @@
 import unittest
 import pandas as pd
-
+from time import strftime
+print( "\n" )
+print( strftime( "%Y-%m-%d %H:%M:%S" ) )
 
 import os
 os.chdir( "../" )

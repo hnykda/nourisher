@@ -53,7 +53,7 @@ def push_to_db( inpObj, dbName = "testdb", collection = "feeds",
 def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
                 ip = "localhost", port = 5432 ):
 
-    ''' Get info from db by it's _id
+    ''' Get info from db by it's _id or objectid
     
     Parameters
     -----------
@@ -61,11 +61,15 @@ def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
     '''
 
     from pymongo import MongoClient
+    from bson.objectid import ObjectId
+
+    if type( idOfO ) == str:
+        idOfO = ObjectId( idOfO )
 
     client = MongoClient( ip, port )
     db = client[dbName][collection]
 
-    outData = db.find( idOfO )
+    outData = db.find_one( {'_id' : idOfO} )
 
     client.disconnect()
 

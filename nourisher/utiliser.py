@@ -33,6 +33,10 @@ def push_to_db( inpObj, dbName = "testdb", collection = "feeds",
     Parameters
     -----------
     inpObj: Series (is converted to dict), dict, or something pymongo can serialize to JSON
+    
+    Returns
+    -------
+    ObjectID: ObjectID of inserted document    
     '''
 
     import pandas as pd
@@ -74,6 +78,22 @@ def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
     client.disconnect()
 
     return( outData )
+
+def get_id_of_last_inserted( dbName = "testdb", collection = "feeds",
+                ip = "localhost", port = 5432 ):
+    '''Get ObjectID of last inserted document
+    from pymongo import MongoClient
+    
+    Returns
+    -------
+    ObjectID: last inserted document to collection
+    '''
+    from pymongo import MongoClient
+    client = MongoClient( ip, port )
+    db = client[dbName][collection]
+
+    return ( db.find().sort( '_id' )[db.count() - 1]['_id'] )
+
 
 def wrangle_numbers( vst ):
     ''' Converts string to numbers, if possible

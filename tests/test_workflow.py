@@ -13,6 +13,7 @@ testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
 
 
 from nourisher.nourisher import Nourisher
+from nourisher.utiliser import push_to_db, get_from_db
 
 nour = Nourisher( testingUrl )
 
@@ -25,20 +26,9 @@ class TestWorkflow( unittest.TestCase ):
         self.assertEqual( nour.data.shape, ( 17, ) )
 
     def test_db_save_and_load( self ):
-
-        """Tohle predelat pomoci push/get db"""
-        from pymongo import MongoClient
-
-        client = MongoClient( "localhost", 5432 )
-        db = client.testdb
-        feeds = db.feeds
-
         dictator = nour.data.to_dict()
-
-        insid = feeds.insert( dictator )
-
-        retr = feeds.find( {"_id":insid } )[0]
-        client.disconnect()
+        insId = push_to_db( dictator )
+        retr = get_from_db( insId )
 
         check_list = ['author', 'bozo', 'href', 'info', 'language', 'version',
                       'link', 'n_of_entries', 'pub_freq', 'status', 'title',

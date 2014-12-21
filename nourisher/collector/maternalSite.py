@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 class Scraper:
     ''' This is common interface for all scrapers, 
@@ -28,11 +29,8 @@ class Scraper:
 
     baseURL = ""
     maternalURL = ""
-    # textWantedSingle = {}
-    # textWantedDouble = {}
     scrapedData = None
     nameOfInputField = ""
-    # this is selenium phantomJS scraper
     driver = None
 
 
@@ -55,8 +53,12 @@ class Scraper:
         # wdriver = webdriver.Firefox()
         wdriver.get( r'http://' + _baseURL )
         inputField = wdriver.find_element_by_xpath( _xpathOfInputField )
+        inputField.clear()
         inputField.send_keys( _maternalURL )
         inputField.submit()
+
+        # what happens if no informations are provided
+
 
         # TODO: get printscreen of that page and save it
 
@@ -65,7 +67,6 @@ class Scraper:
     def selxs( self, xpath ):
         '''this is just shortage for finding ALL matching fields'''
 
-        # TODO: not sure how this is handled in selenium
         elems = self.driver.find_elements_by_xpath( xpath )
         res = [value.text for value in elems]
 
@@ -74,7 +75,12 @@ class Scraper:
     def selx( self, xpath ):
         '''this is just shortage for finding ONE matching fields'''
 
-        return( self.driver.find_element_by_xpath( xpath ).text )
+        try:
+            res = self.driver.find_element_by_xpath( xpath ).text
+        except NoSuchElementException:
+            res = None
+
+        return( res )
 
     def collect_textual_singles( self, textWantedSingle ):
         '''Collects all text from items in textWantedSingle
@@ -91,6 +97,14 @@ class Scraper:
 
         return( xitems )
 
+    def collect_textual_singles_lists( self, textWantedSingleList ):
+        '''For attributes in type key: [val1, val2, ...]'''
+
+        xitems = {}
+        for key, xpath in textWantedSingleList.items():
+            xitems[key] = self.selxs( xpath )
+
+        return( xitems )
 
     def _collect_two_zip( self, Axpath, Bxpath ):
         '''It's common to get data in two collumns (e.g. in tables)
@@ -193,80 +207,85 @@ class Websiteout( Scraper ):
 
     # TODO: jeste pridat estimWorth
     webout_singles = {
-                    "link" : '//*[@id="right"]/table[1]/tr[1]/td[2]/span/span',
-                    "pageviewsPerDay" : '//*[@id="right"]/table[1]/tr[2]/td[2]',
-                    "makingUSD" : '//*[@id="right"]/table[1]/tr[3]/td[2]',
-                    "websiteoutRank" : '//*[@id="right"]/table[1]/tr[4]/td[2]/span[1]',
-                    "backlingsYahoo" : '//*[@id="right"]/table[2]/tr[3]/td[2]',
-                    "traficRank" : '//*[@id="right"]/table[2]/tr[1]/td[2]',
-                    'pageRank' : '//*[@id="right"]/table[2]/tr[2]/td[2]',
+                    "link" : '//*[@id="right"]/table[1]/tbody/tr[1]/td[2]/span/span',
+                    "pageviewsPerDay" : '//*[@id="right"]/table[1]/tbody/tr[2]/td[2]',
+                    "dailyUSD" : '//*[@id="right"]/table[1]/tbody/tr[3]/td[2]',
+                    "websiteoutRank" : '//*[@id="right"]/table[1]/tbody/tr[4]/td[2]/span[1]',
+                    "backlingsYahoo" : '//*[@id="right"]/table[2]/tbody/tr[3]/td[2]',
+                    "traficRank" : '//*[@id="right"]/table[2]/tbody/tr[1]/td[2]',
+                    'pageRank' : '//*[@id="right"]/table[2]/tbody/tr[2]/td[2]',
                     }
 
     def collect_that_all( self ):
         total = {}
         singles = self.collect_textual_singles( self.webout_singles )
 
+        categories = self.selxs( '//*[@id="right"]/table[2]/tbody/tr[4]/td[2]/ol/li/a' )
 
-        # TODO: spatne! dodelat - zkratka ziskat kategorie
-        categories = ( '//*[@id="right"]/table[2]/tr[4]/td[2]/ol/li/a/text()' ).extract()
+        otherSites = self.selxs( '//*[@id="right"]/table[7]/tbody/tr[2]/td[1]/ol/li/a' )
 
-        # TODO: dodelat
-        xitems['otherWebsites'] = sel.xpath( '//*[@id="right"]/table[7]/tr[2]/td[1]/ol/li[1]/a/text()' )
+        # estimated worth
+        text = self.selxs( '//*[@id="right"]/div[3]/p' )
+        splText = text[0].split()
+        splText.reverse()
+        iDofWorth = splText.index( "USD" )
+        total.update( {'estimatedWorth' : splText[iDofWorth - 1] } )
 
         total.update( singles )
-        total.update( categories )
-        total.update( otherWebsites )
+        total.update( {'categories' : categories} )
+        total.update( {'otherSites' : otherSites} )
 
         self.scrapedData = total
 
 class Urlm( Scraper ):
     '''Holder for data from Urlm.com informations'''
 
+    # TODO: Needs a lot of polishin - specially age, category, sitesLinkingIn/Out, popPages
+
     urlm_singles = {
                     'link' : '/html/body/div[1]/div[2]/div/div[1]/div[1]/span',
-                    'global_rank' : '//*[@id="summary"]/div[1]/p[2]/span[1]',
-                    'in_country' : '//*[@id="summary"]/div[1]/p[1]/span[2]',
-                    'rank_in_country' : '//*[@id="summary"]/div[1]/p[1]/span[1]',
-                    'monthly_pages_viewed' : '//*[@id="summary"]/div[2]/table/tbody/tr[1]/td[2]',
-                    'monthly_visits' : '//*[@id="summary"]/div[2]/table/tbody/tr[2]/td[2]',
-                    'value_per_vis' : '//*[@id="summary"]/div[2]/table/tbody/tr[3]/td[2]',
-                    'estimated_worth' : '//*[@id="summary"]/div[2]/table/tbody/tr[4]/td[2]',
-                    'external_links' : '//*[@id="summary"]/div[2]/table/tbody/tr[5]/td[2]',
-                    'number_of_pages' : '//*[@id="summary"]/div[2]/table/tbody/tr[6]/td[2]',
+                    'globalRank' : '//*[@id="summary"]/div[1]/p[2]/span[1]',
+                    'inCountry' : '//*[@id="summary"]/div[1]/p[1]/span[2]',
+                    'rankInCountry' : '//*[@id="summary"]/div[1]/p[1]/span[1]',
+                    'monthlyPagesViewed' : '//*[@id="summary"]/div[2]/table/tbody/tr[1]/td[2]',
+                    'monthlyVisits' : '//*[@id="summary"]/div[2]/table/tbody/tr[2]/td[2]',
+                    'valuePerVis' : '//*[@id="summary"]/div[2]/table/tbody/tr[3]/td[2]',
+                    'estimatedWorth' : '//*[@id="summary"]/div[2]/table/tbody/tr[4]/td[2]',
+                    'externalLinks' : '//*[@id="summary"]/div[2]/table/tbody/tr[5]/td[2]',
+                    'numberOfPages' : '//*[@id="summary"]/div[2]/table/tbody/tr[6]/td[2]',
                     'topics' : '//*[@id="web"]/p[1]',
                     'category' : '//*[@id="web"]/p[2]',
-                    'info_per_day' : '//*[@id="web"]/p[3]',
+                    'infoPerDay' : '//*[@id="web"]/p[3]',
+                    }
+    urlm_singles_lists = {'sitesLinkingIn' : '//*[@id="web"]/ul[2]/li',
+                          'sitesLinkingOut' : '//*[@id="web"]/ul[3]/li',
+                          'popPages' : '//*[@id="web"]/ul[1]/li',
+                          }
+
+    urlm_doubles = { 'rankPerCountries' : ( '//*[@id="summary"]/div[5]/table/tr/td[1]',
+                                           '//*[@id="summary"]/div[5]/table/tr/td[2]' ),
+                    'average90Days' : ( '//*[@id="visitors"]/table[3]/tr/th',
+                                       '//*[@id="visitors"]/table[3]/tr/td[2]' ),
                     }
 
     def collect_that_all( self ):
         total = {}
 
         singles = self.collect_textual_singles( self.urlm_singles )
+        _singlesLists = self.collect_textual_singles_lists( self.urlm_singles_lists )
 
+        # take out first rubish
+        singlesLists = {}
+        for key, listik in _singlesLists.items():
+            singlesLists[key] = listik[1:]
 
-        # TODO: odtud dolu predelat
-        # ranks in countries
-        ranks_countries = sel.xpath( '//*[@id="summary"]/div[5]/table/tr/td[1]/text()' ).extract()
-        countries = sel.xpath( '//*[@id="summary"]/div[5]/table/tr/td[2]/text()' ).extract()
-        xitems["rankPerCountries"] = dict( zip( countries, ranks_countries ) )
+        doubles = self.collect_textual_doubles( self.urlm_doubles )
 
-        # traffic history 90 day average
-        name_ave = sel.xpath( '//*[@id="visitors"]/table[3]/tr/th/text()' ).extract()
-        avergs = sel.xpath( '//*[@id="visitors"]/table[3]/tr/td[1]/text()' ).extract()[1:]
-        change_ave = sel.xpath( '//*[@id="visitors"]/table[3]/tr/td[2]/text()' ).extract()
-        xitems['average_90_days'] = dict( zip( name_ave, zip( avergs, change_ave ) ) )
+        total.update( singles )
+        total.update( singlesLists )
+        total.update( doubles )
 
-        # siteslinkingin
-        xitems['sitesLinkingIn'] = sel.xpath( '//*[@id="web"]/ul[2]/li/text()' ).extract()
-
-        # sites linking out
-        xitems['sitesLinkingOut'] = sel.xpath( '//*[@id="web"]/ul[3]/li/text()' ).extract()
-
-        xitems['location_info'] = sel.xpath( '//*[@id="web"]/table/tr/td/text()' ).extract()[1:]
-
-        # popular pages
-        xitems['popPages'] = sel.xpath( '//*[@id="web"]/ul[1]/li/text()' ).extract()
-
+        self.scrapedData = total
 
 def collect_alexa( maternalURL ):
     ### ALEXA ###
@@ -275,7 +294,7 @@ def collect_alexa( maternalURL ):
     return( alexa.scrapedData )
 
 def collect_websiteout( maternalURL ):
-    websiteout = Websiteout( maternalURL, "www.websiteoutlook", '//*[@id="header"]/form/input[1]' )
+    websiteout = Websiteout( maternalURL, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' )
     websiteout.collect_that_all()
     return ( websiteout.scrapedData )
 

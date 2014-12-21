@@ -49,19 +49,7 @@
             
   <h1>Source code for nourisher.collector.feeder</h1><div class="highlight"><pre>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">feedparser</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-
-<span class="c"># atributy, co mě u feedu zajímají</span>
-<span class="c"># prvni uroven feedparser objectu, bozo je je kvalita formátování feedu</span>
-<span class="n">iafl</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;version&quot;</span><span class="p">,</span> <span class="s">&quot;status&quot;</span><span class="p">,</span> <span class="s">&quot;bozo&quot;</span><span class="p">,</span> <span class="s">&quot;href&quot;</span><span class="p">]</span>
-<span class="c"># entries, frequence nejak nadefinovat</span>
-<span class="n">iae</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">]</span>
-<span class="c"># feed uroven</span>
-<span class="n">iaf</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;subtitle&quot;</span><span class="p">,</span> <span class="s">&quot;info&quot;</span><span class="p">,</span>
-        <span class="s">&quot;language&quot;</span><span class="p">,</span> <span class="s">&quot;link&quot;</span><span class="p">,</span> <span class="s">&quot;author&quot;</span><span class="p">,</span>
-        <span class="s">&quot;published_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;updated_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;tags&quot;</span><span class="p">]</span>
-
 
 <div class="viewcode-block" id="number_of_entries_per_day"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.number_of_entries_per_day">[docs]</a><span class="k">def</span> <span class="nf">number_of_entries_per_day</span><span class="p">(</span> <span class="n">entries</span><span class="p">,</span> <span class="n">n_of_entries</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Vrati kolik clanku dava feed za jeden den&quot;&quot;&quot;</span>
@@ -74,6 +62,7 @@
 <div class="viewcode-block" id="extract_feed_info"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.feeder.extract_feed_info">[docs]</a><span class="k">def</span> <span class="nf">extract_feed_info</span><span class="p">(</span> <span class="n">url</span> <span class="p">):</span>
 
     <span class="kn">import</span> <span class="nn">datetime</span>
+    <span class="kn">import</span> <span class="nn">feedparser</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
 
@@ -81,6 +70,14 @@
 
     <span class="c"># when we started parsing?</span>
     <span class="n">ifs</span><span class="p">[</span><span class="s">&quot;feedparsingTime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span> <span class="p">)</span>
+
+    <span class="c"># atributy, co mě u feedu zajímají</span>
+    <span class="c"># prvni uroven feedparser objectu, bozo je je kvalita formátování feedu</span>
+    <span class="n">iafl</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;version&quot;</span><span class="p">,</span> <span class="s">&quot;status&quot;</span><span class="p">,</span> <span class="s">&quot;bozo&quot;</span><span class="p">,</span> <span class="s">&quot;href&quot;</span><span class="p">]</span>
+    <span class="c"># feed uroven</span>
+    <span class="n">iaf</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;subtitle&quot;</span><span class="p">,</span> <span class="s">&quot;info&quot;</span><span class="p">,</span>
+            <span class="s">&quot;language&quot;</span><span class="p">,</span> <span class="s">&quot;link&quot;</span><span class="p">,</span> <span class="s">&quot;author&quot;</span><span class="p">,</span>
+            <span class="s">&quot;published_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;updated_parsed&quot;</span><span class="p">,</span> <span class="s">&quot;tags&quot;</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">iaf</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -254,12 +251,13 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
-<span class="sd">    ASI NE! - Zere Panda serii, kterou vyhazuje funkce polish_entries_info()</span>
+<span class="sd">    links: corresponding links of titles</span>
+<span class="sd">    corespTitles: corresponding titles to links</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    -----</span>
-<span class="sd">    </span>
-<span class="sd">    Pozor! Linky uz musi byt skutecne.</span>
+<span class="sd">    Links comes from true end address where they were parsered by newspaper, </span>
+<span class="sd">    not from the original feed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">import</span> <span class="nn">re</span>
@@ -268,8 +266,6 @@
 
     <span class="n">check_let</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span> <span class="k">else</span> <span class="bp">False</span>
 
-    <span class="c"># corespTitles = titles</span>
-    <span class="c"># links = entriesInfo.finalUrl</span>
     <span class="n">storeD</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">link</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">corespTitles</span><span class="p">,</span> <span class="n">links</span> <span class="p">):</span>
@@ -277,14 +273,10 @@
         <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">hled</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&#39;_|/|-|\+&#39;</span><span class="p">,</span> <span class="n">lsp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="p">)</span>
         <span class="n">hled</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="n">check_let</span><span class="p">,</span> <span class="n">hled</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="c"># print(title, lsp, hled)</span>
-        <span class="c"># zjistim, zda je nebo neni obsazeno kazde slovo</span>
 
         <span class="n">rat</span> <span class="o">=</span> <span class="n">SequenceMatcher</span><span class="p">(</span> <span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">hled</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">ratio</span><span class="p">()</span>
 
-        <span class="c"># print(&quot;Hledam: &quot;, &quot; &quot;.join(hled), &quot;\t&quot;, title, &quot;\t&quot;, rat)</span>
         <span class="n">storeD</span><span class="p">[</span><span class="s">&quot;matchUrlTitle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">rat</span> <span class="p">)</span>
-
 
         <span class="c"># weird occurences vs textual</span>
         <span class="n">numbAndWeird</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span> <span class="s">&quot;[\W|\d]+&quot;</span><span class="p">,</span> <span class="n">lsp</span> <span class="p">)</span>

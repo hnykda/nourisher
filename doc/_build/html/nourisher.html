@@ -63,6 +63,9 @@
 <li class="toctree-l2"><a class="reference internal" href="nourisher.collector.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nourisher.collector.html#module-nourisher.collector.collector">nourisher.collector.collector module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nourisher.collector.html#module-nourisher.collector.feeder">nourisher.collector.feeder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nourisher.collector.html#module-nourisher.collector.maternalSite">nourisher.collector.maternalSite module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="nourisher.collector.html#module-nourisher.collector">Module contents</a></li>
 </ul>
 </li>
@@ -158,6 +161,35 @@
 <p>&#64;author: dan</p>
 <p>Here are some utilities that might be useful</p>
 <dl class="function">
+<dt id="nourisher.utiliser.get_from_db">
+<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">get_from_db</tt><big>(</big><em>idOfO</em>, <em>dbName='testdb'</em>, <em>collection='feeds'</em>, <em>ip='localhost'</em>, <em>port=5432</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#get_from_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.get_from_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get info from db by it&#8217;s _id or objectid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>idOfO: ID of object in database</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.utiliser.get_id_of_last_inserted">
+<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">get_id_of_last_inserted</tt><big>(</big><em>dbName='testdb'</em>, <em>collection='feeds'</em>, <em>ip='localhost'</em>, <em>port=5432</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#get_id_of_last_inserted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.get_id_of_last_inserted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ObjectID of last inserted document
+from pymongo import MongoClient</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">ObjectID: last inserted document to collection</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="nourisher.utiliser.mean_a_var_z_listu">
 <tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">mean_a_var_z_listu</tt><big>(</big><em>lentry</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#mean_a_var_z_listu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.mean_a_var_z_listu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns mean and std from list of numbers</p>
@@ -168,6 +200,44 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Array of numbers</strong></td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(mean, std)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.utiliser.push_to_db">
+<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">push_to_db</tt><big>(</big><em>inpObj</em>, <em>dbName='testdb'</em>, <em>collection='feeds'</em>, <em>ip='localhost'</em>, <em>port=5432</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#push_to_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.push_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves inpObj to MongoDB and returns it&#8217;s _id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inpObj: Series (is converted to dict), dict, or something pymongo can serialize to JSON</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ObjectID: ObjectID of inserted document</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.utiliser.time_to_dec">
+<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">time_to_dec</tt><big>(</big><em>time</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#time_to_dec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.time_to_dec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="nourisher.utiliser.wrangle_numbers">
+<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">wrangle_numbers</tt><big>(</big><em>vst</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#wrangle_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.wrangle_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts string to numbers, if possible</p>
+<p>Handle even percents and also</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vst: string in form D%, D, D in en_US local, empty</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float</td>
 </tr>
 </tbody>
 </table>

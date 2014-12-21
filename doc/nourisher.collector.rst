@@ -20,6 +20,14 @@ nourisher.collector.feeder module
     :undoc-members:
     :show-inheritance:
 
+nourisher.collector.maternalSite module
+---------------------------------------
+
+.. automodule:: nourisher.collector.maternalSite
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

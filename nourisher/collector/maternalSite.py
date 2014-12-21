@@ -19,12 +19,6 @@ class Scraper:
     textWanteddouble: Dict in format {nameOfCollection : (keys : vals )}, these
     are pairs columns (e.g. tables) from which we want to extract text 
     scrapedData: All data which were scraped
-    
-    Note
-    ----
-    TODO: xpaths could be probably be replaced by better selector
-    methods, since selenium is capable of many different approaches  
-        
     '''
 
     baseURL = ""
@@ -205,7 +199,6 @@ class Websiteout( Scraper ):
     ''' This is holder for Websiteoutlook.com informations
     '''
 
-    # TODO: jeste pridat estimWorth
     webout_singles = {
                     "link" : '//*[@id="right"]/table[1]/tbody/tr[1]/td[2]/span/span',
                     "pageviewsPerDay" : '//*[@id="right"]/table[1]/tbody/tr[2]/td[2]',
@@ -287,8 +280,56 @@ class Urlm( Scraper ):
 
         self.scrapedData = total
 
+
+### RANKS ###
+
+class Ranker( Scraper ):
+    '''Holder for ranks'''
+
+    _rankNames = ['r_google',
+         'r_alexa',
+         'r_compete',
+         'r_mozrank',
+         'r_seznam',
+         'r_jyxo',
+         'r_backlinks_g',
+         'r_majestic',
+         'r_site_explorer',
+         'r_facebook',
+         'r_twitter',
+         'r_plusone_g'
+         ]
+
+    def to_digit( self, lex_numb ):
+        """Prevede rank na cislo, je-li to mozne"""
+        from locale import atof
+        numb = ""
+        try:
+            if ( lex_numb == "N/A" ):
+                numb = None
+            elif "/" in lex_numb:
+                val = lex_numb.split( "/" )[0]
+                if "-" in val:
+                    numb = None
+                else:
+                    numb = atof( val )
+            # for google backlinks
+            elif ";" in lex_numb:
+                numb = lex_numb
+            else:
+                numb = atof( lex_numb )
+        except ValueError:
+            # print( "Chyba prevodu: ", lex_numb, ". Vracim stejny string." )
+            numb = lex_numb
+        return( numb )
+
+    def collect_that_all( self ):
+        _ranks = self.selxs( '//*[@id="content"]/center/table/tbody/tr/td[2]' )
+        ranks = [self.to_digit( lexNumb ) for lexNumb in _ranks]
+
+        self.scrapedData = dict( zip( self._rankNames, ranks ) )
+
 def collect_alexa( maternalURL ):
-    ### ALEXA ###
     alexa = Alexa( maternalURL, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
     alexa.collect_that_all()
     return( alexa.scrapedData )
@@ -303,6 +344,11 @@ def collect_urlm( maternalURL ):
     urlm.collect_that_all()
     return( urlm.scrapedData )
 
+def collect_ranks( maternalURL ):
+    ranks = Ranker( maternalURL, "pagerank.jklir.net", '//*[@id="url"]' )
+    ranks.collect_that_all()
+    return( ranks.scrapedData )
+
 def maternal_that_all( maternalURL ):
     ''' An ultimate function that will return information from all maternal scrapers
     '''
@@ -311,5 +357,6 @@ def maternal_that_all( maternalURL ):
     total.update( {"alexa" : collect_alexa( maternalURL ) } )
     total.update( {"websiteout" : collect_websiteout( maternalURL ) } )
     total.update( {"urlm" : collect_urlm( maternalURL ) } )
+    total.update( {'ranks' : collect_ranks( maternalURL ) } )
 
     return( total )

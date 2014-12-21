@@ -49,15 +49,25 @@
             
   <h1>Source code for nourisher.collector.collector</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">.feeder</span> <span class="kn">import</span> <span class="n">feed_that_all</span>
+<span class="kn">from</span> <span class="nn">nourisher.collector.maternalSite</span> <span class="kn">import</span> <span class="n">maternal_that_all</span>
+<span class="kn">from</span> <span class="nn">..utiliser</span> <span class="kn">import</span> <span class="n">maternal_url_extractor</span>
 
 <div class="viewcode-block" id="collect_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.collector.collect_all">[docs]</a><span class="k">def</span> <span class="nf">collect_all</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Collects maximum informations about feed,</span>
 <span class="sd">        saves them inside database and return info</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="n">feed</span> <span class="o">=</span> <span class="n">feed_that_all</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">feed</span> <span class="p">)</span></div>
+    <span class="n">feedInfo</span> <span class="o">=</span> <span class="n">feed_that_all</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">)</span>
+    <span class="n">finUrls</span> <span class="o">=</span> <span class="n">feedInfo</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">][</span><span class="s">&quot;finalUrl&quot;</span><span class="p">]</span>
+    <span class="n">maternalUrlByAlexa</span> <span class="o">=</span> <span class="n">maternal_url_extractor</span><span class="p">(</span> <span class="n">finUrls</span> <span class="p">)</span>
+    <span class="n">maternalInfo</span> <span class="o">=</span> <span class="n">maternal_that_all</span><span class="p">(</span> <span class="n">maternalUrlByAlexa</span> <span class="p">)</span>
+
+    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">feedInfo</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="p">)</span>
+    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">maternalInfo</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span></div>
 </pre></div>
 
           </div>

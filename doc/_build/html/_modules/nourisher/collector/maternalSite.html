@@ -69,12 +69,6 @@
 <span class="sd">    textWanteddouble: Dict in format {nameOfCollection : (keys : vals )}, these</span>
 <span class="sd">    are pairs columns (e.g. tables) from which we want to extract text </span>
 <span class="sd">    scrapedData: All data which were scraped</span>
-<span class="sd">    </span>
-<span class="sd">    Note</span>
-<span class="sd">    ----</span>
-<span class="sd">    TODO: xpaths could be probably be replaced by better selector</span>
-<span class="sd">    methods, since selenium is capable of many different approaches  </span>
-<span class="sd">        </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">baseURL</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
@@ -255,7 +249,6 @@
     <span class="sd">&#39;&#39;&#39; This is holder for Websiteoutlook.com informations</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="c"># TODO: jeste pridat estimWorth</span>
     <span class="n">webout_singles</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s">&quot;link&quot;</span> <span class="p">:</span> <span class="s">&#39;//*[@id=&quot;right&quot;]/table[1]/tbody/tr[1]/td[2]/span/span&#39;</span><span class="p">,</span>
                     <span class="s">&quot;pageviewsPerDay&quot;</span> <span class="p">:</span> <span class="s">&#39;//*[@id=&quot;right&quot;]/table[1]/tbody/tr[2]/td[2]&#39;</span><span class="p">,</span>
@@ -336,9 +329,57 @@
         <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">doubles</span> <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">scrapedData</span> <span class="o">=</span> <span class="n">total</span>
+
+
+<span class="c">### RANKS ###</span>
+</div></div>
+<div class="viewcode-block" id="Ranker"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker">[docs]</a><span class="k">class</span> <span class="nc">Ranker</span><span class="p">(</span> <span class="n">Scraper</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Holder for ranks&#39;&#39;&#39;</span>
+
+    <span class="n">_rankNames</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;r_google&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_alexa&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_compete&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_mozrank&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_seznam&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_jyxo&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_backlinks_g&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_majestic&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_site_explorer&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_facebook&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_twitter&#39;</span><span class="p">,</span>
+         <span class="s">&#39;r_plusone_g&#39;</span>
+         <span class="p">]</span>
+
+<div class="viewcode-block" id="Ranker.to_digit"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker.to_digit">[docs]</a>    <span class="k">def</span> <span class="nf">to_digit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">lex_numb</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Prevede rank na cislo, je-li to mozne&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">locale</span> <span class="kn">import</span> <span class="n">atof</span>
+        <span class="n">numb</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">lex_numb</span> <span class="o">==</span> <span class="s">&quot;N/A&quot;</span> <span class="p">):</span>
+                <span class="n">numb</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="s">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">lex_numb</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">lex_numb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot;/&quot;</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s">&quot;-&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="n">numb</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">numb</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
+            <span class="c"># for google backlinks</span>
+            <span class="k">elif</span> <span class="s">&quot;;&quot;</span> <span class="ow">in</span> <span class="n">lex_numb</span><span class="p">:</span>
+                <span class="n">numb</span> <span class="o">=</span> <span class="n">lex_numb</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">numb</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">lex_numb</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c"># print( &quot;Chyba prevodu: &quot;, lex_numb, &quot;. Vracim stejny string.&quot; )</span>
+            <span class="n">numb</span> <span class="o">=</span> <span class="n">lex_numb</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">numb</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Ranker.collect_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker.collect_that_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_that_all</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="n">_ranks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;content&quot;]/center/table/tbody/tr/td[2]&#39;</span> <span class="p">)</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">to_digit</span><span class="p">(</span> <span class="n">lexNumb</span> <span class="p">)</span> <span class="k">for</span> <span class="n">lexNumb</span> <span class="ow">in</span> <span class="n">_ranks</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scrapedData</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rankNames</span><span class="p">,</span> <span class="n">ranks</span> <span class="p">)</span> <span class="p">)</span>
 </div></div>
 <div class="viewcode-block" id="collect_alexa"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_alexa">[docs]</a><span class="k">def</span> <span class="nf">collect_alexa</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
-    <span class="c">### ALEXA ###</span>
     <span class="n">alexa</span> <span class="o">=</span> <span class="n">Alexa</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.alexa.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39;</span> <span class="p">)</span>
     <span class="n">alexa</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">alexa</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
@@ -353,6 +394,11 @@
     <span class="n">urlm</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">urlm</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
 </div>
+<div class="viewcode-block" id="collect_ranks"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_ranks">[docs]</a><span class="k">def</span> <span class="nf">collect_ranks</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
+    <span class="n">ranks</span> <span class="o">=</span> <span class="n">Ranker</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;pagerank.jklir.net&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">)</span>
+    <span class="n">ranks</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">ranks</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
+</div>
 <div class="viewcode-block" id="maternal_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.maternal_that_all">[docs]</a><span class="k">def</span> <span class="nf">maternal_that_all</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; An ultimate function that will return information from all maternal scrapers</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -361,6 +407,7 @@
     <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;alexa&quot;</span> <span class="p">:</span> <span class="n">collect_alexa</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
     <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;websiteout&quot;</span> <span class="p">:</span> <span class="n">collect_websiteout</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
     <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;urlm&quot;</span> <span class="p">:</span> <span class="n">collect_urlm</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;ranks&#39;</span> <span class="p">:</span> <span class="n">collect_ranks</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span></div>
 </pre></div>

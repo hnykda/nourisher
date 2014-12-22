@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nourisher.utiliser &mdash; nourisher  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="nourisher  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">nourisher  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for nourisher.utiliser</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Created on Dec 20, 2014</span>
+
+<span class="sd">@author: dan</span>
+
+<span class="sd">Here are some utilities that might be useful</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">locale</span> <span class="kn">import</span> <span class="n">setlocale</span><span class="p">,</span> <span class="n">LC_ALL</span>
+<span class="kn">from</span> <span class="nn">locale</span> <span class="kn">import</span> <span class="n">atof</span>
+<span class="n">setlocale</span><span class="p">(</span> <span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&quot;en_US.UTF8&quot;</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="mean_a_var_z_listu"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.mean_a_var_z_listu">[docs]</a><span class="k">def</span> <span class="nf">mean_a_var_z_listu</span><span class="p">(</span> <span class="n">lentry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns mean and std from list of numbers</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    Array of numbers</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (mean, std)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+    <span class="k">return</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">lentry</span> <span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span> <span class="n">lentry</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="push_to_db"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.push_to_db">[docs]</a><span class="k">def</span> <span class="nf">push_to_db</span><span class="p">(</span> <span class="n">inpObj</span><span class="p">,</span> <span class="n">dbName</span> <span class="o">=</span> <span class="s">&quot;testdb&quot;</span><span class="p">,</span> <span class="n">collection</span> <span class="o">=</span> <span class="s">&quot;feeds&quot;</span><span class="p">,</span>
+                <span class="n">ip</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">5432</span> <span class="p">):</span>
+
+    <span class="sd">&#39;&#39;&#39; Saves inpObj to MongoDB and returns it&#39;s _id</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    inpObj: Series (is converted to dict), dict, or something pymongo can serialize to JSON</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ObjectID: ObjectID of inserted document    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span> <span class="n">inpObj</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="p">):</span>
+        <span class="n">inpObj</span> <span class="o">=</span> <span class="n">inpObj</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
+
+    <span class="n">insID</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="n">inpObj</span> <span class="p">)</span>
+
+    <span class="n">client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">insID</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="get_from_db"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.get_from_db">[docs]</a><span class="k">def</span> <span class="nf">get_from_db</span><span class="p">(</span> <span class="n">idOfO</span><span class="p">,</span> <span class="n">dbName</span> <span class="o">=</span> <span class="s">&quot;testdb&quot;</span><span class="p">,</span> <span class="n">collection</span> <span class="o">=</span> <span class="s">&quot;feeds&quot;</span><span class="p">,</span>
+                <span class="n">ip</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">5432</span> <span class="p">):</span>
+
+    <span class="sd">&#39;&#39;&#39; Get info from db by it&#39;s _id or objectid</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    idOfO: ID of object in database</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+    <span class="kn">from</span> <span class="nn">bson.objectid</span> <span class="kn">import</span> <span class="n">ObjectId</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span> <span class="n">idOfO</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">idOfO</span> <span class="o">=</span> <span class="n">ObjectId</span><span class="p">(</span> <span class="n">idOfO</span> <span class="p">)</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
+
+    <span class="n">outData</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;_id&#39;</span> <span class="p">:</span> <span class="n">idOfO</span><span class="p">}</span> <span class="p">)</span>
+
+    <span class="n">client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">outData</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="get_id_of_last_inserted"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.get_id_of_last_inserted">[docs]</a><span class="k">def</span> <span class="nf">get_id_of_last_inserted</span><span class="p">(</span> <span class="n">dbName</span> <span class="o">=</span> <span class="s">&quot;testdb&quot;</span><span class="p">,</span> <span class="n">collection</span> <span class="o">=</span> <span class="s">&quot;feeds&quot;</span><span class="p">,</span>
+                <span class="n">ip</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">5432</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Get ObjectID of last inserted document</span>
+<span class="sd">    from pymongo import MongoClient</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ObjectID: last inserted document to collection</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">(</span> <span class="n">db</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="s">&#39;_id&#39;</span> <span class="p">)[</span><span class="n">db</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s">&#39;_id&#39;</span><span class="p">]</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="wrangle_numbers"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.wrangle_numbers">[docs]</a><span class="k">def</span> <span class="nf">wrangle_numbers</span><span class="p">(</span> <span class="n">vst</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Converts string to numbers, if possible</span>
+<span class="sd">    </span>
+<span class="sd">    Handle even percents and also </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vst: string in form D%, D, D in en_US local, empty</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    It will probably give some errors, but they can be handled </span>
+<span class="sd">    by IFs (better for debugging)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="n">vst</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">numb</span> <span class="o">=</span> <span class="n">vst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c"># percents to [0,1]</span>
+        <span class="k">if</span> <span class="n">numb</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;%&quot;</span><span class="p">:</span>
+            <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">numb</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
+
+        <span class="c"># some webs return slash when no information are provided</span>
+        <span class="k">elif</span> <span class="n">numb</span> <span class="o">==</span> <span class="s">&quot;-&quot;</span><span class="p">:</span>
+            <span class="n">vysl</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c"># the rest should work normally - this will give errors</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">numb</span> <span class="p">)</span>
+            <span class="c"># this was before -</span>
+            <span class="c"># try:</span>
+            <span class="c">#    vysl = atof(numb)</span>
+            <span class="c"># except:</span>
+            <span class="c">#    vysl = None</span>
+
+    <span class="k">elif</span> <span class="n">vst</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">vysl</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">vysl</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="time_to_dec"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.time_to_dec">[docs]</a><span class="k">def</span> <span class="nf">time_to_dec</span><span class="p">(</span> <span class="n">time</span> <span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">time</span>
+
+        <span class="c"># no information provided</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s">&quot;-&quot;</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
+
+        <span class="n">pl</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot;:&quot;</span> <span class="p">)</span>
+        <span class="n">minutes</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">pl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="p">(</span> <span class="n">atof</span><span class="p">(</span> <span class="n">pl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">60</span> <span class="p">)</span>
+        <span class="n">ttime</span> <span class="o">=</span> <span class="n">minutes</span> <span class="o">+</span> <span class="n">secs</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">ttime</span> <span class="p">)</span>
+
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span> <span class="s">&quot;Nelze: &quot;</span><span class="p">,</span> <span class="n">time</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="maternal_url_extractor"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.maternal_url_extractor">[docs]</a><span class="k">def</span> <span class="nf">maternal_url_extractor</span><span class="p">(</span> <span class="n">finalLinks</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Try to find out most probable maternal URL </span>
+<span class="sd">    based on entries</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    True entries finalUrls</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    string: maternal URL (in www.maternalurl.*)</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    Alexa is maybe better!</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># beru adresu prvniho clanku</span>
+    <span class="n">testUrl</span> <span class="o">=</span> <span class="n">finalLinks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+
+    <span class="n">wdriver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">PhantomJS</span><span class="p">()</span>
+    <span class="c"># wdriver = webdriver.Firefox()</span>
+    <span class="n">wdriver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s">r&#39;http://www.alexa.com/&#39;</span> <span class="p">)</span>
+    <span class="n">inputField</span> <span class="o">=</span> <span class="n">wdriver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39;</span> <span class="p">)</span>
+    <span class="n">inputField</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">inputField</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span> <span class="n">testUrl</span> <span class="p">)</span>
+    <span class="n">inputField</span><span class="o">.</span><span class="n">submit</span><span class="p">()</span>
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">wdriver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;js-li-last&quot;]/span[1]/a&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="s">&#39;www.&#39;</span> <span class="o">+</span> <span class="n">text</span> <span class="p">)</span>
+
+    <span class="c"># OK, NECHAME TO NA ALEXE!</span>
+<span class="c">#     from tldextract import tldextract</span>
+<span class="c">#</span>
+<span class="c">#     # these are domains, which host another websites - for them</span>
+<span class="c">#     # there must be added subdomain</span>
+<span class="c">#     stopSites = [&quot;blogpost.com&quot;, &quot;wordpress.com&quot;]</span>
+<span class="c">#</span>
+<span class="c">#     # these are stop words which are boring - like feeds, feed</span>
+<span class="c">#     stopWords = [&quot;feed&quot;, &quot;feeds&quot;]</span>
+<span class="c">#</span>
+<span class="c">#     regDom = []</span>
+<span class="c">#     subDom = []</span>
+<span class="c">#     origDom = []</span>
+<span class="c">#</span>
+<span class="c">#     for link in finalLinks:</span>
+<span class="c">#         extr = tldextract.extract( link )</span>
+<span class="c">#         reg = extr.registered_domain</span>
+<span class="c">#         regDom.append( reg )</span>
+<span class="c">#</span>
+<span class="c">#         _sub = extr.subdomain.split( &quot;.&quot; )</span>
+<span class="c">#         subDom.append( _sub )</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c">#         if _sub[-1] == &#39;www&#39;:</span>
+<span class="c">#             origDom = &#39;www&#39; + reg</span>
+<span class="c">#         # this is bad - maybe even lower higher domains should be joined</span>
+<span class="c">#         elif reg in stopSites:</span>
+<span class="c">#             origDom = _sub[-1] + reg</span>
+<span class="c">#         elif _sub[-1] in stopWords:</span>
+<span class="c">#             origDom = &#39;www&#39; + reg</span>
+<span class="c">#         else:</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">nourisher  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

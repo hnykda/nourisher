@@ -1,17 +1,18 @@
-import pandas as pd
 from collections import defaultdict
+from nourisher import settings as setl, utiliser
 
 def number_of_entries_per_day( entries, n_of_entries ):
     """Vrati kolik clanku dava feed za jeden den"""
 
-    published_times = [pd.to_datetime( entry["published"] ) for entry in entries]
-    pub_t = pd.TimeSeries( published_times )
+    from pandas import to_datetime, TimeSeries
+    published_times = [to_datetime( entry["published"] ) for entry in entries]
+    pub_t = TimeSeries( published_times )
     pub_freq = ( pub_t.max() - pub_t.min() ) / n_of_entries
     return( ( 24 * 3600 ) / pub_freq.total_seconds() )
 
 def extract_feed_info( url ):
 
-    import datetime
+    from datetime import datetime
     import feedparser
 
     d = feedparser.parse( url )
@@ -19,7 +20,7 @@ def extract_feed_info( url ):
     ifs = {}
 
     # when we started parsing?
-    ifs["feedparsingTime"] = tuple( datetime.datetime.now().timetuple() )
+    ifs["feedparsingTime"] = tuple( datetime.now().timetuple() )
 
     # atributy, co mě u feedu zajímají
     # prvni uroven feedparser objectu, bozo je je kvalita formátování feedu
@@ -70,7 +71,7 @@ def extract_feed_info( url ):
     ifs["entries"] = d["entries"]
 
 
-    return( pd.Series( ifs ) )
+    return( dict( ifs ) )
 
 
 
@@ -101,7 +102,7 @@ def polish_entries_info( lc ):
             except:
                 d[key] = []
 
-    return( pd.Series( d ) )
+    return( dict( d ) )
 
 def get_entries_info( links ):
     ''' Collect all informations about entries as a list
@@ -123,76 +124,97 @@ def get_entries_info( links ):
 
     dtb = defaultdict( list )
     for plink in links:
-        # this is because requests follow redirects,
-        # hence it ends up on true address
-        artURL = requests.get( plink ).url
-        dtb["finalUrl"].append( artURL )
+        utiliser.informer( plink )
+        # TODO: This is wrong - values are now mixed (not that anybody cares...)
+        try:
+            # this is because requests follow redirects,
+            # hence it ends up on true address
+            artURL = requests.get( plink ).url
+            dtb["finalUrl"].append( artURL )
 
+            art = nwsp.Article( artURL )
+            art.download()
+            art.parse()
+            art.nlp()
 
-        art = nwsp.Article( artURL )
-        art.download()
-        art.parse()
-        art.nlp()
+            dtb["sourceURL"].append( art.source_url )
+            dtb["articleKeywords"].append( art.keywords )
 
-        dtb["sourceURL"].append( art.source_url )
-        dtb["articleKeywords"].append( art.keywords )
+            pageHtml = art.html
+            pageSoup = BeautifulSoup( pageHtml )
+            strSoup = str( pageSoup )
+            strSoupSplit = strSoup.split()
 
-        # get text of an article
-        artText = art.text
-        if artText == '':
-            artText = None
-        dtb["text"].append( artText )
+            # length of code in chars normed to text
+            dtb["htmlCodeLengthChars"].append( len( strSoup ) )
+            # length of code splitted at whitespace
+            dtb["htmlCodeLengthwhite"].append( len( strSoupSplit ) )
 
-        # counts number of specific tags in the article html code
-        artHtm = tostring( art.top_node )
-        dtb["htmlText"].append( artHtm )
-        artSoup = BeautifulSoup( artHtm )
-        chtene = ["img", "div", "p"]
-        for tag in chtene:
-            nm = "nTagCountsEntries_" + tag
-            poc = len( artSoup.findAll( tag ) )
-            dtb[nm].append( poc )
+            # count all tags
+            dtb["nOfAllTagsHtml"].append( len( pageSoup.findAll() ) )
 
-        # ratio length in characters of text vs. html code of the article
-        rat = len ( artText ) / len ( artHtm )
-        dtb["textHtmlArticleRatioChars"].append( rat )
+            wanted_tags = ["meta", "script", "iframe", "div", "img", "p"]
+            for tag in wanted_tags:
+                nm = "nTagCountsWhole_" + tag
+                poc = len( pageSoup.findAll( tag ) )
+                dtb[nm].append( poc )
 
-        # ratio number of words vs number of tags in an article
-        # this is IMHO better than characters, since tags can have long names
-        # or css styling attributes
-        ratW = len ( artText.split() ) / len ( artSoup.findAll() )
-        dtb["textHtmlArticleRatioWords"].append( ratW )
+            # get text of an article
+            artText = art.text
+            if artText == '':
+                artText = None
+            dtb["text"].append( artText )
 
-        pageHtml = art.html
-        pageSoup = BeautifulSoup( pageHtml )
-        strSoup = str( pageSoup )
-        strSoupSplit = strSoup.split()
+            # counts number of specific tags in the article html code
+            try:
+                artHtm = tostring( art.top_node )
+                dtb["htmlText"].append( artHtm )
+                artSoup = BeautifulSoup( artHtm )
+                chtene = ["img", "div", "p"]
+                for tag in chtene:
+                    nm = "nTagCountsEntries_" + tag
+                    poc = len( artSoup.findAll( tag ) )
+                    dtb[nm].append( poc )
 
-        # length of code in chars normed to text
-        dtb["htmlCodeLengthChars"].append( len( strSoup ) )
-        # length of code splitted at whitespace
-        dtb["htmlCodeLengthwhite"].append( len( strSoupSplit ) )
+                # ratio length in characters of text vs. html code of the article
+                rat = len ( artText ) / len ( artHtm )
+                dtb["textHtmlArticleRatioChars"].append( rat )
 
-        # text words vs. number of tags
-        ratWT = len ( artText.split() ) / len ( pageSoup.findAll() )
-        dtb["textCodeHtmlRatioWT"].append( ratWT )
+                # ratio number of words vs number of tags in an article
+                # this is IMHO better than characters, since tags can have long names
+                # or css styling attributes
+                ratW = len ( artText.split() ) / len ( artSoup.findAll() )
+                dtb["textHtmlArticleRatioWords"].append( ratW )
 
-        # number of uppercase letters vs words ratio
-        ratUT = sum( 1 for letter in artText if letter.isupper() ) / len( strSoupSplit )
-        dtb["uppercaseTextRatio"].append( ratUT )
+                # text words vs. number of tags
+                ratWT = len ( artText.split() ) / len ( pageSoup.findAll() )
+                dtb["textCodeHtmlRatioWT"].append( ratWT )
 
-        # count all tags
-        dtb["nOfAllTagsHtml"].append( len( pageSoup.findAll() ) )
+                # number of uppercase letters vs words ratio
+                ratUT = sum( 1 for letter in artText if letter.isupper() ) / len( strSoupSplit )
+                dtb["uppercaseTextRatio"].append( ratUT )
 
-        wanted_tags = ["meta", "script", "iframe", "div", "img", "p"]
-        for tag in wanted_tags:
-            nm = "nTagCountsWhole_" + tag
-            poc = len( pageSoup.findAll( tag ) )
-            dtb[nm].append( poc )
+            # if there is no text, there is no reason why to continue
+            except TypeError:
+                noTextConsequence = ['htmlText',
+                                     'nTagCountsEntries_div',
+                                     'nTagCountsEntries_img',
+                                     'nTagCountsEntries_p',
+                                     'textCodeHtmlRatioWT',
+                                     'textHtmlArticleRatioChars',
+                                     'textHtmlArticleRatioWords',
+                                     'uppercaseTextRatio',
+                                     ]
 
-        dtb["rawHtmlOfPage"].append( str( pageSoup ) )
+                for notAble in noTextConsequence:
+                    dtb[notAble].append( None )
 
-    return( pd.Series( dtb ) )
+            # Not needed
+            # dtb["rawHtmlOfPage"].append( str( pageSoup ) )
+        except TypeError:
+            pass
+
+    return( dict( dtb ) )
 
 def get_url_info( links, corespTitles ):
     """Zjistuje, zda se url shoduje s title clanku
@@ -266,7 +288,7 @@ def get_url_info( links, corespTitles ):
 #     vals = [mns, std, cd_m, cd_s, ch_m, ch_s, aw_m, aw_s]
 
 
-    return( pd.Series( storeD ) )
+    return( dict( storeD ) )
 
 def feed_that_all( url ):
     '''This collect everything from above
@@ -274,16 +296,20 @@ def feed_that_all( url ):
 
     defaultInfo = extract_feed_info( url )
 
-    entriesPolished = polish_entries_info( defaultInfo.entries )
-    entrieInfo = get_entries_info( entriesPolished.links )
-    entriesSim = get_url_info( entrieInfo.finalUrl, entriesPolished.titles )
+    entriesPolished = polish_entries_info( defaultInfo["entries"] )
+    entrieInfo = get_entries_info( entriesPolished["links"] )
+    entriesSim = get_url_info( entrieInfo["finalUrl"], entriesPolished["titles"] )
 
     # feedparser object of entries is no longer needed
-    defaultInfo.drop( "entries", inplace = True )
+    defaultInfo.pop( "entries" )
 
-    entriesTotal = pd.concat( [entriesPolished, entrieInfo, entriesSim] )
+    entriesTotal = {}
+    for diction in [entriesPolished, entrieInfo, entriesSim]:
+        entriesTotal.update( diction )
 
-    # thanks to mongo we do not feer structured data
-    total = defaultInfo.append( pd.Series ( {"entries" : entriesTotal.to_dict() } ) )
+    # thanks to mongo we do not fear structured data
+    total = {}
+    total.update( defaultInfo )
+    total.update( {"entries" : entriesTotal } )
 
     return( total )

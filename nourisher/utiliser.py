@@ -6,9 +6,18 @@ Created on Dec 20, 2014
 Here are some utilities that might be useful
 '''
 
-from locale import setlocale, LC_ALL
-from locale import atof
+from locale import setlocale, LC_ALL, atof
+from nourisher import settings as lset
+from pymongo import MongoClient
+
 setlocale( LC_ALL, "en_US.UTF8" )
+
+def informer( msg ):
+
+    if lset.VERBOSITY == 0:
+        pass
+    elif lset.VERBOSITY == 1:
+        print( msg )
 
 def mean_a_var_z_listu( lentry ):
     """Returns mean and std from list of numbers
@@ -25,8 +34,8 @@ def mean_a_var_z_listu( lentry ):
 
     return ( np.mean( lentry ), np.std( lentry ) )
 
-def push_to_db( inpObj, dbName = "testdb", collection = "feeds",
-                ip = "localhost", port = 5432 ):
+def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
+                ip = lset.DB_IP, port = lset.DB_PORT ):
 
     ''' Saves inpObj to MongoDB and returns it's _id
     
@@ -43,7 +52,6 @@ def push_to_db( inpObj, dbName = "testdb", collection = "feeds",
     if type( inpObj ) == type( pd.Series ):
         inpObj = inpObj.to_dict()
 
-    from pymongo import MongoClient
 
     client = MongoClient( ip, port )
     db = client[dbName][collection]
@@ -54,8 +62,8 @@ def push_to_db( inpObj, dbName = "testdb", collection = "feeds",
 
     return( insID )
 
-def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
-                ip = "localhost", port = 5432 ):
+def get_from_db( idOfO, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
+                ip = lset.DB_IP, port = lset.DB_PORT ):
 
     ''' Get info from db by it's _id or objectid
     
@@ -64,7 +72,6 @@ def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
     idOfO: ID of object in database
     '''
 
-    from pymongo import MongoClient
     from bson.objectid import ObjectId
 
     if type( idOfO ) == str:
@@ -73,14 +80,14 @@ def get_from_db( idOfO, dbName = "testdb", collection = "feeds",
     client = MongoClient( ip, port )
     db = client[dbName][collection]
 
-    outData = db.find_one( {'_id' : idOfO} )
+    outData = db.find_one( {'_id' : idOfO}, {"_id" : 0} )
 
     client.disconnect()
 
     return( outData )
 
-def get_id_of_last_inserted( dbName = "testdb", collection = "feeds",
-                ip = "localhost", port = 5432 ):
+def get_id_of_last_inserted( dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
+                ip = lset.DB_IP, port = lset.DB_PORT ):
     '''Get ObjectID of last inserted document
     from pymongo import MongoClient
     
@@ -88,75 +95,40 @@ def get_id_of_last_inserted( dbName = "testdb", collection = "feeds",
     -------
     ObjectID: last inserted document to collection
     '''
-    from pymongo import MongoClient
     client = MongoClient( ip, port )
     db = client[dbName][collection]
 
-    return ( db.find().sort( '_id' )[db.count() - 1]['_id'] )
+    return ( db.find().sort( '_id', -1 )[0]["_id"] )
 
-
-def wrangle_numbers( vst ):
-    ''' Converts string to numbers, if possible
-    
-    Handle even percents and also 
+def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
+                ip = lset.DB_IP, port = lset.DB_PORT ):
+    '''Update object in db
     
     Parameters
-    ----------
-    vst: string in form D%, D, D in en_US local, empty
-    
-    Returns
-    -------
-    float
-    
-    Note
-    -----
-    It will probably give some errors, but they can be handled 
-    by IFs (better for debugging)
+    -----------
+    finder: dict by which we should find {key : value}
+    key: under this name value will be added
+    value: data to add under key
     '''
+    client = MongoClient( ip, port )
+    db = client[dbName][collection]
 
-    if len( vst ) > 0:
-        numb = vst[0]
+    res = db.update( finder, {"$set" : {key: value}} )
+    return( res )
 
-        # percents to [0,1]
-        if numb[-1] == "%":
-            vysl = atof( numb[:-1] ) / 100
+def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
+                ip = lset.DB_IP, port = lset.DB_PORT ):
+    '''Try to find object by original URL of feed'''
 
-        # some webs return slash when no information are provided
-        elif numb == "-":
-            vysl = None
+    client = MongoClient( ip, port )
+    db = client[dbName][collection]
 
-        # the rest should work normally - this will give errors
-        else:
-            vysl = atof( numb )
-            # this was before -
-            # try:
-            #    vysl = atof(numb)
-            # except:
-            #    vysl = None
-
-    elif vst == "":
-        vysl = None
-
-
-    return( vysl )
-
-def time_to_dec( time ):
     try:
-        t = time
+        res = db.find( {"origURL" : origUrl} ).sort( '_id', -1 )[0]["_id"]
+    except IndexError:
+        res = None
 
-        # no information provided
-        if t == "-":
-            return( None )
-
-        pl = t.split( ":" )
-        minutes = atof( pl[0] )
-        secs = ( atof( pl[1] ) / 60 )
-        ttime = minutes + secs
-        return( ttime )
-
-    except:
-        print( "Nelze: ", time )
-        return( None )
+    return( res )
 
 def maternal_url_extractor( finalLinks ):
     ''' Try to find out most probable maternal URL 
@@ -224,4 +196,3 @@ def maternal_url_extractor( finalLinks ):
 #         elif _sub[-1] in stopWords:
 #             origDom = 'www' + reg
 #         else:
-

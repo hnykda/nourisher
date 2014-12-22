@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from nourisher.settings import DEFAULT_DRIVER
 
 class Scraper:
     ''' This is common interface for all scrapers, 
@@ -28,41 +29,65 @@ class Scraper:
     driver = None
 
 
-    def __init__( self, _maternalURL, _baseURL, _xpathOfInputField ):
+    def __init__( self, _maternalURL, _baseURL, _xpathOfInputField, browser = DEFAULT_DRIVER ):
         ''' Init
         
         Parameters
         ----------
         _xpathOfInputField: name of field where is the input field for
         maternal URL
+        browser: one of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR"]
         '''
 
         self.baseURL = _baseURL
-        # self.textWantedSingle = _textWantedSingle
 
-        # if _textWantedDouble != None:
-            # self.textWantedDouble = _textWantedDouble
+        if browser == "phantomjs":
+            wdriver = webdriver.PhantomJS()
+        elif browser == "phantomjsTOR":
+            serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']
+            wdriver = webdriver.PhantomJS( service_args = serviceArgs )
+        elif browser == "firefox":
+            wdriver = webdriver.Firefox()
+        elif browser == "firefoxTOR":
+            profile = webdriver.FirefoxProfile()
+            profile.set_preference( 'network.proxy.type', 1 )
+            profile.set_preference( 'network.proxy.socks', 'localhost' )
+            profile.set_preference( 'network.proxy.socks_port', 9050 )
+            wdriver = webdriver.Firefox( profile )
 
-        wdriver = webdriver.PhantomJS()
-        # wdriver = webdriver.Firefox()
         wdriver.get( r'http://' + _baseURL )
         inputField = wdriver.find_element_by_xpath( _xpathOfInputField )
         inputField.clear()
         inputField.send_keys( _maternalURL )
         inputField.submit()
 
-        # what happens if no informations are provided
+        # what happens if no informations are available
+        try:
+            if self.check_unavailability( wdriver ) == True:
+                wdriver.close()
+                raise RuntimeError ( "No available data from this Scraper" )
+        except NoSuchElementException:
+            pass
 
 
         # TODO: get printscreen of that page and save it
 
         self.driver = wdriver
 
+    def check_unavailability( self, wdriver ):
+        """Returns True if no informations are available"""
+
+        # children must implement
+        raise NotImplementedError
+
     def selxs( self, xpath ):
         '''this is just shortage for finding ALL matching fields'''
 
-        elems = self.driver.find_elements_by_xpath( xpath )
-        res = [value.text for value in elems]
+        try:
+            elems = self.driver.find_elements_by_xpath( xpath )
+            res = [value.text for value in elems]
+        except NoSuchElementException:
+            res = None
 
         return( res )
 
@@ -109,7 +134,8 @@ class Scraper:
 
         # used to be a dict, but mongodb can't store things
         # under key which contain a dot
-        return( tuple( zip( A, B ) ) )
+        res = [list( c ) for c in zip( A, B )]
+        return( res )
 
     def collect_textual_doubles( self, textWantedDouble ):
         '''Collects all text from items in textWantedDouble
@@ -138,7 +164,10 @@ class Scraper:
         pandas-serie with data
         '''
 
-        raise
+        raise NotImplementedError
+
+    def close_driver( self ):
+        self.driver.close()
 
 class Alexa( Scraper ):
     ''' This holder for Alexa.com informations
@@ -170,6 +199,16 @@ class Alexa( Scraper ):
                'whereGoNext': ( '//*[@id="subdomain_table"]/tbody/tr/td/span[@class="word-wrap"]',
                                '//*[@id="subdomain_table"]/tbody/tr/td[@class="text-right"]/span' )
                }
+
+    def check_unavailability( self, driver ):
+
+        status = driver.find_element_by_xpath( '//*[@id="no-enough-data"]/div/div/span[1]/span/strong' ).text
+
+        # usually not even here it gets...
+        if "We don't have enough data to rank this website." in status:
+            return( True )
+        else:
+            return( False )
 
 
     def collect_that_all( self ):
@@ -208,6 +247,16 @@ class Websiteout( Scraper ):
                     "traficRank" : '//*[@id="right"]/table[2]/tbody/tr[1]/td[2]',
                     'pageRank' : '//*[@id="right"]/table[2]/tbody/tr[2]/td[2]',
                     }
+
+    def check_unavailability( self, driver ):
+
+        status = driver.find_element_by_xpath( '/html/body' ).text
+
+        if "Not a Valid Domain#2" in status:
+            return( True )
+        else:
+            return( False )
+
 
     def collect_that_all( self ):
         total = {}
@@ -261,6 +310,15 @@ class Urlm( Scraper ):
                                        '//*[@id="visitors"]/table[3]/tr/td[2]' ),
                     }
 
+    def check_unavailability( self, driver ):
+
+        status = driver.find_element_by_xpath( '/html/body/div/div[2]/div/div/div/div/h3' ).text
+
+        if "Sorry, we do not have data on this website" in status:
+            return( True )
+        else:
+            return( False )
+
     def collect_that_all( self ):
         total = {}
 
@@ -286,18 +344,18 @@ class Urlm( Scraper ):
 class Ranker( Scraper ):
     '''Holder for ranks'''
 
-    _rankNames = ['r_google',
-         'r_alexa',
-         'r_compete',
-         'r_mozrank',
-         'r_seznam',
-         'r_jyxo',
-         'r_backlinks_g',
-         'r_majestic',
-         'r_site_explorer',
-         'r_facebook',
-         'r_twitter',
-         'r_plusone_g'
+    _rankNames = ['rGoogle',
+         'rAlexa',
+         'rCompete',
+         'rMozrank',
+         'rSeznam',
+         'rJyxo',
+         'rBacklinksG',
+         'rMajestic',
+         'rSiteExplorer',
+         'rFacebook',
+         'rTwitter',
+         'rPlusoneG'
          ]
 
     def to_digit( self, lex_numb ):
@@ -323,6 +381,9 @@ class Ranker( Scraper ):
             numb = lex_numb
         return( numb )
 
+    def check_unavailability( self, wdriver ):
+        return( False )
+
     def collect_that_all( self ):
         _ranks = self.selxs( '//*[@id="content"]/center/table/tbody/tr/td[2]' )
         ranks = [self.to_digit( lexNumb ) for lexNumb in _ranks]
@@ -332,21 +393,25 @@ class Ranker( Scraper ):
 def collect_alexa( maternalURL ):
     alexa = Alexa( maternalURL, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
     alexa.collect_that_all()
+    alexa.close_driver()
     return( alexa.scrapedData )
 
 def collect_websiteout( maternalURL ):
     websiteout = Websiteout( maternalURL, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' )
     websiteout.collect_that_all()
+    websiteout.close_driver()
     return ( websiteout.scrapedData )
 
 def collect_urlm( maternalURL ):
     urlm = Urlm( maternalURL, "www.urlm.co", '//*[@id="url"]' )
     urlm.collect_that_all()
+    urlm.close_driver()
     return( urlm.scrapedData )
 
 def collect_ranks( maternalURL ):
     ranks = Ranker( maternalURL, "pagerank.jklir.net", '//*[@id="url"]' )
     ranks.collect_that_all()
+    ranks.close_driver()
     return( ranks.scrapedData )
 
 def maternal_that_all( maternalURL ):
@@ -354,9 +419,12 @@ def maternal_that_all( maternalURL ):
     '''
 
     total = {}
-    total.update( {"alexa" : collect_alexa( maternalURL ) } )
-    total.update( {"websiteout" : collect_websiteout( maternalURL ) } )
-    total.update( {"urlm" : collect_urlm( maternalURL ) } )
-    total.update( {'ranks' : collect_ranks( maternalURL ) } )
+    for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],
+                         [collect_websiteout, collect_urlm, collect_alexa, collect_ranks] ):
+        try:
+            total.update( {dom : func( maternalURL ) } )
+        except RuntimeError:
+            total.update( {dom : None} )
+
 
     return( total )

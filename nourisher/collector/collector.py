@@ -1,6 +1,8 @@
 from .feeder import feed_that_all
-from nourisher.collector.maternalSite import maternal_that_all
-from ..utiliser import maternal_url_extractor
+from .maternalSite import maternal_that_all
+
+from ..utiliser import maternal_url_extractor, push_to_db
+
 
 def collect_all( origUrl ):
     '''Collects maximum informations about feed,
@@ -14,7 +16,10 @@ def collect_all( origUrl ):
     maternalUrlByAlexa = maternal_url_extractor( finUrls )
     maternalInfo = maternal_that_all( maternalUrlByAlexa )
 
-    total.update( feedInfo.to_dict() )
+    total.update( {"feedInfo" : feedInfo} )
     total.update( maternalInfo )
+    total.update( {"origURL" : origUrl} )
 
-    return( total )
+    resID = push_to_db( total )
+
+    return( resID )

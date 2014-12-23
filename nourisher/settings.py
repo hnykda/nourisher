@@ -19,7 +19,7 @@ DB_COLLECTION = "feeds"
 DEFAULT_DRIVER = "phantomjs"
 
 ### VERBOSITY ###
-VERBOSITY = 0
+VERBOSITY = 1
 
 
 def get_setings():

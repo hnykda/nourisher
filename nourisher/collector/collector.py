@@ -2,6 +2,7 @@ from .feeder import feed_that_all
 from .maternalSite import maternal_that_all
 
 from ..utiliser import maternal_url_extractor, push_to_db
+from nourisher.utiliser import informer
 
 
 def collect_all( origUrl ):
@@ -11,9 +12,14 @@ def collect_all( origUrl ):
 
     total = {}
 
-    feedInfo = feed_that_all( origUrl )
-    finUrls = feedInfo["entries"]["finalUrl"]
+    _feedInfo = feed_that_all( origUrl )
+    feedInfo = _feedInfo[0]
+    informer( "feedInfo collected." )
+
+    # this is hack - no list needed
+    finUrls = _feedInfo[1]
     maternalUrlByAlexa = maternal_url_extractor( finUrls )
+
     maternalInfo = maternal_that_all( maternalUrlByAlexa )
 
     total.update( {"feedInfo" : feedInfo} )

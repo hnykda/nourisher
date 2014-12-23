@@ -1,5 +1,5 @@
 from urllib.error import URLError, HTTPError
-from nourisher.utiliser import get_from_db, push_to_db
+from nourisher.utiliser import get_from_db, push_to_db, informer
 class Nourisher:
     '''Top-holder for everything next
     
@@ -53,9 +53,10 @@ class Nourisher:
         from urllib.request import urlopen
 
         try:
-            urlopen( origUrl ).status
+            sta = urlopen( origUrl ).status
+            informer( "Page {0} is responding: ".format( origUrl ) + str( sta ) )
             return( True )
-        except ( ConnectionResetError, URLError, HTTPError ) as ex:
+        except ( ConnectionResetError, URLError, HTTPError ):
             pass
 
 
@@ -89,6 +90,7 @@ class Nourisher:
         objID = self.get_objectid()
         data = get_from_db( objID )
         self.dataLoaded = data
+        informer( "Data retrieved for {0}".format( objID ) )
         return( data )
 
     def clean_data( self ):
@@ -100,6 +102,7 @@ class Nourisher:
         from .cleaning import clean_that_all
         cleaned = clean_that_all( self.dataLoaded )
         self.dataCleaned = cleaned
+        informer( "Data have been cleaned." )
         return( cleaned )
 
     def add_to_object_db( self, key, data ):

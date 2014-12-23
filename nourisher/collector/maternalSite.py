@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from nourisher.settings import DEFAULT_DRIVER
+from nourisher.utiliser import informer
 
 class Scraper:
     ''' This is common interface for all scrapers, 
@@ -65,6 +66,7 @@ class Scraper:
         try:
             if self.check_unavailability( wdriver ) == True:
                 wdriver.close()
+                informer( "No data from this scrapper: ".format( self.__class__.__name__ ) )
                 raise RuntimeError ( "No available data from this Scraper" )
         except NoSuchElementException:
             pass
@@ -252,7 +254,7 @@ class Websiteout( Scraper ):
 
         status = driver.find_element_by_xpath( '/html/body' ).text
 
-        if "Not a Valid Domain#2" in status:
+        if "Not a Valid Domain#2" in status or "no data" in status:
             return( True )
         else:
             return( False )
@@ -267,11 +269,18 @@ class Websiteout( Scraper ):
         otherSites = self.selxs( '//*[@id="right"]/table[7]/tbody/tr[2]/td[1]/ol/li/a' )
 
         # estimated worth
-        text = self.selxs( '//*[@id="right"]/div[3]/p' )
-        splText = text[0].split()
-        splText.reverse()
-        iDofWorth = splText.index( "USD" )
-        total.update( {'estimatedWorth' : splText[iDofWorth - 1] } )
+        try:
+            text = self.selxs( '//*[@id="right"]/div[3]/p' )
+            splText = text[0].split()
+            splText.reverse()
+            iDofWorth = splText.index( "USD" )
+            worth = splText[iDofWorth - 1]
+            potVal = splText[iDofWorth - 2]
+            if potVal in ["Million", "Billion"]:
+                worth += " " + potVal
+        except ValueError:
+            worth = None
+        total.update( {'estimatedWorth' :  worth} )
 
         total.update( singles )
         total.update( {'categories' : categories} )
@@ -382,7 +391,12 @@ class Ranker( Scraper ):
         return( numb )
 
     def check_unavailability( self, wdriver ):
-        return( False )
+
+        try:
+            wdriver.find_element_by_xpath( '//*[@id="content"]/center/table[1]/tbody/tr/td[1]/a/img' )
+            return( False )
+        except NoSuchElementException:
+            raise RuntimeError ( "Problem! Pravdepodobne jsem dostal ban!" )
 
     def collect_that_all( self ):
         _ranks = self.selxs( '//*[@id="content"]/center/table/tbody/tr/td[2]' )
@@ -421,9 +435,12 @@ def maternal_that_all( maternalURL ):
     total = {}
     for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],
                          [collect_websiteout, collect_urlm, collect_alexa, collect_ranks] ):
+        informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ) )
         try:
             total.update( {dom : func( maternalURL ) } )
+            informer( "Succeded." )
         except RuntimeError:
+            informer( "Not successful." )
             total.update( {dom : None} )
 
 

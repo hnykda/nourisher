@@ -8,7 +8,8 @@ os.chdir( "../" )
 print( os.path.abspath( "." ) )
 
 # testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
-testingUrl = 'http://smittyspeaks.weebly.com/1/feed'
+# testingUrl = 'http://smittyspeaks.weebly.com/1/feed'
+testingUrl = 'http://css-tricks.com/frosting-glass-css-filters/feed/'
 
 
 from nourisher.nourisher import Nourisher

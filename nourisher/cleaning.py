@@ -3,7 +3,7 @@ Created on Dec 22, 2014
 
 @author: dan
 '''
-
+from nourisher import utiliser
 def wrangle_numbers( vst ):
     ''' Converts string to numbers, if possible
     
@@ -40,24 +40,25 @@ def wrangle_numbers( vst ):
             vysl = atof( numb[:-1] ) / 100
 
         elif numb[0] == r"$":
+            vysl = atof( numb[1:] )
+
+        # websiteout
+        elif numb.split( " " )[1] in ["Million", "Billion"]:
             if 'Million' in numb:
                 spl = numb.split( " " )
-                vysl = atof( spl[0][1:] ) * 1000000
-            else:
-                vysl = atof( numb[1:] )
-
+                vysl = atof( spl[0] ) * 1000000
+            if "Billion" in numb:
+                spl = numb.split( " " )
+                vysl = atof( spl[0] ) * 1000000000
         # some webs return slash when no information are provided
         elif numb == "-" or numb == "--":
             vysl = None
 
-        # the rest should work normally - this will give errors
+        # urlm sometimes throws e.g. "< 300"
+        elif numb[0] == "<":
+            vysl = atof( numb[1:] )
         else:
             vysl = atof( numb )
-
-            # try:
-            #    vysl = atof(numb)
-            # except:
-            #    vysl = None
 
     elif vst == "" or vst == []:
         vysl = None
@@ -135,14 +136,21 @@ def wrangle_entries( entries ):
                      'nTagCountsEntries_p',
                      'htmlCodeLengthChars']
 
-    from statistics import stdev, mean
-    for key in numericLists:
-        try:
-            x = entries[key]
-            standardDev = stdev( x )
-            meanOfAll = mean( x )
-        except TypeError:
+    from statistics import stdev, mean, StatisticsError
+    # take only those which are contained in entries keys
+    for key in [att for att in numericLists if att in entries.keys()]:
+        # cleaning from None values
+        x = [val for val in entries[key] if val is not None]
+        if len( x ) > 0:
+            try:
+                standardDev = stdev( x )
+                meanOfAll = mean( x )
+            except ( StatisticsError ):
+                standardDev, meanOfAll = None, None
+                utiliser.informer( "array is: " + str( entries[key] ) )
+        elif len( x ) == 0:
             standardDev, meanOfAll = None, None
+            utiliser.informer( r"array is empty: [] ==" + str( entries[key] ) )
 
         newE[key + "_STD"], newE[key + "_MEAN"] = standardDev, meanOfAll
 

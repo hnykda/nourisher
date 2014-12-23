@@ -124,13 +124,13 @@ def get_entries_info( links ):
 
     dtb = defaultdict( list )
     for plink in links:
-        utiliser.informer( plink )
         # TODO: This is wrong - values are now mixed (not that anybody cares...)
         try:
             # this is because requests follow redirects,
             # hence it ends up on true address
             artURL = requests.get( plink ).url
             dtb["finalUrl"].append( artURL )
+            utiliser.informer( "Parsing link: " + str( artURL ) )
 
             art = nwsp.Article( artURL )
             art.download()
@@ -211,9 +211,10 @@ def get_entries_info( links ):
 
             # Not needed
             # dtb["rawHtmlOfPage"].append( str( pageSoup ) )
-        except TypeError:
-            pass
 
+        except ( TypeError, nwsp.article.ArticleException ):
+            utiliser.informer( "Error when parsing an article" )
+    utiliser.informer( dict( dtb ) )
     return( dict( dtb ) )
 
 def get_url_info( links, corespTitles ):
@@ -292,24 +293,38 @@ def get_url_info( links, corespTitles ):
 
 def feed_that_all( url ):
     '''This collect everything from above
+    
+    Returns
+    -------
+    total: all data collected by feeder
+    finalURLs: list of URL addresses which will alexa use to try to find maternal URL
     '''
 
     defaultInfo = extract_feed_info( url )
 
-    entriesPolished = polish_entries_info( defaultInfo["entries"] )
-    entrieInfo = get_entries_info( entriesPolished["links"] )
-    entriesSim = get_url_info( entrieInfo["finalUrl"], entriesPolished["titles"] )
+    if defaultInfo["n_of_entries"] > 0:
+        entriesPolished = polish_entries_info( defaultInfo["entries"] )
+        entrieInfo = get_entries_info( entriesPolished["links"] )
+        entriesSim = get_url_info( entrieInfo["finalUrl"], entriesPolished["titles"] )
+
+        entriesTotal = {}
+        for diction in [entriesPolished, entrieInfo, entriesSim]:
+            entriesTotal.update( diction )
+
+        # for finding maternalURL
+        finalUrls = entrieInfo["finalUrl"]
+    elif defaultInfo["n_of_entries"] == 0:
+        utiliser.informer( "No entries are found!" )
+        entriesTotal = None
+        # nothing else to do...
+        finalUrls = [defaultInfo["href"]]
 
     # feedparser object of entries is no longer needed
     defaultInfo.pop( "entries" )
-
-    entriesTotal = {}
-    for diction in [entriesPolished, entrieInfo, entriesSim]:
-        entriesTotal.update( diction )
 
     # thanks to mongo we do not fear structured data
     total = {}
     total.update( defaultInfo )
     total.update( {"entries" : entriesTotal } )
 
-    return( total )
+    return( total, finalUrls )

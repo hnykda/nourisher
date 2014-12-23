@@ -12,12 +12,20 @@ from pymongo import MongoClient
 
 setlocale( LC_ALL, "en_US.UTF8" )
 
-def informer( msg ):
+def informer( msg, *args ):
 
-    if lset.VERBOSITY == 0:
-        pass
-    elif lset.VERBOSITY == 1:
-        print( msg )
+    # we don't want any errors from logging...
+    try:
+        if lset.VERBOSITY == 0:
+            pass
+        elif lset.VERBOSITY == 1:
+            print( msg )
+            if args:
+                for arg in args:
+                    print( arg )
+    except:
+        import sys
+        print( "Can't print message because of ", sys.exc_info() )
 
 def mean_a_var_z_listu( lentry ):
     """Returns mean and std from list of numbers
@@ -48,15 +56,16 @@ def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     ObjectID: ObjectID of inserted document    
     '''
 
-    import pandas as pd
-    if type( inpObj ) == type( pd.Series ):
-        inpObj = inpObj.to_dict()
+    # import pandas as pd
+    # if type( inpObj ) == type( pd.Series ):
+    #    inpObj = inpObj.to_dict()
 
 
     client = MongoClient( ip, port )
     db = client[dbName][collection]
 
     insID = db.insert( inpObj )
+    informer( "Saving to database under ObjectID: ", str( insID ) )
 
     client.disconnect()
 
@@ -124,10 +133,14 @@ def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB
     db = client[dbName][collection]
 
     try:
-        res = db.find( {"origURL" : origUrl} ).sort( '_id', -1 )[0]["_id"]
+        allRes = db.find( {"origURL" : origUrl} ).sort( '_id', -1 )
+        res = allRes[0]["_id"]
     except IndexError:
         res = None
 
+    # TODO: Slow! But after find is fetched by res, allRes is empty...
+    informer( "Object(s) by URL found: ", [( obj["_id"], obj["_id"].generation_time.isoformat() )
+                                           for obj in db.find( {"origURL" : origUrl} ).sort( '_id', -1 )] )
     return( res )
 
 def maternal_url_extractor( finalLinks ):
@@ -163,6 +176,7 @@ def maternal_url_extractor( finalLinks ):
 
     text = wdriver.find_element_by_xpath( '//*[@id="js-li-last"]/span[1]/a' ).text
 
+    informer( "Alexa thinks that the maternal URL is: " + str( "www." + text ) )
     return( 'www.' + text )
 
     # OK, NECHAME TO NA ALEXE!

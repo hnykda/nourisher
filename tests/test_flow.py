@@ -1,5 +1,6 @@
 import unittest
 from time import strftime
+from nourisher.collector import collector
 print( "\n" )
 print( strftime( "%Y-%m-%d %H:%M:%S" ) )
 
@@ -7,9 +8,9 @@ import os
 os.chdir( "../" )
 print( os.path.abspath( "." ) )
 
-# testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
+testingUrl = 'www.huffingtonpost.com'
 # testingUrl = 'http://smittyspeaks.weebly.com/1/feed'
-testingUrl = 'http://css-tricks.com/frosting-glass-css-filters/feed/'
+# testingUrl = 'www.pornoquantum.tumblr.com'
 
 
 from nourisher.nourisher import Nourisher
@@ -26,6 +27,7 @@ class Testfeeder( unittest.TestCase ):
         retr = get_from_db( nour.dataID )
 
         self.assertEqual( nour.dataLoaded["origURL"], retr["origURL"] )
+
 
         # self.assertNotEqual( nour.data, None, "Nothing has been saved" )
 

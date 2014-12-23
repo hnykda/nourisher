@@ -13,7 +13,7 @@ from unittest.suite import TestSuite
 
 # maternalURL = 'www.huffingtonpost.com'
 BadmaternalURL = 'www.asdsgsdfgdfgdfgdfgxxsa.com'
-maternalURL = "www.scoop.it"
+maternalURL = "www.google.com"
 
 class Test( unittest.TestCase ):
 #     def test_Alexa( self ):
@@ -26,15 +26,15 @@ class Test( unittest.TestCase ):
 #         self.assertDictEqual( res, retr )
 #         self.assertRaises( RuntimeError, collect_alexa, BadmaternalURL )
 
-    def test_Websiteout( self ):
-        res = collect_websiteout( maternalURL )
-        insId = push_to_db( res )
-
-        retr = get_from_db( insId )
-
-        self.maxDiff = None
-        self.assertDictEqual( res, retr )
-        self.assertRaises( RuntimeError, collect_websiteout, BadmaternalURL )
+#     def test_Websiteout( self ):
+#         res = collect_websiteout( maternalURL )
+#         insId = push_to_db( res )
+#
+#         retr = get_from_db( insId )
+#
+#         self.maxDiff = None
+#         self.assertDictEqual( res, retr )
+#         self.assertRaises( RuntimeError, collect_websiteout, BadmaternalURL )
 
 #     def test_Urlm( self ):
 #         res = collect_urlm( maternalURL )
@@ -55,6 +55,11 @@ class Test( unittest.TestCase ):
 #         self.assertDictEqual( res, retr )
         # self.assertRaises( RuntimeError, collect_ranks, BadmaternalURL )
 
+        def test_maternal( self ):
+            idecko = maternal_that_all( maternalURL )
+            from nourisher.cleaning import clean_that_all
+            clean_that_all( idecko )
+            print( idecko )
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

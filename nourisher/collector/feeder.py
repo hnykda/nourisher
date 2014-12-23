@@ -281,7 +281,7 @@ def get_entries_info( links ):
 
         except ( TypeError, nwsp.article.ArticleException ):
             utiliser.informer( "\nError when parsing an article" )
-    utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
+    # utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
     utiliser.informer( "Number of parsed articles: ", len( dtb['finalUrl'] ), level = 1 )
     return( dict( dtb ) )
 

@@ -38,11 +38,13 @@ def wrangle_numbers( vst ):
         if numb[-1] == "%":
             vysl = atof( numb[:-1] ) / 100
 
-        elif numb[0] == r"$":
-            vysl = atof( numb[1:] )
-
-        # websiteout
+        # websiteout and urlm worth
         elif ( "Million" in numb ) or ( "Billion" in numb ):
+
+            # urlm
+            if numb[1] == r"$":
+                numb = numb[1:-1]
+
             if 'Million' in numb:
                 spl = numb.split( " " )
                 vysl = atof( spl[0] ) * 1000000
@@ -50,6 +52,10 @@ def wrangle_numbers( vst ):
                 spl = numb.split( " " )
                 vysl = atof( spl[0] ) * 1000000000
         # some webs return slash when no information are provided
+
+        elif numb[0] == r"$":
+            vysl = atof( numb[1:] )
+
         elif numb == "-" or numb == "--":
             vysl = None
 
@@ -100,6 +106,7 @@ def time_to_dec( time ):
 def numbs_from_list( diction, keys ):
     '''Tries to wrangle every string from list to numbers'''
 
+    utiliser.informer( "Finding {0} in {1}".format( list( diction.keys() ), keys ), level = 2 )
     new = {}
     for key in keys:
         new[key] = wrangle_numbers( diction[key] )
@@ -137,7 +144,8 @@ def wrangle_entries( entries ):
     
     Parameters
     ----------
-    Dict of information about entries which are collected by feedInfo collector
+    entries : dict 
+        of information about entries which are collected by feedInfo collector
     
     Returns
     -------
@@ -224,6 +232,7 @@ def clean_alexa( alexData ):
     # newData.update( {'link' : alexData['link']} )
     newData.update( {'dailyTimeOnSite' : time_to_dec( alexData['dailyTimeOnSite'] ) } )
     newData.update( numbs_from_list( alexData, wanted_numeric ) )
+    newData.update( {'dailyTimeOnSite' : None } )
 
     return( newData )
 

@@ -22,7 +22,7 @@ def collect_all( origUrl ):
 
     import time
 
-    startTime = time.time.now()
+    startTime = time.time()
     total = {}
 
     _feedInfo = feed_that_all( origUrl )
@@ -40,6 +40,6 @@ def collect_all( origUrl ):
     total.update( {"origURL" : origUrl} )
 
     resID = push_to_db( total )
-    informer( "Collection data took: {0}".format( time.time.now() - startTime ) + " seconds", verbosity = 2 )
+    informer( "Collection data took: {0}".format( time.time() - startTime ) + " seconds", level = 2 )
 
     return( resID )

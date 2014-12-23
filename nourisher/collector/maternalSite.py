@@ -89,7 +89,7 @@ class Scraper:
         try:
             if self.check_unavailability( wdriver ) == True:
                 wdriver.close()
-                informer( "No data from this scrapper." )
+                informer( "\nNo data from this scrapper." )
                 raise RuntimeError ( "No available data from this Scraper" )
         except NoSuchElementException:
             pass
@@ -550,38 +550,44 @@ def maternal_that_all( maternalURL ):
 #     correspInit = [
 #                     ( "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' ),
 #                     ( "www.urlm.co", '//*[@id="url"]' ),
-#                     ( "pagerank.jklir.net", '//*[@id="url"]' )
+#                     ( "pagerank.jklir.net", '//*[@id="url"]' ),
 #                     ( "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' ),
 #                     ]
-#     correspNames = ["websiteout", "urlm", "alexa", "ranks"]
-#
-#     total = {}
-#     for name, cls, ( baseURL, xpathOfInput ) in zip( correspNames, classes, correspInit ):
-#         curcl = cls( maternalURL, baseURL, xpathOfInput )
-#
-#         informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ), rewrite = True )
-#
-#         try:
-#             curcl.collect_that_all()
-#             curcl.close_driver()
-#             total.update( {name : curcl.scrapedData } )
-#             informer( "Succeded.", rewrite = True )
-#         except RuntimeError:
-#             informer( "Not successful." )
-#             total.update( {name : None} )
-#
-#     return( total )
+#     correspNames = ["websiteout", "urlm", "ranks", "alexa"]
+
+    # every scraper must be named here in format:
+    # {"nameOfScraper" : (ClassOfScrapper, baseURL, xPathOfInputField)}
+    rouse = {"websiteout" : ( Websiteout, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' ),
+             "urlm": ( Urlm, "www.urlm.co", '//*[@id="url"]' ),
+             "ranks" : ( Ranker, "pagerank.jklir.net", '//*[@id="url"]' ),
+             "alexa" : ( Alexa, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
+             }
 
     total = {}
-    for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],
-                         [collect_websiteout, collect_urlm, collect_alexa, collect_ranks] ):
-        informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ), rewrite = True )
+    for name, ( cls, baseURL, xpathOfInput ) in rouse.items():
+        informer( "Trying to get data for {0} by {1}".format( maternalURL, name ), rewrite = True )
         try:
-            total.update( {dom : func( maternalURL ) } )
+            curcl = cls( maternalURL, baseURL, xpathOfInput )
+            curcl.collect_that_all()
+            curcl.close_driver()
+            total.update( {name : curcl.scrapedData } )
             informer( "Succeded.", rewrite = True )
         except RuntimeError:
             informer( "Not successful." )
-            total.update( {dom : None} )
-
+            total.update( {name : None} )
 
     return( total )
+
+#     total = {}
+#     for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],
+#                          [collect_websiteout, collect_urlm, collect_alexa, collect_ranks] ):
+#         informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ), rewrite = True )
+#         try:
+#             total.update( {dom : func( maternalURL ) } )
+#             informer( "Succeded.", rewrite = True )
+#         except RuntimeError:
+#             informer( "Not successful." )
+#             total.update( {dom : None} )
+#
+#
+#     return( total )

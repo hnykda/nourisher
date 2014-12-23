@@ -10,6 +10,25 @@ from nourisher import settings as lset
 from pymongo import MongoClient
 
 def informer( msg, *args, level = 1, rewrite = False ):
+    """Used for getting output from program
+    
+    Parameters
+    ----------
+    msg : everything what is possible to print
+        whatever you want to see as an output
+        
+        **Warning** Don't mix str + int etc. which are not easily
+        printed together. They can be added as *args.
+    *args
+        Everything passed as an argument is going to be printed
+    level : positive integer, currently implemented `[0,1,2]`, optional 
+        default 1, level of verbosity for which at least
+        should be this message printed
+    rewrite : True or False, optional, default False 
+        if `True`, then the output is going to be rewritten on the same 
+        line as the previous. If `False`, then the outpus is going to 
+        be printed on next line
+    """
 
     # we don't want any errors from logging...
     try:
@@ -38,11 +57,21 @@ def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     
     Parameters
     -----------
-    inpObj: Series (is converted to dict), dict, or something pymongo can serialize to JSON
+    inpObj: dict, or something pymongo can serialize to JSON
+        Object which should be pushed to database
+    dbName: string, optional
+        default in settings, name of database to write into
+    collection: string, optional
+        default in settings, Name of collection to write into
+    ip: string, optional
+        default in settings, IP where is MongoDB running
+    port: interger, optional
+        default in settings, port where is MongoDB running
     
     Returns
     -------
-    ObjectID: ObjectID of inserted document    
+    ObjectID: ObjectID 
+        ObjectID of inserted document    
     '''
 
     client = MongoClient( ip, port )
@@ -62,7 +91,16 @@ def get_from_db( idOfO, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     
     Parameters
     -----------
-    idOfO: ID of object in database
+    idOfO: ID in string, ObjectID
+        of object which we want to retrieve data 
+    dbName: string, optional
+        default in settings, name of database to write into
+    collection: string, optional
+        default in settings, Name of collection to write into
+    ip: string, optional
+        default in settings, IP where is MongoDB running
+    port: interger, optional
+        default in settings, port where is MongoDB running 
     '''
 
     from bson.objectid import ObjectId
@@ -84,9 +122,21 @@ def get_id_of_last_inserted( dbName = lset.DB_NAME, collection = lset.DB_COLLECT
     '''Get ObjectID of last inserted document
     from pymongo import MongoClient
     
+    Parameters
+    ----------
+    dbName: string, optional
+        default in settings, name of database to write into
+    collection: string, optional
+        default in settings, Name of collection to write into
+    ip: string, optional
+        default in settings, IP where is MongoDB running
+    port: interger, optional
+        default in settings, port where is MongoDB running 
+    
     Returns
     -------
-    ObjectID: last inserted document to collection
+    ObjectID : ObjectID 
+        last inserted document to collection
     '''
     client = MongoClient( ip, port )
     db = client[dbName][collection]
@@ -99,9 +149,25 @@ def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = ls
     
     Parameters
     -----------
-    finder: dict by which we should find {key : value}
-    key: under this name value will be added
-    value: data to add under key
+    finder : dict 
+        by which we should find {key : value}
+    key: string
+        under this name value will be added
+    value: dict, somthing seriazable 
+        data to add under key
+    dbName: string, optional
+        default in settings, name of database to write into
+    collection: string, optional
+        default in settings, Name of collection to write into
+    ip: string, optional
+        default in settings, IP where is MongoDB running
+    port: interger, optional
+        default in settings, port where is MongoDB running
+        
+    Returns
+    -------
+    ObjectID
+        of insterted document
     '''
     client = MongoClient( ip, port )
     db = client[dbName][collection]
@@ -111,7 +177,31 @@ def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = ls
 
 def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
                 ip = lset.DB_IP, port = lset.DB_PORT ):
-    '''Try to find object by original URL of feed'''
+    '''Try to find object by original URL of feed
+    
+    Parameters
+    ----------
+    origUrl : string of URL
+        URL by which we should find in database
+    dbName: string, optional
+        default in settings, name of database to write into
+    collection: string, optional
+        default in settings, Name of collection to write into
+    ip: string, optional
+        default in settings, IP where is MongoDB running
+    port: interger, optional
+        default in settings, port where is MongoDB running
+        
+    Returns
+    -------
+    ObjectID
+        of found document
+        
+    Raises
+    ------
+    IndexError
+        When no document is found
+    '''
 
     client = MongoClient( ip, port )
     db = client[dbName][collection]
@@ -133,11 +223,13 @@ def maternal_url_extractor( finalLinks ):
     
     Parameters
     ----------
-    True entries finalUrls
+    finalLinks : list
+        true finalUrls of entries
     
     Returns
     -------
-    string: maternal URL (in www.maternalurl.*)
+    string 
+        maternal URL (in www.maternalurl.*)
     
     Note
     -----

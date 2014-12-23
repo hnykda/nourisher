@@ -50,74 +50,159 @@
   <h1>Source code for nourisher.collector.maternalSite</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
 <span class="kn">from</span> <span class="nn">selenium.common.exceptions</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span>
+<span class="kn">from</span> <span class="nn">nourisher.settings</span> <span class="kn">import</span> <span class="n">DEFAULT_DRIVER</span>
+<span class="kn">from</span> <span class="nn">nourisher.utiliser</span> <span class="kn">import</span> <span class="n">informer</span>
 
 <div class="viewcode-block" id="Scraper"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper">[docs]</a><span class="k">class</span> <span class="nc">Scraper</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39; This is common interface for all scrapers, </span>
 <span class="sd">    like these for Alexa.com, urlm.com, websiteoutlook.com, etc.</span>
 <span class="sd">    </span>
+<span class="sd">    This class should not be called directly - there should be descendants implemented</span>
+<span class="sd">    who inherits from this class.</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
 <span class="sd">    There should not be any wrangling - save it as it is somewhere and</span>
 <span class="sd">    after that wrangling can come - there might be errors during it and</span>
 <span class="sd">    it is inconvenient to collect data again if they are corrupted.</span>
+<span class="sd">    </span>
+<span class="sd">    **Adding new scrapper** To add a new scrapper is necessary to:</span>
+<span class="sd">    </span>
+<span class="sd">    1. Create descendant of Scraper - find out scrapper baseURL, </span>
+<span class="sd">    xpath of input field, xpaths for data to scrap, implement necessary</span>
+<span class="sd">    functions (e.g. `check_unavailability()` ), </span>
 <span class="sd">        </span>
 <span class="sd">    Atributes</span>
 <span class="sd">    ---------</span>
-<span class="sd">    baseURL: URL address without http:// of the webpage from which data should</span>
-<span class="sd">    be scraped of</span>
-<span class="sd">    maternalURL: URL of maternal website of feed we want to get info about</span>
-<span class="sd">    textWantedSingle: Dict in format {nameOfAttribut : xpathOfAttribut}, </span>
-<span class="sd">    those atts we want text from and it&#39;s a single value </span>
-<span class="sd">    textWanteddouble: Dict in format {nameOfCollection : (keys : vals )}, these</span>
-<span class="sd">    are pairs columns (e.g. tables) from which we want to extract text </span>
-<span class="sd">    scrapedData: All data which were scraped</span>
+<span class="sd">    baseURL : string </span>
+<span class="sd">        URL address without http:// of the webpage from which data should be scraped of</span>
+<span class="sd">    maternalURL : string </span>
+<span class="sd">        URL of maternal website of feed we want to get info about</span>
+<span class="sd">    scrapedData : dict</span>
+<span class="sd">        Data scraped from the website</span>
+<span class="sd">    driver : selenium.webdriver</span>
+<span class="sd">        webdriver used for scraping of current instance</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">baseURL</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     <span class="n">maternalURL</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     <span class="n">scrapedData</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="n">nameOfInputField</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     <span class="n">driver</span> <span class="o">=</span> <span class="bp">None</span>
 
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_maternalURL</span><span class="p">,</span> <span class="n">_baseURL</span><span class="p">,</span> <span class="n">_xpathOfInputField</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_maternalURL</span><span class="p">,</span> <span class="n">_baseURL</span><span class="p">,</span> <span class="n">_xpathOfInputField</span><span class="p">,</span> <span class="n">browser</span> <span class="o">=</span> <span class="n">DEFAULT_DRIVER</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Init</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        _xpathOfInputField: name of field where is the input field for</span>
-<span class="sd">        maternal URL</span>
+<span class="sd">        _maternalURL : string</span>
+<span class="sd">            URL of maternal website of feed we want to get info about</span>
+<span class="sd">        baseURL : string </span>
+<span class="sd">            URL address without http:// of the webpage from which data should be scraped of</span>
+<span class="sd">        _xpathOfInputField: string </span>
+<span class="sd">            name of field where is the input field for maternal URL</span>
+<span class="sd">        browser: string, optinal</span>
+<span class="sd">            </span>
+<span class="sd">            Defaults to nourisher.settings.DEFAULT_DRIVER</span>
+<span class="sd">            </span>
+<span class="sd">            One of [&quot;firefox&quot;, &quot;firefoxTOR&quot;, &quot;phatnomjs&quot;, &quot;phantomjsTOR&quot;]</span>
+<span class="sd">            </span>
+<span class="sd">            Specify which browser you want to use for scrapping and if you want </span>
+<span class="sd">            to use TOR version or not (TOR must be running at localhost:9050, socks5!) </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">baseURL</span> <span class="o">=</span> <span class="n">_baseURL</span>
-        <span class="c"># self.textWantedSingle = _textWantedSingle</span>
 
-        <span class="c"># if _textWantedDouble != None:</span>
-            <span class="c"># self.textWantedDouble = _textWantedDouble</span>
+        <span class="k">if</span> <span class="n">browser</span> <span class="o">==</span> <span class="s">&quot;phantomjs&quot;</span><span class="p">:</span>
+            <span class="n">wdriver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">PhantomJS</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">browser</span> <span class="o">==</span> <span class="s">&quot;phantomjsTOR&quot;</span><span class="p">:</span>
+            <span class="n">serviceArgs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;--proxy=localhost:9050&#39;</span><span class="p">,</span> <span class="s">&#39;--proxy-type=socks5&#39;</span><span class="p">]</span>
+            <span class="n">wdriver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">PhantomJS</span><span class="p">(</span> <span class="n">service_args</span> <span class="o">=</span> <span class="n">serviceArgs</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">browser</span> <span class="o">==</span> <span class="s">&quot;firefox&quot;</span><span class="p">:</span>
+            <span class="n">wdriver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">browser</span> <span class="o">==</span> <span class="s">&quot;firefoxTOR&quot;</span><span class="p">:</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">FirefoxProfile</span><span class="p">()</span>
+            <span class="n">profile</span><span class="o">.</span><span class="n">set_preference</span><span class="p">(</span> <span class="s">&#39;network.proxy.type&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+            <span class="n">profile</span><span class="o">.</span><span class="n">set_preference</span><span class="p">(</span> <span class="s">&#39;network.proxy.socks&#39;</span><span class="p">,</span> <span class="s">&#39;localhost&#39;</span> <span class="p">)</span>
+            <span class="n">profile</span><span class="o">.</span><span class="n">set_preference</span><span class="p">(</span> <span class="s">&#39;network.proxy.socks_port&#39;</span><span class="p">,</span> <span class="mi">9050</span> <span class="p">)</span>
+            <span class="n">wdriver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">(</span> <span class="n">profile</span> <span class="p">)</span>
 
-        <span class="n">wdriver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">PhantomJS</span><span class="p">()</span>
-        <span class="c"># wdriver = webdriver.Firefox()</span>
         <span class="n">wdriver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s">r&#39;http://&#39;</span> <span class="o">+</span> <span class="n">_baseURL</span> <span class="p">)</span>
         <span class="n">inputField</span> <span class="o">=</span> <span class="n">wdriver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="n">_xpathOfInputField</span> <span class="p">)</span>
         <span class="n">inputField</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="n">inputField</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span> <span class="n">_maternalURL</span> <span class="p">)</span>
         <span class="n">inputField</span><span class="o">.</span><span class="n">submit</span><span class="p">()</span>
 
-        <span class="c"># what happens if no informations are provided</span>
-
+        <span class="c"># what happens if no informations are available</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_unavailability</span><span class="p">(</span> <span class="n">wdriver</span> <span class="p">)</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">wdriver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;No data from this scrapper.&quot;</span> <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span> <span class="p">(</span> <span class="s">&quot;No available data from this Scraper&quot;</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
+            <span class="k">pass</span>
 
         <span class="c"># TODO: get printscreen of that page and save it</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">wdriver</span>
 
-<div class="viewcode-block" id="Scraper.selxs"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.selxs">[docs]</a>    <span class="k">def</span> <span class="nf">selxs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xpath</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;this is just shortage for finding ALL matching fields&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Scraper.check_unavailability"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.check_unavailability">[docs]</a>    <span class="k">def</span> <span class="nf">check_unavailability</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">wdriver</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if information of scrapper are available</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        </span>
+<span class="sd">        All descendants must implement this function</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wdriver : selenium.webdriver instance</span>
+<span class="sd">            current webdriver </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if no informations are provided, else False (and hence, continue)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">elems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">find_elements_by_xpath</span><span class="p">(</span> <span class="n">xpath</span> <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">elems</span><span class="p">]</span>
+        <span class="c"># children must implement</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+<div class="viewcode-block" id="Scraper.selxs"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.selxs">[docs]</a>    <span class="k">def</span> <span class="nf">selxs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xpath</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;this is just shorthand for finding text from ALL matching fields</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xpath: string</span>
+<span class="sd">            xpath of wanted elements</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of strings</span>
+<span class="sd">            list of texts from scraped values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">elems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">find_elements_by_xpath</span><span class="p">(</span> <span class="n">xpath</span> <span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">elems</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="k">return</span><span class="p">(</span> <span class="n">res</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Scraper.selx"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.selx">[docs]</a>    <span class="k">def</span> <span class="nf">selx</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xpath</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;this is just shortage for finding ONE matching fields&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;This is just shortage for finding text from ONE matching fields</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xpath: string</span>
+<span class="sd">            xpath of wanted elements</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        string</span>
+<span class="sd">            text from scraped value</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="n">xpath</span> <span class="p">)</span><span class="o">.</span><span class="n">text</span>
@@ -129,9 +214,15 @@
 <div class="viewcode-block" id="Scraper.collect_textual_singles"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.collect_textual_singles">[docs]</a>    <span class="k">def</span> <span class="nf">collect_textual_singles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">textWantedSingle</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Collects all text from items in textWantedSingle</span>
 <span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        textWantedSingle : dict</span>
+<span class="sd">            dict in format {nameOfAtt1 : xpath1, nameOfAtt2:xpath2, ...}</span>
+<span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict in format {nameOfAtt, value}</span>
+<span class="sd">        dict</span>
+<span class="sd">            in format {nameOfAtt1 : value1, nameOfAtt2 : value2,...}</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">xitems</span> <span class="o">=</span> <span class="p">{}</span>
@@ -142,7 +233,18 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">xitems</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Scraper.collect_textual_singles_lists"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.collect_textual_singles_lists">[docs]</a>    <span class="k">def</span> <span class="nf">collect_textual_singles_lists</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">textWantedSingleList</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;For attributes in type key: [val1, val2, ...]&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;For attributes in type key: [val1, val2, ...]</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        textWantedSingleList : dict</span>
+<span class="sd">            in type {nameOfAtt : xpath}</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            in form {nameOfAtt : [val1, val2, ...]}</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">xitems</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">xpath</span> <span class="ow">in</span> <span class="n">textWantedSingleList</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -152,22 +254,45 @@
 </div>
     <span class="k">def</span> <span class="nf">_collect_two_zip</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Axpath</span><span class="p">,</span> <span class="n">Bxpath</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;It&#39;s common to get data in two collumns (e.g. in tables)</span>
-<span class="sd">        so this will return them in pandas serie</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Axpath : list of strings (xpaths)</span>
+<span class="sd">            xpaths of first column (usually names for values in Bxpath)</span>
+<span class="sd">        Bxpath : list of strings (xpaths)</span>
+<span class="sd">            xpaths of second column (usually values for keys in Axpath)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of tuples</span>
+<span class="sd">            in format {AxpathValue1 : BxpathValue1, ,...}</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        Returns list of tuples instead of dict, because mongodb can&#39;t store </span>
+<span class="sd">        under names with &quot;.&quot; (dot) in them. This was problem when storing </span>
+<span class="sd">        e.g. {&quot;google.com&quot; : &quot;13.4%&quot;}.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="n">Axpath</span> <span class="p">)</span>
         <span class="n">B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="n">Bxpath</span> <span class="p">)</span>
 
         <span class="c"># used to be a dict, but mongodb can&#39;t store things</span>
         <span class="c"># under key which contain a dot</span>
-        <span class="k">return</span><span class="p">(</span> <span class="nb">tuple</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span> <span class="n">c</span> <span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span> <span class="p">)]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">res</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Scraper.collect_textual_doubles"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.collect_textual_doubles">[docs]</a>    <span class="k">def</span> <span class="nf">collect_textual_doubles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">textWantedDouble</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Collects all text from items in textWantedDouble</span>
 <span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        textWantedDouble : dict</span>
+<span class="sd">            in format {attName : (Axpath, Bxpath)}</span>
+<span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict of dicts in format {nameOfCollection : data}, where </span>
-<span class="sd">        data is in {nameOfVal : val} </span>
+<span class="sd">        dict of dicts </span>
+<span class="sd">            in format {nameOfCollection : data}, where data is in (nameOfVal, val) </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">xitems</span> <span class="o">=</span> <span class="p">{}</span>
@@ -185,10 +310,13 @@
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
-<span class="sd">        pandas-serie with data</span>
+<span class="sd">        dict: dictionary with data</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">raise</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+<div class="viewcode-block" id="Scraper.close_driver"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Scraper.close_driver">[docs]</a>    <span class="k">def</span> <span class="nf">close_driver</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </div></div>
 <div class="viewcode-block" id="Alexa"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Alexa">[docs]</a><span class="k">class</span> <span class="nc">Alexa</span><span class="p">(</span> <span class="n">Scraper</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; This holder for Alexa.com informations</span>
@@ -221,7 +349,17 @@
                                <span class="s">&#39;//*[@id=&quot;subdomain_table&quot;]/tbody/tr/td[@class=&quot;text-right&quot;]/span&#39;</span> <span class="p">)</span>
                <span class="p">}</span>
 
+<div class="viewcode-block" id="Alexa.check_unavailability"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Alexa.check_unavailability">[docs]</a>    <span class="k">def</span> <span class="nf">check_unavailability</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">driver</span> <span class="p">):</span>
 
+        <span class="n">status</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;no-enough-data&quot;]/div/div/span[1]/span/strong&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="c"># usually not even here it gets...</span>
+        <span class="k">if</span> <span class="s">&quot;We don&#39;t have enough data to rank this website.&quot;</span> <span class="ow">in</span> <span class="n">status</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">False</span> <span class="p">)</span>
+
+</div>
 <div class="viewcode-block" id="Alexa.collect_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Alexa.collect_that_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_that_all</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
 
         <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
@@ -259,6 +397,16 @@
                     <span class="s">&#39;pageRank&#39;</span> <span class="p">:</span> <span class="s">&#39;//*[@id=&quot;right&quot;]/table[2]/tbody/tr[2]/td[2]&#39;</span><span class="p">,</span>
                     <span class="p">}</span>
 
+<div class="viewcode-block" id="Websiteout.check_unavailability"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Websiteout.check_unavailability">[docs]</a>    <span class="k">def</span> <span class="nf">check_unavailability</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">driver</span> <span class="p">):</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="s">&#39;/html/body&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="k">if</span> <span class="s">&quot;Not a Valid Domain#2&quot;</span> <span class="ow">in</span> <span class="n">status</span> <span class="ow">or</span> <span class="s">&quot;no data&quot;</span> <span class="ow">in</span> <span class="n">status</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">False</span> <span class="p">)</span>
+
+</div>
 <div class="viewcode-block" id="Websiteout.collect_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Websiteout.collect_that_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_that_all</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">singles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collect_textual_singles</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">webout_singles</span> <span class="p">)</span>
@@ -268,11 +416,18 @@
         <span class="n">otherSites</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;right&quot;]/table[7]/tbody/tr[2]/td[1]/ol/li/a&#39;</span> <span class="p">)</span>
 
         <span class="c"># estimated worth</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;right&quot;]/div[3]/p&#39;</span> <span class="p">)</span>
-        <span class="n">splText</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-        <span class="n">splText</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-        <span class="n">iDofWorth</span> <span class="o">=</span> <span class="n">splText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="s">&quot;USD&quot;</span> <span class="p">)</span>
-        <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;estimatedWorth&#39;</span> <span class="p">:</span> <span class="n">splText</span><span class="p">[</span><span class="n">iDofWorth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;right&quot;]/div[3]/p&#39;</span> <span class="p">)</span>
+            <span class="n">splText</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">splText</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+            <span class="n">iDofWorth</span> <span class="o">=</span> <span class="n">splText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="s">&quot;USD&quot;</span> <span class="p">)</span>
+            <span class="n">worth</span> <span class="o">=</span> <span class="n">splText</span><span class="p">[</span><span class="n">iDofWorth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">potVal</span> <span class="o">=</span> <span class="n">splText</span><span class="p">[</span><span class="n">iDofWorth</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">potVal</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;Million&quot;</span><span class="p">,</span> <span class="s">&quot;Billion&quot;</span><span class="p">]:</span>
+                <span class="n">worth</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">potVal</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">worth</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;estimatedWorth&#39;</span> <span class="p">:</span>  <span class="n">worth</span><span class="p">}</span> <span class="p">)</span>
 
         <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">singles</span> <span class="p">)</span>
         <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;categories&#39;</span> <span class="p">:</span> <span class="n">categories</span><span class="p">}</span> <span class="p">)</span>
@@ -311,6 +466,15 @@
                                        <span class="s">&#39;//*[@id=&quot;visitors&quot;]/table[3]/tr/td[2]&#39;</span> <span class="p">),</span>
                     <span class="p">}</span>
 
+<div class="viewcode-block" id="Urlm.check_unavailability"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Urlm.check_unavailability">[docs]</a>    <span class="k">def</span> <span class="nf">check_unavailability</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">driver</span> <span class="p">):</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="s">&#39;/html/body/div/div[2]/div/div/div/div/h3&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="k">if</span> <span class="s">&quot;Sorry, we do not have data on this website&quot;</span> <span class="ow">in</span> <span class="n">status</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">False</span> <span class="p">)</span>
+</div>
 <div class="viewcode-block" id="Urlm.collect_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Urlm.collect_that_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_that_all</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -336,18 +500,18 @@
 <div class="viewcode-block" id="Ranker"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker">[docs]</a><span class="k">class</span> <span class="nc">Ranker</span><span class="p">(</span> <span class="n">Scraper</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Holder for ranks&#39;&#39;&#39;</span>
 
-    <span class="n">_rankNames</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;r_google&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_alexa&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_compete&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_mozrank&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_seznam&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_jyxo&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_backlinks_g&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_majestic&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_site_explorer&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_facebook&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_twitter&#39;</span><span class="p">,</span>
-         <span class="s">&#39;r_plusone_g&#39;</span>
+    <span class="n">_rankNames</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;rGoogle&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rAlexa&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rCompete&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rMozrank&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rSeznam&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rJyxo&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rBacklinksG&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rMajestic&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rSiteExplorer&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rFacebook&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rTwitter&#39;</span><span class="p">,</span>
+         <span class="s">&#39;rPlusoneG&#39;</span>
          <span class="p">]</span>
 
 <div class="viewcode-block" id="Ranker.to_digit"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker.to_digit">[docs]</a>    <span class="k">def</span> <span class="nf">to_digit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">lex_numb</span> <span class="p">):</span>
@@ -373,6 +537,14 @@
             <span class="n">numb</span> <span class="o">=</span> <span class="n">lex_numb</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">numb</span> <span class="p">)</span>
 </div>
+<div class="viewcode-block" id="Ranker.check_unavailability"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker.check_unavailability">[docs]</a>    <span class="k">def</span> <span class="nf">check_unavailability</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">wdriver</span> <span class="p">):</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wdriver</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;content&quot;]/center/table[1]/tbody/tr/td[1]/a/img&#39;</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">False</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span> <span class="p">(</span> <span class="s">&quot;Problem! Pravdepodobne jsem dostal ban!&quot;</span> <span class="p">)</span>
+</div>
 <div class="viewcode-block" id="Ranker.collect_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.Ranker.collect_that_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_that_all</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="n">_ranks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selxs</span><span class="p">(</span> <span class="s">&#39;//*[@id=&quot;content&quot;]/center/table/tbody/tr/td[2]&#39;</span> <span class="p">)</span>
         <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">to_digit</span><span class="p">(</span> <span class="n">lexNumb</span> <span class="p">)</span> <span class="k">for</span> <span class="n">lexNumb</span> <span class="ow">in</span> <span class="n">_ranks</span><span class="p">]</span>
@@ -382,32 +554,70 @@
 <div class="viewcode-block" id="collect_alexa"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_alexa">[docs]</a><span class="k">def</span> <span class="nf">collect_alexa</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
     <span class="n">alexa</span> <span class="o">=</span> <span class="n">Alexa</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.alexa.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39;</span> <span class="p">)</span>
     <span class="n">alexa</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
+    <span class="n">alexa</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">alexa</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="collect_websiteout"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_websiteout">[docs]</a><span class="k">def</span> <span class="nf">collect_websiteout</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
     <span class="n">websiteout</span> <span class="o">=</span> <span class="n">Websiteout</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.websiteoutlook.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;header&quot;]/form/input[1]&#39;</span> <span class="p">)</span>
     <span class="n">websiteout</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
+    <span class="n">websiteout</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">(</span> <span class="n">websiteout</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="collect_urlm"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_urlm">[docs]</a><span class="k">def</span> <span class="nf">collect_urlm</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
     <span class="n">urlm</span> <span class="o">=</span> <span class="n">Urlm</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.urlm.co&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">)</span>
     <span class="n">urlm</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
+    <span class="n">urlm</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">urlm</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="collect_ranks"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_ranks">[docs]</a><span class="k">def</span> <span class="nf">collect_ranks</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
     <span class="n">ranks</span> <span class="o">=</span> <span class="n">Ranker</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;pagerank.jklir.net&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">)</span>
     <span class="n">ranks</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
+    <span class="n">ranks</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">ranks</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="maternal_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.maternal_that_all">[docs]</a><span class="k">def</span> <span class="nf">maternal_that_all</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; An ultimate function that will return information from all maternal scrapers</span>
+<span class="sd">    </span>
+<span class="sd">    This could even replace functions above</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
+<span class="c">#     classes = [Websiteout, Urlm, Ranker, Alexa]</span>
+<span class="c">#     correspInit = [</span>
+<span class="c">#                     ( &quot;www.websiteoutlook.com&quot;, &#39;//*[@id=&quot;header&quot;]/form/input[1]&#39; ),</span>
+<span class="c">#                     ( &quot;www.urlm.co&quot;, &#39;//*[@id=&quot;url&quot;]&#39; ),</span>
+<span class="c">#                     ( &quot;pagerank.jklir.net&quot;, &#39;//*[@id=&quot;url&quot;]&#39; )</span>
+<span class="c">#                     ( &quot;www.alexa.com&quot;, &#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39; ),</span>
+<span class="c">#                     ]</span>
+<span class="c">#     correspNames = [&quot;websiteout&quot;, &quot;urlm&quot;, &quot;alexa&quot;, &quot;ranks&quot;]</span>
+<span class="c">#</span>
+<span class="c">#     total = {}</span>
+<span class="c">#     for name, cls, ( baseURL, xpathOfInput ) in zip( correspNames, classes, correspInit ):</span>
+<span class="c">#         curcl = cls( maternalURL, baseURL, xpathOfInput )</span>
+<span class="c">#</span>
+<span class="c">#         informer( &quot;Trying to get data for {0} by {1}&quot;.format( maternalURL, dom ), rewrite = True )</span>
+<span class="c">#</span>
+<span class="c">#         try:</span>
+<span class="c">#             curcl.collect_that_all()</span>
+<span class="c">#             curcl.close_driver()</span>
+<span class="c">#             total.update( {name : curcl.scrapedData } )</span>
+<span class="c">#             informer( &quot;Succeded.&quot;, rewrite = True )</span>
+<span class="c">#         except RuntimeError:</span>
+<span class="c">#             informer( &quot;Not successful.&quot; )</span>
+<span class="c">#             total.update( {name : None} )</span>
+<span class="c">#</span>
+<span class="c">#     return( total )</span>
+
     <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;alexa&quot;</span> <span class="p">:</span> <span class="n">collect_alexa</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
-    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;websiteout&quot;</span> <span class="p">:</span> <span class="n">collect_websiteout</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
-    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;urlm&quot;</span> <span class="p">:</span> <span class="n">collect_urlm</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
-    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;ranks&#39;</span> <span class="p">:</span> <span class="n">collect_ranks</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">dom</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="p">[</span><span class="s">&quot;websiteout&quot;</span><span class="p">,</span> <span class="s">&quot;urlm&quot;</span><span class="p">,</span> <span class="s">&quot;alexa&quot;</span><span class="p">,</span> <span class="s">&quot;ranks&quot;</span><span class="p">],</span>
+                         <span class="p">[</span><span class="n">collect_websiteout</span><span class="p">,</span> <span class="n">collect_urlm</span><span class="p">,</span> <span class="n">collect_alexa</span><span class="p">,</span> <span class="n">collect_ranks</span><span class="p">]</span> <span class="p">):</span>
+        <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Trying to get data for {0} by {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">dom</span> <span class="p">),</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="n">func</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
+            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Succeded.&quot;</span><span class="p">,</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Not successful.&quot;</span> <span class="p">)</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="p">)</span>
+
 
     <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span></div>
 </pre></div>

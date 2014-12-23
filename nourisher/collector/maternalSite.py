@@ -7,26 +7,38 @@ class Scraper:
     ''' This is common interface for all scrapers, 
     like these for Alexa.com, urlm.com, websiteoutlook.com, etc.
     
+    This class should not be called directly - there should be descendants implemented
+    who inherits from this class.
+    
+    Note
+    -----
     There should not be any wrangling - save it as it is somewhere and
     after that wrangling can come - there might be errors during it and
     it is inconvenient to collect data again if they are corrupted.
+    
+    **Adding new scrapper** To add a new scrapper is necessary to:
+    
+    1. Create descendant of Scraper - find out scrapper baseURL, 
+    xpath of input field, xpaths for data to scrap, implement necessary
+    functions (e.g. `check_unavailability()`, `collect_all()` ) 
+    2. Add entry to maternal_that_all()
+    3. Implement methods for cleaning data
         
     Atributes
     ---------
-    baseURL: URL address without http:// of the webpage from which data should
-    be scraped of
-    maternalURL: URL of maternal website of feed we want to get info about
-    textWantedSingle: Dict in format {nameOfAttribut : xpathOfAttribut}, 
-    those atts we want text from and it's a single value 
-    textWanteddouble: Dict in format {nameOfCollection : (keys : vals )}, these
-    are pairs columns (e.g. tables) from which we want to extract text 
-    scrapedData: All data which were scraped
+    baseURL : string 
+        URL address without http:// of the webpage from which data should be scraped of
+    maternalURL : string 
+        URL of maternal website of feed we want to get info about
+    scrapedData : dict
+        Data scraped from the website
+    driver : selenium.webdriver
+        webdriver used for scraping of current instance
     '''
 
     baseURL = ""
     maternalURL = ""
     scrapedData = None
-    nameOfInputField = ""
     driver = None
 
 
@@ -35,9 +47,20 @@ class Scraper:
         
         Parameters
         ----------
-        _xpathOfInputField: name of field where is the input field for
-        maternal URL
-        browser: one of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR"]
+        _maternalURL : string
+            URL of maternal website of feed we want to get info about
+        baseURL : string 
+            URL address without http:// of the webpage from which data should be scraped of
+        _xpathOfInputField: string 
+            name of field where is the input field for maternal URL
+        browser: string, optinal
+            
+            Defaults to nourisher.settings.DEFAULT_DRIVER
+            
+            One of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR"]
+            
+            Specify which browser you want to use for scrapping and if you want 
+            to use TOR version or not (TOR must be running at localhost:9050, socks5!) 
         '''
 
         self.baseURL = _baseURL
@@ -71,19 +94,45 @@ class Scraper:
         except NoSuchElementException:
             pass
 
-
         # TODO: get printscreen of that page and save it
 
         self.driver = wdriver
 
     def check_unavailability( self, wdriver ):
-        """Returns True if no informations are available"""
+        """Checks if information of scrapper are available
+        
+        Note
+        -----
+        
+        All descendants must implement this function
+        
+        Parameters
+        ----------
+        wdriver : selenium.webdriver instance
+            current webdriver 
+        
+        Returns
+        -------
+        bool
+            True if no informations are provided, else False (and hence, continue)
+        """
 
         # children must implement
         raise NotImplementedError
 
     def selxs( self, xpath ):
-        '''this is just shortage for finding ALL matching fields'''
+        '''this is just shorthand for finding text from ALL matching fields
+        
+        Parameters
+        ----------
+        xpath: string
+            xpath of wanted elements
+            
+        Returns
+        -------
+        list of strings
+            list of texts from scraped values
+        '''
 
         try:
             elems = self.driver.find_elements_by_xpath( xpath )
@@ -94,7 +143,18 @@ class Scraper:
         return( res )
 
     def selx( self, xpath ):
-        '''this is just shortage for finding ONE matching fields'''
+        '''This is just shortage for finding text from ONE matching fields
+        
+        Parameters
+        ----------
+        xpath: string
+            xpath of wanted elements
+            
+        Returns
+        -------
+        string
+            text from scraped value
+        '''
 
         try:
             res = self.driver.find_element_by_xpath( xpath ).text
@@ -106,9 +166,15 @@ class Scraper:
     def collect_textual_singles( self, textWantedSingle ):
         '''Collects all text from items in textWantedSingle
         
+        Parameters
+        ----------
+        textWantedSingle : dict
+            dict in format {nameOfAtt1 : xpath1, nameOfAtt2:xpath2, ...}
+        
         Returns
         -------
-        dict in format {nameOfAtt, value}
+        dict
+            in format {nameOfAtt1 : value1, nameOfAtt2 : value2,...}
         '''
 
         xitems = {}
@@ -119,7 +185,18 @@ class Scraper:
         return( xitems )
 
     def collect_textual_singles_lists( self, textWantedSingleList ):
-        '''For attributes in type key: [val1, val2, ...]'''
+        '''For attributes in type key: [val1, val2, ...]
+        
+        Parameters
+        ----------
+        textWantedSingleList : dict
+            in type {nameOfAtt : xpath}
+        
+        Returns
+        -------
+        dict
+            in form {nameOfAtt : [val1, val2, ...]}
+        '''
 
         xitems = {}
         for key, xpath in textWantedSingleList.items():
@@ -130,9 +207,23 @@ class Scraper:
     def _collect_two_zip( self, Axpath, Bxpath ):
         '''It's common to get data in two collumns (e.g. in tables)
         
+        Parameters
+        ----------
+        Axpath : list of strings (xpaths)
+            xpaths of first column (usually names for values in Bxpath)
+        Bxpath : list of strings (xpaths)
+            xpaths of second column (usually values for keys in Axpath)
+        
         Returns
         -------
-        dict: dict in format {key1:value1, key2:value2,...}
+        list of tuples
+            in format {AxpathValue1 : BxpathValue1, ,...}
+        
+        Note
+        -----
+        Returns list of tuples instead of dict, because mongodb can't store 
+        under names with "." (dot) in them. This was problem when storing 
+        e.g. {"google.com" : "13.4%"}.
         '''
         A = self.selxs( Axpath )
         B = self.selxs( Bxpath )
@@ -145,10 +236,15 @@ class Scraper:
     def collect_textual_doubles( self, textWantedDouble ):
         '''Collects all text from items in textWantedDouble
         
+        Parameters
+        ----------
+        textWantedDouble : dict
+            in format {attName : (Axpath, Bxpath)}
+        
         Returns
         -------
-        dict of dicts in format {nameOfCollection : data}, where 
-        data is in {nameOfVal : val} 
+        dict of dicts 
+            in format {nameOfCollection : data}, where data is in (nameOfVal, val) 
         '''
 
         xitems = {}
@@ -432,8 +528,49 @@ def collect_ranks( maternalURL ):
     return( ranks.scrapedData )
 
 def maternal_that_all( maternalURL ):
-    ''' An ultimate function that will return information from all maternal scrapers
+    ''' An ultimate function for module that will return
+     information from all scrapers.
+     
+    Parameters
+    ----------
+    maternalURL : string
+        URL for which we want to get informations
+    
+    Returns
+    -------
+    dict
+        dictionary that holdes all collected informations
+    
+    
+    
+    TODO: This could even replace functions above
     '''
+
+#     classes = [Websiteout, Urlm, Ranker, Alexa]
+#     correspInit = [
+#                     ( "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' ),
+#                     ( "www.urlm.co", '//*[@id="url"]' ),
+#                     ( "pagerank.jklir.net", '//*[@id="url"]' )
+#                     ( "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' ),
+#                     ]
+#     correspNames = ["websiteout", "urlm", "alexa", "ranks"]
+#
+#     total = {}
+#     for name, cls, ( baseURL, xpathOfInput ) in zip( correspNames, classes, correspInit ):
+#         curcl = cls( maternalURL, baseURL, xpathOfInput )
+#
+#         informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ), rewrite = True )
+#
+#         try:
+#             curcl.collect_that_all()
+#             curcl.close_driver()
+#             total.update( {name : curcl.scrapedData } )
+#             informer( "Succeded.", rewrite = True )
+#         except RuntimeError:
+#             informer( "Not successful." )
+#             total.update( {name : None} )
+#
+#     return( total )
 
     total = {}
     for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],

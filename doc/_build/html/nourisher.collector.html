@@ -61,8 +61,16 @@
 <dl class="function">
 <dt id="nourisher.collector.collector.collect_all">
 <tt class="descclassname">nourisher.collector.collector.</tt><tt class="descname">collect_all</tt><big>(</big><em>origUrl</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/collector.html#collect_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.collector.collect_all" title="Permalink to this definition">¶</a></dt>
-<dd><p>Collects maximum informations about feed,
-saves them inside database and return info</p>
+<dd><p>Collects maximum informations about the feed,
+saves them inside database and returns ObjectID</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>origUrl: original URL of the input feed</strong></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -71,25 +79,76 @@ saves them inside database and return info</p>
 <dl class="function">
 <dt id="nourisher.collector.feeder.extract_feed_info">
 <tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">extract_feed_info</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#extract_feed_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.extract_feed_info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Collects basic informations about the feed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<blockquote>
+<div><p>url of feed</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>dictionary with data</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="nourisher.collector.feeder.feed_that_all">
 <tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">feed_that_all</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#feed_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.feed_that_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>This collect everything from above</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<blockquote>
+<div><p>URL of feed</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote>
+<div><p>all data collected by feeder</p>
+</div></blockquote>
+<p>list</p>
+<blockquote class="last">
+<div><p>list of URL addresses which will alexa use to try to find maternal URL</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="nourisher.collector.feeder.get_entries_info">
 <tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">get_entries_info</tt><big>(</big><em>links</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#get_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.get_entries_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collect all informations about entries as a list</p>
+<p>TODO: Viz TODO nad polished_entries...</p>
+<p>TODO: This could be definitely made better - not just one enormous try block</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>links: list of links</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>links: list</strong></p>
+<blockquote>
+<div><p>list of links</p>
+</div></blockquote>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Informations about entries in lists</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>Parsed information about entries</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -105,8 +164,20 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>links: corresponding links of titles</strong></p>
-<p class="last"><strong>corespTitles: corresponding titles to links</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>links</strong> : list</p>
+<blockquote>
+<div><p>corresponding links of titles</p>
+</div></blockquote>
+<p><strong>corespTitles: list</strong></p>
+<blockquote>
+<div><p>corresponding titles to links</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>dictionary with informations</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -114,15 +185,54 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="nourisher.collector.feeder.number_of_entries_per_day">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">number_of_entries_per_day</tt><big>(</big><em>entries</em>, <em>n_of_entries</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#number_of_entries_per_day"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.number_of_entries_per_day" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vrati kolik clanku dava feed za jeden den</p>
+<dt id="nourisher.collector.feeder.polish_entries_info">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">polish_entries_info</tt><big>(</big><em>lc</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#polish_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.polish_entries_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get informations about entries of the feed</p>
+<p>TODO: Should be better implemented inside e.g. extract feed info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lc</strong> : dict</p>
+<blockquote>
+<div><p>dict of entries
+ODO: Not sure what this is...</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>dict with polished informations</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="nourisher.collector.feeder.polish_entries_info">
-<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">polish_entries_info</tt><big>(</big><em>lc</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#polish_entries_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.polish_entries_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vytahne info o clancich z dictu</p>
+<dt id="nourisher.collector.feeder.publication_frequency">
+<tt class="descclassname">nourisher.collector.feeder.</tt><tt class="descname">publication_frequency</tt><big>(</big><em>publishedTimes</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/feeder.html#publication_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.feeder.publication_frequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Frequency of publication</p>
+<p>Returns how many entries are published per one hour</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>publishedTimes</strong> : list</p>
+<blockquote>
+<div><p>Timetuples which represents publish times of articles</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">float</p>
+<blockquote class="last">
+<div><p>Number of entries per hour</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -130,7 +240,7 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 <span id="nourisher-collector-maternalsite-module"></span><h2>nourisher.collector.maternalSite module<a class="headerlink" href="#module-nourisher.collector.maternalSite" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nourisher.collector.maternalSite.Alexa">
-<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Alexa</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Alexa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Alexa</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em>, <em>browser='phantomjs'</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Alexa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#nourisher.collector.maternalSite.Scraper" title="nourisher.collector.maternalSite.Scraper"><tt class="xref py py-class docutils literal"><span class="pre">nourisher.collector.maternalSite.Scraper</span></tt></a></p>
 <p>This holder for Alexa.com informations</p>
 <p class="rubric">Attributes</p>
@@ -155,6 +265,12 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Alexa.check_unavailability" title="nourisher.collector.maternalSite.Alexa.check_unavailability"><tt class="xref py py-obj docutils literal"><span class="pre">check_unavailability</span></tt></a>(driver)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">close_driver</span></tt>()</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">collect_textual_doubles</span></tt>(textWantedDouble)</td>
 <td>Collects all text from items in textWantedDouble</td>
 </tr>
@@ -168,21 +284,26 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">selx</span></tt>(xpath)</td>
-<td>this is just shortage for finding ONE matching fields</td>
+<td>This is just shortage for finding text from ONE matching fields</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">selxs</span></tt>(xpath)</td>
-<td>this is just shortage for finding ALL matching fields</td>
+<td>this is just shorthand for finding text from ALL matching fields</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Alexa.alexa_doubles">
-<tt class="descname">alexa_doubles</tt><em class="property"> = {'upstreamSites': ('//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[1]/a', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span'), 'popKeywords': ('//*[&#64;id=&quot;keywords_top_keywords_table&quot;]/tbody/tr/td[1]/span[2]', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span'), 'whereGoNext': ('//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td/span[&#64;class=&quot;word-wrap&quot;]', '//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td[&#64;class=&quot;text-right&quot;]/span')}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_doubles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">alexa_doubles</tt><em class="property"> = {'upstreamSites': ('//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[1]/a', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span'), 'whereGoNext': ('//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td/span[&#64;class=&quot;word-wrap&quot;]', '//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td[&#64;class=&quot;text-right&quot;]/span'), 'popKeywords': ('//*[&#64;id=&quot;keywords_top_keywords_table&quot;]/tbody/tr/td[1]/span[2]', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span')}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_doubles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Alexa.alexa_singles">
-<tt class="descname">alexa_singles</tt><em class="property"> = {'bounceRateChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/span', 'link': '//*[&#64;id=&quot;js-li-last&quot;]/span[1]/a', 'dailyPagevPerVisChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/span', 'rankInCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'inCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/h4/a', 'globalRank': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[1]/span/span/div/strong', 'totalSitesLinking': '//*[&#64;id=&quot;linksin-panel-content&quot;]/div[1]/span/div/span', 'dailyTimeOnSiteChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/span', 'globalRankChange': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'dailyTimeOnSite': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/strong', 'bounceRate': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/strong', 'searchVisitsChange': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/span', 'searchVisits': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/strong', 'relatedLinks': '//*[&#64;id=&quot;related_link_table&quot;]/tbody/tr/td/a', 'dailyPagevPerVis': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/strong'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_singles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">alexa_singles</tt><em class="property"> = {'globalRank': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[1]/span/span/div/strong', 'relatedLinks': '//*[&#64;id=&quot;related_link_table&quot;]/tbody/tr/td/a', 'searchVisitsChange': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/span', 'dailyPagevPerVisChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/span', 'bounceRateChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/span', 'inCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/h4/a', 'link': '//*[&#64;id=&quot;js-li-last&quot;]/span[1]/a', 'dailyPagevPerVis': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/strong', 'rankInCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'dailyTimeOnSite': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/strong', 'totalSitesLinking': '//*[&#64;id=&quot;linksin-panel-content&quot;]/div[1]/span/div/span', 'dailyTimeOnSiteChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/span', 'globalRankChange': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'bounceRate': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/strong', 'searchVisits': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/strong'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_singles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nourisher.collector.maternalSite.Alexa.check_unavailability">
+<tt class="descname">check_unavailability</tt><big>(</big><em>driver</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Alexa.check_unavailability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.check_unavailability" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -194,7 +315,7 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 
 <dl class="class">
 <dt id="nourisher.collector.maternalSite.Ranker">
-<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Ranker</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Ranker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Ranker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Ranker</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em>, <em>browser='phantomjs'</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Ranker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Ranker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#nourisher.collector.maternalSite.Scraper" title="nourisher.collector.maternalSite.Scraper"><tt class="xref py py-class docutils literal"><span class="pre">nourisher.collector.maternalSite.Scraper</span></tt></a></p>
 <p>Holder for ranks</p>
 <p class="rubric">Attributes</p>
@@ -219,6 +340,12 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Ranker.check_unavailability" title="nourisher.collector.maternalSite.Ranker.check_unavailability"><tt class="xref py py-obj docutils literal"><span class="pre">check_unavailability</span></tt></a>(wdriver)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">close_driver</span></tt>()</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">collect_textual_doubles</span></tt>(textWantedDouble)</td>
 <td>Collects all text from items in textWantedDouble</td>
 </tr>
@@ -232,16 +359,21 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">selx</span></tt>(xpath)</td>
-<td>this is just shortage for finding ONE matching fields</td>
+<td>This is just shortage for finding text from ONE matching fields</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">selxs</span></tt>(xpath)</td>
-<td>this is just shortage for finding ALL matching fields</td>
+<td>this is just shorthand for finding text from ALL matching fields</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Ranker.to_digit" title="nourisher.collector.maternalSite.Ranker.to_digit"><tt class="xref py py-obj docutils literal"><span class="pre">to_digit</span></tt></a>(lex_numb)</td>
 <td>Prevede rank na cislo, je-li to mozne</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="nourisher.collector.maternalSite.Ranker.check_unavailability">
+<tt class="descname">check_unavailability</tt><big>(</big><em>wdriver</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Ranker.check_unavailability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Ranker.check_unavailability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="nourisher.collector.maternalSite.Ranker.collect_that_all">
 <tt class="descname">collect_that_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Ranker.collect_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Ranker.collect_that_all" title="Permalink to this definition">¶</a></dt>
@@ -257,13 +389,12 @@ jeste navic zjisti, zda url adresa obsahuje specialni znaky</p>
 
 <dl class="class">
 <dt id="nourisher.collector.maternalSite.Scraper">
-<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Scraper</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Scraper</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em>, <em>browser='phantomjs'</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>This is common interface for all scrapers, 
 like these for Alexa.com, urlm.com, websiteoutlook.com, etc.</p>
-<p>There should not be any wrangling - save it as it is somewhere and
-after that wrangling can come - there might be errors during it and
-it is inconvenient to collect data again if they are corrupted.</p>
+<p>This class should not be called directly - there should be descendants implemented
+who inherits from this class.</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -286,6 +417,12 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Scraper.check_unavailability" title="nourisher.collector.maternalSite.Scraper.check_unavailability"><tt class="xref py py-obj docutils literal"><span class="pre">check_unavailability</span></tt></a>(wdriver)</td>
+<td>Checks if information of scrapper are available</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Scraper.close_driver" title="nourisher.collector.maternalSite.Scraper.close_driver"><tt class="xref py py-obj docutils literal"><span class="pre">close_driver</span></tt></a>()</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Scraper.collect_textual_doubles" title="nourisher.collector.maternalSite.Scraper.collect_textual_doubles"><tt class="xref py py-obj docutils literal"><span class="pre">collect_textual_doubles</span></tt></a>(textWantedDouble)</td>
 <td>Collects all text from items in textWantedDouble</td>
 </tr>
@@ -299,16 +436,45 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <td>Collects all possible informations - every instance must implement</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Scraper.selx" title="nourisher.collector.maternalSite.Scraper.selx"><tt class="xref py py-obj docutils literal"><span class="pre">selx</span></tt></a>(xpath)</td>
-<td>this is just shortage for finding ONE matching fields</td>
+<td>This is just shortage for finding text from ONE matching fields</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Scraper.selxs" title="nourisher.collector.maternalSite.Scraper.selxs"><tt class="xref py py-obj docutils literal"><span class="pre">selxs</span></tt></a>(xpath)</td>
-<td>this is just shortage for finding ALL matching fields</td>
+<td>this is just shorthand for finding text from ALL matching fields</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Scraper.baseURL">
 <tt class="descname">baseURL</tt><em class="property"> = ''</em><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.baseURL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nourisher.collector.maternalSite.Scraper.check_unavailability">
+<tt class="descname">check_unavailability</tt><big>(</big><em>wdriver</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper.check_unavailability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.check_unavailability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if information of scrapper are available</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wdriver</strong> : selenium.webdriver instance</p>
+<blockquote>
+<div><p>current webdriver</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bool</p>
+<blockquote class="last">
+<div><p>True if no informations are provided, else False (and hence, continue)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nourisher.collector.maternalSite.Scraper.close_driver">
+<tt class="descname">close_driver</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper.close_driver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.close_driver" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -319,8 +485,16 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dict of dicts in format {nameOfCollection</strong> : data}, where</p>
-<p class="last"><strong>data is in {nameOfVal</strong> : val}</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>textWantedDouble</strong> : dict</p>
+<blockquote>
+<div><p>in format {attName : (Axpath, Bxpath)}</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict of dicts</p>
+<blockquote class="last">
+<div><p>in format {nameOfCollection : data}, where data is in (nameOfVal, val)</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -335,7 +509,17 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict in format {nameOfAtt, value}</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>textWantedSingle</strong> : dict</p>
+<blockquote>
+<div><p>dict in format {nameOfAtt1 : xpath1, nameOfAtt2:xpath2, ...}</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>in format {nameOfAtt1 : value1, nameOfAtt2 : value2,...}</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -345,6 +529,24 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <dt id="nourisher.collector.maternalSite.Scraper.collect_textual_singles_lists">
 <tt class="descname">collect_textual_singles_lists</tt><big>(</big><em>textWantedSingleList</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper.collect_textual_singles_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.collect_textual_singles_lists" title="Permalink to this definition">¶</a></dt>
 <dd><p>For attributes in type key: [val1, val2, ...]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>textWantedSingleList</strong> : dict</p>
+<blockquote>
+<div><p>in type {nameOfAtt : xpath}</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>in form {nameOfAtt : [val1, val2, ...]}</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -357,7 +559,7 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>maternalURL: url of maternal website of feed</strong></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">pandas-serie with data</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict: dictionary with data</td>
 </tr>
 </tbody>
 </table>
@@ -374,11 +576,6 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="nourisher.collector.maternalSite.Scraper.nameOfInputField">
-<tt class="descname">nameOfInputField</tt><em class="property"> = ''</em><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.nameOfInputField" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Scraper.scrapedData">
 <tt class="descname">scrapedData</tt><em class="property"> = None</em><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.scrapedData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -386,20 +583,56 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <dl class="method">
 <dt id="nourisher.collector.maternalSite.Scraper.selx">
 <tt class="descname">selx</tt><big>(</big><em>xpath</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper.selx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.selx" title="Permalink to this definition">¶</a></dt>
-<dd><p>this is just shortage for finding ONE matching fields</p>
+<dd><p>This is just shortage for finding text from ONE matching fields</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>xpath: string</strong></p>
+<blockquote>
+<div><p>xpath of wanted elements</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>text from scraped value</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="nourisher.collector.maternalSite.Scraper.selxs">
 <tt class="descname">selxs</tt><big>(</big><em>xpath</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Scraper.selxs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Scraper.selxs" title="Permalink to this definition">¶</a></dt>
-<dd><p>this is just shortage for finding ALL matching fields</p>
+<dd><p>this is just shorthand for finding text from ALL matching fields</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>xpath: string</strong></p>
+<blockquote>
+<div><p>xpath of wanted elements</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of strings</p>
+<blockquote class="last">
+<div><p>list of texts from scraped values</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="nourisher.collector.maternalSite.Urlm">
-<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Urlm</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Urlm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Urlm</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em>, <em>browser='phantomjs'</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Urlm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#nourisher.collector.maternalSite.Scraper" title="nourisher.collector.maternalSite.Scraper"><tt class="xref py py-class docutils literal"><span class="pre">nourisher.collector.maternalSite.Scraper</span></tt></a></p>
 <p>Holder for data from Urlm.com informations</p>
 <p class="rubric">Attributes</p>
@@ -424,6 +657,12 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Urlm.check_unavailability" title="nourisher.collector.maternalSite.Urlm.check_unavailability"><tt class="xref py py-obj docutils literal"><span class="pre">check_unavailability</span></tt></a>(driver)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">close_driver</span></tt>()</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">collect_textual_doubles</span></tt>(textWantedDouble)</td>
 <td>Collects all text from items in textWantedDouble</td>
 </tr>
@@ -437,13 +676,18 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">selx</span></tt>(xpath)</td>
-<td>this is just shortage for finding ONE matching fields</td>
+<td>This is just shortage for finding text from ONE matching fields</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">selxs</span></tt>(xpath)</td>
-<td>this is just shortage for finding ALL matching fields</td>
+<td>this is just shorthand for finding text from ALL matching fields</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="nourisher.collector.maternalSite.Urlm.check_unavailability">
+<tt class="descname">check_unavailability</tt><big>(</big><em>driver</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Urlm.check_unavailability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.check_unavailability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="nourisher.collector.maternalSite.Urlm.collect_that_all">
 <tt class="descname">collect_that_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Urlm.collect_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.collect_that_all" title="Permalink to this definition">¶</a></dt>
@@ -456,19 +700,19 @@ it is inconvenient to collect data again if they are corrupted.</p>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Urlm.urlm_singles">
-<tt class="descname">urlm_singles</tt><em class="property"> = {'link': '/html/body/div[1]/div[2]/div/div[1]/div[1]/span', 'monthlyPagesViewed': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[1]/td[2]', 'externalLinks': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[5]/td[2]', 'inCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[2]', 'monthlyVisits': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[2]/td[2]', 'infoPerDay': '//*[&#64;id=&quot;web&quot;]/p[3]', 'estimatedWorth': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[4]/td[2]', 'globalRank': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[2]/span[1]', 'topics': '//*[&#64;id=&quot;web&quot;]/p[1]', 'valuePerVis': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[3]/td[2]', 'category': '//*[&#64;id=&quot;web&quot;]/p[2]', 'rankInCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[1]', 'numberOfPages': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[6]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">urlm_singles</tt><em class="property"> = {'globalRank': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[2]/span[1]', 'category': '//*[&#64;id=&quot;web&quot;]/p[2]', 'inCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[2]', 'numberOfPages': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[6]/td[2]', 'rankInCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[1]', 'externalLinks': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[5]/td[2]', 'infoPerDay': '//*[&#64;id=&quot;web&quot;]/p[3]', 'topics': '//*[&#64;id=&quot;web&quot;]/p[1]', 'link': '/html/body/div[1]/div[2]/div/div[1]/div[1]/span', 'monthlyVisits': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[2]/td[2]', 'estimatedWorth': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[4]/td[2]', 'valuePerVis': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[3]/td[2]', 'monthlyPagesViewed': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[1]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Urlm.urlm_singles_lists">
-<tt class="descname">urlm_singles_lists</tt><em class="property"> = {'popPages': '//*[&#64;id=&quot;web&quot;]/ul[1]/li', 'sitesLinkingIn': '//*[&#64;id=&quot;web&quot;]/ul[2]/li', 'sitesLinkingOut': '//*[&#64;id=&quot;web&quot;]/ul[3]/li'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles_lists" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">urlm_singles_lists</tt><em class="property"> = {'popPages': '//*[&#64;id=&quot;web&quot;]/ul[1]/li', 'sitesLinkingOut': '//*[&#64;id=&quot;web&quot;]/ul[3]/li', 'sitesLinkingIn': '//*[&#64;id=&quot;web&quot;]/ul[2]/li'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles_lists" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="nourisher.collector.maternalSite.Websiteout">
-<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Websiteout</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Websiteout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">Websiteout</tt><big>(</big><em>_maternalURL</em>, <em>_baseURL</em>, <em>_xpathOfInputField</em>, <em>browser='phantomjs'</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Websiteout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#nourisher.collector.maternalSite.Scraper" title="nourisher.collector.maternalSite.Scraper"><tt class="xref py py-class docutils literal"><span class="pre">nourisher.collector.maternalSite.Scraper</span></tt></a></p>
 <p>This is holder for Websiteoutlook.com informations</p>
 <p class="rubric">Attributes</p>
@@ -493,6 +737,12 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.collector.maternalSite.Websiteout.check_unavailability" title="nourisher.collector.maternalSite.Websiteout.check_unavailability"><tt class="xref py py-obj docutils literal"><span class="pre">check_unavailability</span></tt></a>(driver)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">close_driver</span></tt>()</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">collect_textual_doubles</span></tt>(textWantedDouble)</td>
 <td>Collects all text from items in textWantedDouble</td>
 </tr>
@@ -506,13 +756,18 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">selx</span></tt>(xpath)</td>
-<td>this is just shortage for finding ONE matching fields</td>
+<td>This is just shortage for finding text from ONE matching fields</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">selxs</span></tt>(xpath)</td>
-<td>this is just shortage for finding ALL matching fields</td>
+<td>this is just shorthand for finding text from ALL matching fields</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="nourisher.collector.maternalSite.Websiteout.check_unavailability">
+<tt class="descname">check_unavailability</tt><big>(</big><em>driver</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Websiteout.check_unavailability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout.check_unavailability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="nourisher.collector.maternalSite.Websiteout.collect_that_all">
 <tt class="descname">collect_that_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#Websiteout.collect_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout.collect_that_all" title="Permalink to this definition">¶</a></dt>
@@ -520,7 +775,7 @@ it is inconvenient to collect data again if they are corrupted.</p>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Websiteout.webout_singles">
-<tt class="descname">webout_singles</tt><em class="property"> = {'link': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[1]/td[2]/span/span', 'pageRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[2]/td[2]', 'backlingsYahoo': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[3]/td[2]', 'pageviewsPerDay': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[2]/td[2]', 'traficRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[1]/td[2]', 'dailyUSD': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[3]/td[2]', 'websiteoutRank': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[4]/td[2]/span[1]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout.webout_singles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">webout_singles</tt><em class="property"> = {'backlingsYahoo': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[3]/td[2]', 'pageviewsPerDay': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[2]/td[2]', 'dailyUSD': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[3]/td[2]', 'traficRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[1]/td[2]', 'link': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[1]/td[2]/span/span', 'websiteoutRank': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[4]/td[2]/span[1]', 'pageRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[2]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout.webout_singles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -549,6 +804,7 @@ it is inconvenient to collect data again if they are corrupted.</p>
 <dt id="nourisher.collector.maternalSite.maternal_that_all">
 <tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">maternal_that_all</tt><big>(</big><em>maternalURL</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#maternal_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.maternal_that_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>An ultimate function that will return information from all maternal scrapers</p>
+<p>This could even replace functions above</p>
 </dd></dl>
 
 </div>

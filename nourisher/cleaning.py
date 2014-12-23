@@ -5,17 +5,17 @@ Created on Dec 22, 2014
 '''
 from nourisher import utiliser
 def wrangle_numbers( vst ):
-    ''' Converts string to numbers, if possible
-    
-    Handle even percents and also 
+    ''' Converts string to numbers, if possible. 
     
     Parameters
     ----------
-    vst: string in form D%, D, D in en_US local, empty
+    vst: string 
+        in several forms - these that are collected by scrapers
     
     Returns
     -------
     float
+        wrangled number
     
     Note
     -----
@@ -66,6 +66,18 @@ def wrangle_numbers( vst ):
     return( vysl )
 
 def time_to_dec( time ):
+    '''Convert time interval from MM:SS to MM.S
+    
+    Parameters
+    ----------
+    string of time
+        time in MM:SS format
+    
+    Returns
+    -------
+        time in minutes in decimal format
+    '''
+
     from locale import setlocale, LC_ALL, atof
     setlocale( LC_ALL, "en_US.UTF8" )
     try:
@@ -86,6 +98,7 @@ def time_to_dec( time ):
         return( None )
 
 def numbs_from_list( diction, keys ):
+    '''Tries to wrangle every string from list to numbers'''
 
     new = {}
     for key in keys:
@@ -94,6 +107,20 @@ def numbs_from_list( diction, keys ):
     return( new )
 
 def check_if_presents_list( diction, keys ):
+    '''Returns True if element from key is present and nonempty in diction
+    
+    Parameters
+    ----------
+    diction : dict
+        dictionary which should be checked
+    keys : list of strings
+        strings that should be as keys in diction
+        
+    Returns
+    -------
+    dict
+        in form {key:bool, ...}
+    '''
 
     new = {}
     for key in keys:
@@ -106,6 +133,17 @@ def check_if_presents_list( diction, keys ):
     return( new )
 
 def wrangle_entries( entries ):
+    '''Wrangle informations from entries, basically make numbers from them
+    
+    Parameters
+    ----------
+    Dict of information about entries which are collected by feedInfo collector
+    
+    Returns
+    -------
+    dict
+        wrangled informations about entries for the feed
+    '''
 
     newE = {}
 
@@ -161,6 +199,7 @@ def wrangle_entries( entries ):
     return( newE )
 
 def clean_websiteout( websData ):
+    """Cleaner for websiteoutlook.com"""
 
     wanted_numeric = ['pageviewsPerDay', 'backlingsYahoo', 'pageRank', 'dailyUSD', 'estimatedWorth', 'websiteoutRank', 'traficRank']
     # wanted_text = ['link']
@@ -172,6 +211,7 @@ def clean_websiteout( websData ):
     return( newData )
 
 def clean_alexa( alexData ):
+    """Cleaner for alexa.com"""
 
     wanted_numeric = ['searchVisits',
                      'bounceRate',
@@ -188,6 +228,7 @@ def clean_alexa( alexData ):
     return( newData )
 
 def clean_urlm( urlmData ):
+    """Cleaner for urlm.co"""
 
     wanted_numeric = ['valuePerVis', 'numberOfPages', 'globalRank', 'externalLinks', 'monthlyVisits', 'monthlyPagesViewed']
 
@@ -198,8 +239,8 @@ def clean_urlm( urlmData ):
     return( newData )
 
 def clean_ranks( ranksData ):
-    # wanted_numeric = ['r_mozrank', 'r_seznam', 'r_plusone_g', 'r_compete', 'r_alexa',
-    #                  'r_twitter', 'r_majestic', 'r_google', 'r_facebook', 'r_site_explorer', 'r_jyxo']
+    """Cleaner for ranks"""
+
     wanted_numeric = ['rGoogle',
          'rAlexa',
          'rCompete',
@@ -220,6 +261,7 @@ def clean_ranks( ranksData ):
 
 
 def clean_feedInfo( feedData ):
+    """Cleaner for feed info"""
 
     newData = {}
 
@@ -250,11 +292,10 @@ def clean_feedInfo( feedData ):
     return( newData )
 
 def clean_that_all( rawData ):
+    """Wrapper for all cleaners"""
 
     doms = ['urlm', 'websiteout', 'alexa', 'feedInfo', 'ranks']
     funcs = [clean_urlm, clean_websiteout, clean_alexa, clean_feedInfo, clean_ranks]
-
-    # prepro = [func( rawData[dom] ) for func, dom in zip( funcs, doms ) if (rawData[dom] != None) else None]
 
     prepro = []
     for func, dom in zip( funcs, doms ):

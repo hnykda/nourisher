@@ -6,8 +6,16 @@ from nourisher.utiliser import informer
 
 
 def collect_all( origUrl ):
-    '''Collects maximum informations about feed,
-        saves them inside database and return info
+    '''Collects maximum informations about the feed,
+    saves them inside database and returns ObjectID
+        
+    Parameters
+    ----------
+    origUrl: original URL of the input feed
+    
+    Return
+    ------
+    ObjectID: ObjectID of data saved in database
     '''
 
     total = {}

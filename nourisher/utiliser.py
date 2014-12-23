@@ -177,7 +177,7 @@ def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = ls
 
 def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
                 ip = lset.DB_IP, port = lset.DB_PORT ):
-    '''Try to find object by original URL of feed
+    '''Try to find object by original URL of feed and returns the LAST one inserted
     
     Parameters
     ----------
@@ -195,7 +195,7 @@ def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB
     Returns
     -------
     ObjectID
-        of found document
+        of last inserted matching document 
         
     Raises
     ------

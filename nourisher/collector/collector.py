@@ -11,13 +11,18 @@ def collect_all( origUrl ):
         
     Parameters
     ----------
-    origUrl: original URL of the input feed
+    origUrl: string 
+        original URL of the input feed
     
     Return
     ------
-    ObjectID: ObjectID of data saved in database
+    ObjectID: ObjectID 
+        of data saved in database
     '''
 
+    import time
+
+    startTime = time.time.now()
     total = {}
 
     _feedInfo = feed_that_all( origUrl )
@@ -35,5 +40,6 @@ def collect_all( origUrl ):
     total.update( {"origURL" : origUrl} )
 
     resID = push_to_db( total )
+    informer( "Collection data took: {0}".format( time.time.now() - startTime ) + " seconds", verbosity = 2 )
 
     return( resID )

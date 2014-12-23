@@ -19,6 +19,8 @@ class Nourisher:
         if self.check_response( _origUrlofFeed ) == True:
             pass
         else:
+            # if no response is given, just push this to databse and
+            # it means that there is nothing to collect
             push_to_db( {"origURL" : self.origFeedUrl} )
             raise URLError( "Can't connect to feed" )
 

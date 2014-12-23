@@ -12,17 +12,24 @@ from pymongo import MongoClient
 
 setlocale( LC_ALL, "en_US.UTF8" )
 
-def informer( msg, *args ):
+def informer( msg, *args, level = 1, rewrite = False ):
 
     # we don't want any errors from logging...
     try:
-        if lset.VERBOSITY == 0:
+        if lset.VERBOSITY < level:
             pass
-        elif lset.VERBOSITY == 1:
-            print( msg )
-            if args:
-                for arg in args:
-                    print( arg )
+        elif lset.VERBOSITY >= level:
+            if rewrite == False:
+                print( msg )
+                if args:
+                    for arg in args:
+                        print( arg )
+            elif rewrite == True:
+                print( "\r" + msg, end = "" )
+                if args:
+                    for arg in args:
+                        print( "\r" + arg, end = "" )
+
     except:
         import sys
         print( "Can't print message because of ", sys.exc_info() )

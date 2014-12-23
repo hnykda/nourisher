@@ -123,6 +123,11 @@ def get_entries_info( links ):
     import requests
 
     dtb = defaultdict( list )
+
+    utiliser.informer( "Parsing links... " )
+
+    # just for process checking
+    counterI = 1
     for plink in links:
         # TODO: This is wrong - values are now mixed (not that anybody cares...)
         try:
@@ -130,7 +135,8 @@ def get_entries_info( links ):
             # hence it ends up on true address
             artURL = requests.get( plink ).url
             dtb["finalUrl"].append( artURL )
-            utiliser.informer( "Parsing link: " + str( artURL ) )
+            utiliser.informer( "Parsing link {0}/{1}: ".format( counterI, len( links ) ) + str( artURL ), level = 1, rewrite = True )
+            counterI += 1
 
             art = nwsp.Article( artURL )
             art.download()
@@ -213,8 +219,9 @@ def get_entries_info( links ):
             # dtb["rawHtmlOfPage"].append( str( pageSoup ) )
 
         except ( TypeError, nwsp.article.ArticleException ):
-            utiliser.informer( "Error when parsing an article" )
-    utiliser.informer( dict( dtb ) )
+            utiliser.informer( "\nError when parsing an article" )
+    utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
+    utiliser.informer( "Number of parsed articles: ", len( dtb['finalUrl'] ), level = 1 )
     return( dict( dtb ) )
 
 def get_url_info( links, corespTitles ):

@@ -25,7 +25,6 @@ def wrangle_numbers( vst ):
     from locale import setlocale, LC_ALL, atof
     setlocale( LC_ALL, "en_US.UTF8" )
 
-
     if type( vst ) == float or type( vst ) == int:
         vysl = vst
     elif type( vst ) == type( None ):
@@ -43,7 +42,7 @@ def wrangle_numbers( vst ):
             vysl = atof( numb[1:] )
 
         # websiteout
-        elif numb.split( " " )[1] in ["Million", "Billion"]:
+        elif ( "Million" in numb ) or ( "Billion" in numb ):
             if 'Million' in numb:
                 spl = numb.split( " " )
                 vysl = atof( spl[0] ) * 1000000
@@ -63,6 +62,7 @@ def wrangle_numbers( vst ):
     elif vst == "" or vst == []:
         vysl = None
 
+    utiliser.informer( "Wrangling from: " + str( vst ) + " to:\t " + str( vysl ), level = 2 )
     return( vysl )
 
 def time_to_dec( time ):
@@ -242,9 +242,11 @@ def clean_feedInfo( feedData ):
         except KeyError:
             newData[k] = 0
 
-    entries = wrangle_entries( feedData["entries"] )
-    newData.update( entries )
-
+    if feedData["n_of_entries"] > 0:
+        entries = wrangle_entries( feedData["entries"] )
+        newData.update( entries )
+    elif feedData["n_of_entries"] == 0:
+        newData.update( {"entries" : None} )
     return( newData )
 
 def clean_that_all( rawData ):

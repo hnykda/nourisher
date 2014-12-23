@@ -66,7 +66,7 @@ class Scraper:
         try:
             if self.check_unavailability( wdriver ) == True:
                 wdriver.close()
-                informer( "No data from this scrapper: ".format( self.__class__.__name__ ) )
+                informer( "No data from this scrapper." )
                 raise RuntimeError ( "No available data from this Scraper" )
         except NoSuchElementException:
             pass
@@ -435,10 +435,10 @@ def maternal_that_all( maternalURL ):
     total = {}
     for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],
                          [collect_websiteout, collect_urlm, collect_alexa, collect_ranks] ):
-        informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ) )
+        informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ), rewrite = True )
         try:
             total.update( {dom : func( maternalURL ) } )
-            informer( "Succeded." )
+            informer( "Succeded.", rewrite = True )
         except RuntimeError:
             informer( "Not successful." )
             total.update( {dom : None} )

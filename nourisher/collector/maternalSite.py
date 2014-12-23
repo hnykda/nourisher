@@ -129,7 +129,10 @@ class Scraper:
 
     def _collect_two_zip( self, Axpath, Bxpath ):
         '''It's common to get data in two collumns (e.g. in tables)
-        so this will return them in pandas serie
+        
+        Returns
+        -------
+        dict: dict in format {key1:value1, key2:value2,...}
         '''
         A = self.selxs( Axpath )
         B = self.selxs( Bxpath )
@@ -163,7 +166,7 @@ class Scraper:
         
         Returns
         --------
-        pandas-serie with data
+        dict: dictionary with data
         '''
 
         raise NotImplementedError

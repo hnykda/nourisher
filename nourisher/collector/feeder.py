@@ -1,14 +1,19 @@
 from collections import defaultdict
 from nourisher import settings as setl, utiliser
 
-def number_of_entries_per_day( entries, n_of_entries ):
+def number_of_entries_per_day( published_times ):
     """Vrati kolik clanku dava feed za jeden den"""
 
-    from pandas import to_datetime, TimeSeries
-    published_times = [to_datetime( entry["published"] ) for entry in entries]
-    pub_t = TimeSeries( published_times )
-    pub_freq = ( pub_t.max() - pub_t.min() ) / n_of_entries
-    return( ( 24 * 3600 ) / pub_freq.total_seconds() )
+    from time import mktime, struct_time
+
+    _times = published_times
+    times = [mktime( struct_time( x ) ) for x in _times]
+    first = min( times )
+    last = max( times )
+    # number of entries per hour
+    pub_freq = len( times ) / ( ( last - first ) / 3600 )
+    return( pub_freq )
+
 
 def extract_feed_info( url ):
 
@@ -58,7 +63,7 @@ def extract_feed_info( url ):
         ifs["n_of_entries"] = None
 
     try:
-        ifs["pub_freq"] = number_of_entries_per_day( entries, n_of_entries )
+        ifs["pub_freq"] = number_of_entries_per_day( entries["published_parsed"] )
     except:
         ifs["pub_freq"] = None
 

@@ -6,11 +6,8 @@ Created on Dec 20, 2014
 Here are some utilities that might be useful
 '''
 
-from locale import setlocale, LC_ALL, atof
 from nourisher import settings as lset
 from pymongo import MongoClient
-
-setlocale( LC_ALL, "en_US.UTF8" )
 
 def informer( msg, *args, level = 1, rewrite = False ):
 
@@ -34,21 +31,6 @@ def informer( msg, *args, level = 1, rewrite = False ):
         import sys
         print( "Can't print message because of ", sys.exc_info() )
 
-def mean_a_var_z_listu( lentry ):
-    """Returns mean and std from list of numbers
-    
-    Parameters
-    -----------
-    Array of numbers
-    
-    Returns
-    -------
-    (mean, std)
-    """
-    import numpy as np
-
-    return ( np.mean( lentry ), np.std( lentry ) )
-
 def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
                 ip = lset.DB_IP, port = lset.DB_PORT ):
 
@@ -62,11 +44,6 @@ def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     -------
     ObjectID: ObjectID of inserted document    
     '''
-
-    # import pandas as pd
-    # if type( inpObj ) == type( pd.Series ):
-    #    inpObj = inpObj.to_dict()
-
 
     client = MongoClient( ip, port )
     db = client[dbName][collection]

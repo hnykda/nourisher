@@ -78,7 +78,8 @@ def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     db = client[dbName][collection]
 
     insID = db.insert( inpObj )
-    informer( "Saving to database under ObjectID: ", str( insID ) )
+    informer( "Saving to {0} database, {1} collection under ObjectID: ".format( dbName, collection )
+              , str( insID ) )
 
     client.disconnect()
 
@@ -104,6 +105,8 @@ def get_from_db( idOfO, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     '''
 
     from bson.objectid import ObjectId
+    informer( "Looking in {0} database, {1} collection under ObjectID: {2}".format( dbName, collection, idOfO ) )
+
 
     if type( idOfO ) == str:
         idOfO = ObjectId( idOfO )
@@ -138,6 +141,8 @@ def get_id_of_last_inserted( dbName = lset.DB_NAME, collection = lset.DB_COLLECT
     ObjectID : ObjectID 
         last inserted document to collection
     '''
+
+    informer( "Looking in {0} database, {1} collection for last item.".format( dbName, collection ) )
     client = MongoClient( ip, port )
     db = client[dbName][collection]
 
@@ -175,7 +180,7 @@ def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = ls
     res = db.update( finder, {"$set" : {key: value}} )
     return( res )
 
-def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
+def find_objects_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
                 ip = lset.DB_IP, port = lset.DB_PORT ):
     '''Try to find object by original URL of feed and returns the LAST one inserted
     
@@ -211,7 +216,7 @@ def find_object_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB
         res = allRes[0]["_id"]
     except IndexError:
         res = None
-
+    informer( "Looking in {0} database, {1} collection for URL: {2}".format( dbName, collection, origUrl ) )
     # TODO: Slow! But after find is fetched by res, allRes is empty...
     informer( "Object(s) by URL found: ", [( obj["_id"], obj["_id"].generation_time.isoformat() )
                                            for obj in db.find( {"origURL" : origUrl} ).sort( '_id', -1 )] )

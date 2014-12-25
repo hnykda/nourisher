@@ -202,10 +202,12 @@ def get_entries_info( links ):
             art = nwsp.Article( artURL )
             art.download()
             art.parse()
-            art.nlp()
 
             dtb["sourceURL"].append( art.source_url )
-            dtb["articleKeywords"].append( art.keywords )
+
+            # TODO: Not needed
+            # art.nlp()
+            # dtb["articleKeywords"].append( art.keywords )
 
             pageHtml = art.html
             pageSoup = BeautifulSoup( pageHtml )
@@ -279,10 +281,12 @@ def get_entries_info( links ):
             # Not needed
             # dtb["rawHtmlOfPage"].append( str( pageSoup ) )
 
-        except ( TypeError, nwsp.article.ArticleException ):
-            utiliser.informer( "\nError when parsing an article" )
+        except ( TypeError, nwsp.article.ArticleException, UnicodeDecodeError, requests.exceptions.ConnectionError ) as ex:
+            import traceback
+            utiliser.informer( "\nError when parsing an article", ex )
+            utiliser.informer( traceback.format_exc() )
     # utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
-    utiliser.informer( "Number of parsed articles: ", len( dtb['finalUrl'] ), level = 1 )
+    utiliser.informer( "\nNumber of parsed articles: {0}".format( len( dtb['finalUrl'] ) ), level = 1 )
     return( dict( dtb ) )
 
 def get_url_info( links, corespTitles ):

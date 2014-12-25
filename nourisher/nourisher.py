@@ -1,4 +1,3 @@
-from urllib.error import URLError, HTTPError
 from nourisher.utiliser import get_from_db, push_to_db, informer
 class Nourisher:
     '''Top-holder for everything next
@@ -38,7 +37,7 @@ class Nourisher:
             # if no response is given, just push this to databse and
             # it means that there is nothing to collect
             push_to_db( {"origURL" : self.origFeedUrl} )
-            raise URLError( "Can't connect to feed" )
+            raise ConnectionError( "Can't connect to feed" )
 
     def get_objectid( self ):
         """Try to find out by origFeedUrl if it is already in database
@@ -59,14 +58,14 @@ class Nourisher:
 
         if self.dataID == None:
             print( "Trying to find out if this URL is already in database" )
-            from .utiliser import find_object_by_origurl
-            obj = find_object_by_origurl( self.origFeedUrl )
+            from .utiliser import find_objects_by_origurl
+            obj = find_objects_by_origurl( self.origFeedUrl )
             if obj == None:
                 raise RuntimeError ( "Data hasn't been collected yet. Run collect_all()" )
             else:
                 res = obj
                 # Mongodb have UTC time, not local
-                print( "Data have been already collected in  ", res.generation_time.isoformat() )
+                # print( "Data have been already collected in  ", res.generation_time.isoformat() )
                 return( res )
         else:
             return( self.dataID )
@@ -87,14 +86,20 @@ class Nourisher:
             True if page responds, else exception
         '''
 
-        from urllib.request import urlopen
+        import requests
 
         try:
-            sta = urlopen( origUrl ).status
-            informer( "Page {0} is responding: ".format( origUrl ) + str( sta ) )
-            return( True )
-        except ( ConnectionResetError, URLError, HTTPError ):
-            pass
+            gmet = requests.get( origUrl, timeout = 10 )
+            statusCode = gmet.status_code
+
+            if statusCode == 404:
+                raise ConnectionError ( "Page is not responding 404" )
+            else:
+                return( True )
+                informer( "Page {0} is responding: ".format( origUrl ) + str( statusCode ) )
+
+        except ( ConnectionError, requests.exceptions.Timeout ) as ex:
+            raise ex
 
 
 

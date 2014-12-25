@@ -196,7 +196,7 @@ def wrangle_entries( entries ):
                 utiliser.informer( "array is: " + str( entries[key] ) )
         elif len( x ) == 0:
             standardDev, meanOfAll = None, None
-            utiliser.informer( r"array is empty: [] ==" + str( entries[key] ) )
+            utiliser.informer( r"array is empty or full of None ==" + str( entries[key] ), level = 2 )
 
         newE[key + "_STD"], newE[key + "_MEAN"] = standardDev, meanOfAll
 
@@ -310,9 +310,12 @@ def clean_that_all( rawData ):
     for func, dom in zip( funcs, doms ):
         dataDomain = rawData[dom]
         if dataDomain == None:
-            prepro.append( {dom : None} )
+            # False if there are no data available for this domain
+            # and True if data were provided
+            prepro.append( {dom : False} )
         else:
             prepro.append( func( dataDomain ) )
+            prepro.append( {dom : True} )
 
     cleaned = {}
     for diction in prepro:

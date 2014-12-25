@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nourisher.manager &mdash; nourisher  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="nourisher  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">nourisher  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for nourisher.manager</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Created on Dec 24, 2014</span>
+
+<span class="sd">@author: dan</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">nourisher</span> <span class="kn">import</span> <span class="n">settings</span> <span class="k">as</span> <span class="n">setl</span><span class="p">,</span> <span class="n">utiliser</span>
+<span class="kn">from</span> <span class="nn">numpy.ma.core</span> <span class="kn">import</span> <span class="n">ids</span>
+<span class="kn">from</span> <span class="nn">_collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module is for managing whole collection</span>
+
+<span class="sd">Basically it&#39;s a little ORM</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Collection"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.Collection">[docs]</a><span class="k">class</span> <span class="nc">Collection</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Collection for whole dataset</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    datasetID : list of ObjectID</span>
+<span class="sd">        ObjectIDs of all objects in database    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">datasetID</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">fetched</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">setl</span><span class="o">.</span><span class="n">DB_IP</span><span class="p">,</span> <span class="n">setl</span><span class="o">.</span><span class="n">DB_PORT</span> <span class="p">)</span>
+        <span class="n">coll</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">setl</span><span class="o">.</span><span class="n">DB_NAME</span><span class="p">][</span><span class="n">setl</span><span class="o">.</span><span class="n">DB_COLLECTION</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="n">coll</span>
+
+<div class="viewcode-block" id="Collection.get_ids"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.Collection.get_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_ids</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load ObjectIDs of items in collection</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of ObjectID</span>
+<span class="sd">            ObjectIDs of all items in database, saves them to self.datasetID</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span> <span class="s">&quot;Fetch IDs first&quot;</span> <span class="p">)</span>
+
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span> <span class="n">item</span><span class="p">[</span><span class="s">&quot;_id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasetID</span> <span class="o">=</span> <span class="n">ids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fetched</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">ids</span> <span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="Collection.get_collumn"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.Collection.get_collumn">[docs]</a>    <span class="k">def</span> <span class="nf">get_collumn</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get first level column of every fetched object</span>
+<span class="sd">        </span>
+<span class="sd">        If key is not found, only None for given URL is returned</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            one of key in database</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            in form {ObjectID1 : val1, ...}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetched</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span> <span class="p">(</span> <span class="s">&quot;Fetch IDs first&quot;</span> <span class="p">)</span>
+
+        <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">counterEmptiness</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasetID</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">oid</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span> <span class="p">:</span> <span class="n">oid</span><span class="p">}</span> <span class="p">)[</span><span class="n">key</span><span class="p">]}</span> <span class="p">)</span>
+                <span class="n">counterEmptiness</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">total</span><span class="o">.</span><span class="n">update</span> <span class="p">(</span> <span class="p">{</span><span class="n">oid</span> <span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">counterEmptiness</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span> <span class="p">(</span> <span class="s">&quot;No such key in any of objects&quot;</span> <span class="p">)</span>
+
+
+        <span class="nb">setattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">total</span> <span class="p">)</span>
+        <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> 
+            <span class="s">&quot;Data saved under {0} attribut. Number of None values: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_nones</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Collection.count_nones"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.Collection.count_nones">[docs]</a>    <span class="k">def</span> <span class="nf">count_nones</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count None values in column&quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span> <span class="p">(</span> <span class="s">&quot;Data are not fetched to this attribut&quot;</span> <span class="p">)</span>
+
+        <span class="n">cnones</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">False</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">filter</span><span class="p">(</span> <span class="n">cnones</span><span class="p">,</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">count</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Collection.init_nourisher_by_id"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.Collection.init_nourisher_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">init_nourisher_by_id</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ide</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes ObjectID, tries to find out this ID in database, create </span>
+<span class="sd">        new Nourisher object initialized with dataID, dataretrieved and</span>
+<span class="sd">        make a new cleaning on them.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ide</span>
+<span class="sd">            ObjectID of wished object</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Nourisher instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">nourisher</span> <span class="kn">import</span> <span class="n">nourisher</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">utiliser</span><span class="o">.</span><span class="n">get_from_db</span><span class="p">(</span> <span class="n">ide</span> <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s">&quot;origURL&quot;</span><span class="p">]</span>
+        <span class="n">nour</span> <span class="o">=</span> <span class="n">nourisher</span><span class="o">.</span><span class="n">Nourisher</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+        <span class="n">nour</span><span class="o">.</span><span class="n">dataID</span> <span class="o">=</span> <span class="n">nour</span><span class="o">.</span><span class="n">get_objectid</span><span class="p">()</span>
+        <span class="n">nour</span><span class="o">.</span><span class="n">retrieve_data</span><span class="p">()</span>
+        <span class="n">nour</span><span class="o">.</span><span class="n">clean_data</span><span class="p">()</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">nour</span> <span class="p">)</span>
+
+<span class="c">#     def analyze_collection( self ):</span>
+<span class="c">#         &quot;&quot;&quot;</span>
+<span class="c">#         Analyze number of missing values, return wrong items...</span>
+<span class="c">#</span>
+<span class="c">#         Note</span>
+<span class="c">#         -----</span>
+<span class="c">#         Memory consuming!</span>
+<span class="c">#         &quot;&quot;&quot;</span>
+<span class="c">#</span>
+<span class="c">#         if self.fetched == False:</span>
+<span class="c">#             raise KeyError ( &quot;Get IDs first!&quot; )</span>
+<span class="c">#</span>
+<span class="c">#         evr = self.cur.find( {} )</span>
+<span class="c">#</span>
+<span class="c">#         # no data at all</span>
+<span class="c">#         fetchEvr = [i for i in evr]</span>
+<span class="c">#</span>
+<span class="c">#         # missing data per domain</span>
+<span class="c">#</span>
+<span class="c">#         setattr( self, &quot;collection_info&quot;, dataAnalysis )</span>
+
+<span class="c">#     def collect_cols( self, lkeys ):</span>
+<span class="c">#         &quot;&quot;&quot;Collects keys in lkeys and make a collection from that</span>
+<span class="c">#</span>
+<span class="c">#         Parameters</span>
+<span class="c">#         ----------</span>
+<span class="c">#         lkeys : list of strings</span>
+<span class="c">#             contains name of keys from which to build a collections</span>
+<span class="c">#</span>
+<span class="c">#         Returns</span>
+<span class="c">#         -------</span>
+<span class="c">#         dict</span>
+<span class="c">#             in format `{key1 : [data1], key2 : [data2], ...}`</span>
+<span class="c">#         &quot;&quot;&quot;</span>
+<span class="c">#</span>
+<span class="c">#         valsList = []</span>
+<span class="c">#         for key in lkeys:</span>
+<span class="c">#             valsList.append( {key : self.get_collumn( key )} )</span>
+<span class="c">#</span>
+<span class="c">#         dataTotal = {}</span>
+<span class="c">#         for lst in valsList:</span>
+<span class="c">#             idIn = {}</span>
+<span class="c">#             for curID, val in lst.items():</span>
+<span class="c">#                 idIn.update( {curID : val} )</span>
+<span class="c">#             dataTotal.update( idIn )</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">nourisher  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

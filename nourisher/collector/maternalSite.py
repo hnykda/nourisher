@@ -503,6 +503,17 @@ class Ranker( Scraper ):
 
         self.scrapedData = dict( zip( self._rankNames, ranks ) )
 
+# da se nahradit
+# rAlexa : http://moonsy.com/alexa_rank/, //*[@id="domain"], //*[@id="l"]/div[3]/h2[2]/b[2]
+# rMozrank :http://moonsy.com/mozrank/, //*[@id="l"]/div[3]/div[6]/table/tbody/tr[2]/td[1]
+# rMozTrust : http://moonsy.com/moztrust/, //*[@id="l"]/div[3]/div[6]/table/tbody/tr[2]/td[1]
+# rCompete : http://moonsy.com/compete-rank/, //*[@id="domain"]
+# rGoogle : http://moonsy.com/pagerank_checker/, //*[@id="domain"]
+# pageAge : http://moonsy.com/domain_age/, //*[@id="l"]/div[3]/div[5]/span[2]
+# rBacklinks: http://moonsy.com/backlinks_checker/, //*[@id="l"]/div[3]/div[6]/table/tbody/tr[2]/td[1]
+# rLinkingIn : http://moonsy.com/link_popularity/, //*[@id="resId"]
+# YahooListing : http://moonsy.com/yahoo-directory-checker/, //*[@id="l"]/div[3]/p[3]/b[1]
+
 # def collect_alexa( maternalURL ):
 #     alexa = Alexa( maternalURL, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
 #     alexa.collect_that_all()

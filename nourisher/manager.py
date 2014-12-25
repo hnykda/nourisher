@@ -4,8 +4,6 @@ Created on Dec 24, 2014
 @author: dan
 '''
 from nourisher import settings as setl, utiliser
-from numpy.ma.core import ids
-from _collections import defaultdict
 
 """
 This module is for managing whole collection

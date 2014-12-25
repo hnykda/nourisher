@@ -365,6 +365,102 @@ make a new cleaning on them.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="nourisher.manager.MultiScrapper">
+<em class="property">class </em><tt class="descclassname">nourisher.manager.</tt><tt class="descname">MultiScrapper</tt><a class="reference internal" href="_modules/nourisher/manager.html#MultiScrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.MultiScrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>This is for collecting data for multiple source URLs</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>sourceURLs</td>
+<td>(list of strings) list of URLs which we want to scrap</td>
+</tr>
+<tr class="row-even"><td>goodOnes</td>
+<td>(list of strings) urls which were processed correctly</td>
+</tr>
+<tr class="row-odd"><td>badOnes</td>
+<td>(list of strings) urls which were processed correctly</td>
+</tr>
+<tr class="row-even"><td>counter</td>
+<td>(int) number of processed URLs so far</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.manager.MultiScrapper.fetch_urls" title="nourisher.manager.MultiScrapper.fetch_urls"><tt class="xref py py-obj docutils literal"><span class="pre">fetch_urls</span></tt></a>(filePath)</td>
+<td>Get urls from file and appends them to sourceURLs.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nourisher.manager.MultiScrapper.scrap_data" title="nourisher.manager.MultiScrapper.scrap_data"><tt class="xref py py-obj docutils literal"><span class="pre">scrap_data</span></tt></a>([startingPoint,&nbsp;sleepInt,&nbsp;logFile])</td>
+<td>Scrap all URLs from sourceURLs</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="nourisher.manager.MultiScrapper.badOnes">
+<tt class="descname">badOnes</tt><em class="property"> = []</em><a class="headerlink" href="#nourisher.manager.MultiScrapper.badOnes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nourisher.manager.MultiScrapper.counter">
+<tt class="descname">counter</tt><em class="property"> = 0</em><a class="headerlink" href="#nourisher.manager.MultiScrapper.counter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nourisher.manager.MultiScrapper.fetch_urls">
+<tt class="descname">fetch_urls</tt><big>(</big><em>filePath</em><big>)</big><a class="reference internal" href="_modules/nourisher/manager.html#MultiScrapper.fetch_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.MultiScrapper.fetch_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get urls from file and appends them to sourceURLs.</p>
+<p>This file must have one url address on every line, encoding utf-8.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nourisher.manager.MultiScrapper.goodOnes">
+<tt class="descname">goodOnes</tt><em class="property"> = []</em><a class="headerlink" href="#nourisher.manager.MultiScrapper.goodOnes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nourisher.manager.MultiScrapper.scrap_data">
+<tt class="descname">scrap_data</tt><big>(</big><em>startingPoint=0</em>, <em>sleepInt=300</em>, <em>logFile='scrap.log'</em><big>)</big><a class="reference internal" href="_modules/nourisher/manager.html#MultiScrapper.scrap_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.MultiScrapper.scrap_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scrap all URLs from sourceURLs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>startingPoint</strong> : int</p>
+<blockquote>
+<div><p>from which url in sourceURLs should be started</p>
+</div></blockquote>
+<p><strong>sleepInt</strong> : int</p>
+<blockquote>
+<div><p>number of seconds to wait between every loop (because of bans on some servers)</p>
+</div></blockquote>
+<p><strong>logFile</strong> : strings</p>
+<blockquote class="last">
+<div><p>path to file where you want to save log</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nourisher.manager.MultiScrapper.sourceURLs">
+<tt class="descname">sourceURLs</tt><em class="property"> = []</em><a class="headerlink" href="#nourisher.manager.MultiScrapper.sourceURLs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-nourisher.nourisher">
 <span id="nourisher-nourisher-module"></span><h2>nourisher.nourisher module<a class="headerlink" href="#module-nourisher.nourisher" title="Permalink to this headline">¶</a></h2>
@@ -895,7 +991,9 @@ based on entries</p>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-nourisher.cleaning">nourisher.cleaning module</a></li>
-<li><a class="reference internal" href="#module-nourisher.manager">nourisher.manager module</a></li>
+<li><a class="reference internal" href="#module-nourisher.manager">nourisher.manager module</a><ul>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-nourisher.nourisher">nourisher.nourisher module</a></li>
 <li><a class="reference internal" href="#module-nourisher.settings">nourisher.settings module</a></li>
 <li><a class="reference internal" href="#module-nourisher.utiliser">nourisher.utiliser module</a></li>

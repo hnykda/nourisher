@@ -53,9 +53,8 @@
 
 <span class="sd">@author: dan</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">nourisher</span> <span class="kn">import</span> <span class="n">settings</span> <span class="k">as</span> <span class="n">setl</span><span class="p">,</span> <span class="n">utiliser</span>
-<span class="kn">from</span> <span class="nn">numpy.ma.core</span> <span class="kn">import</span> <span class="n">ids</span>
-<span class="kn">from</span> <span class="nn">_collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">nourisher</span> <span class="kn">import</span> <span class="n">settings</span> <span class="k">as</span> <span class="n">setl</span>
+<span class="kn">from</span> <span class="nn">nourisher</span> <span class="kn">import</span> <span class="n">utiliser</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module is for managing whole collection</span>
@@ -223,7 +222,90 @@
 <span class="c">#             for curID, val in lst.items():</span>
 <span class="c">#                 idIn.update( {curID : val} )</span>
 <span class="c">#             dataTotal.update( idIn )</span>
-</pre></div></div></div>
+
+</div></div>
+<div class="viewcode-block" id="MultiScrapper"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.MultiScrapper">[docs]</a><span class="k">class</span> <span class="nc">MultiScrapper</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is for collecting data for multiple source URLs</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sourceURLs : list of strings</span>
+<span class="sd">        list of URLs which we want to scrap</span>
+<span class="sd">    goodOnes : list of strings</span>
+<span class="sd">        urls which were processed correctly</span>
+<span class="sd">    badOnes  : list of strings</span>
+<span class="sd">        urls which were processed correctly</span>
+<span class="sd">    counter : int</span>
+<span class="sd">        number of processed URLs so far</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sourceURLs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">goodOnes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">badOnes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="MultiScrapper.scrap_data"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.MultiScrapper.scrap_data">[docs]</a>    <span class="k">def</span> <span class="nf">scrap_data</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">startingPoint</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sleepInt</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">logFile</span> <span class="o">=</span> <span class="s">&quot;scrap.log&quot;</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scrap all URLs from sourceURLs</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        startingPoint : int</span>
+<span class="sd">            from which url in sourceURLs should be started</span>
+<span class="sd">        sleepInt : int</span>
+<span class="sd">            number of seconds to wait between every loop (because of bans on some servers)</span>
+<span class="sd">        logFile : strings</span>
+<span class="sd">            path to file where you want to save log</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="kn">import</span> <span class="nn">traceback</span>
+        <span class="kn">from</span> <span class="nn">nourisher.nourisher</span> <span class="kn">import</span> <span class="n">Nourisher</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">startingPoint</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceURLs</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Processing {0}/{1}: {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> 
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceURLs</span> <span class="p">)</span> <span class="p">,</span> <span class="n">url</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">nour</span> <span class="o">=</span> <span class="n">Nourisher</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+                <span class="n">nour</span><span class="o">.</span><span class="n">collect_all</span><span class="p">()</span>
+                <span class="n">nour</span><span class="o">.</span><span class="n">retrieve_data</span><span class="p">()</span>
+                <span class="n">nour</span><span class="o">.</span><span class="n">clean_data</span><span class="p">()</span>
+                <span class="n">nour</span><span class="o">.</span><span class="n">update_object_db</span><span class="p">(</span> <span class="s">&quot;cleaned&quot;</span><span class="p">,</span> <span class="n">nour</span><span class="o">.</span><span class="n">dataCleaned</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">goodOnes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="c"># if ctrl+c is pressed exit</span>
+                <span class="k">raise</span> <span class="n">ex</span>
+                <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">&quot;So far were processed {0} ({1}) URLs. &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">,</span> <span class="n">url</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c"># but if anything else - continue</span>
+                <span class="n">sysEr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+                <span class="n">tracb</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="n">sysEr</span><span class="p">,</span> <span class="n">tracb</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">badOnes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span> <span class="n">url</span><span class="p">,</span> <span class="n">tracb</span> <span class="p">)</span> <span class="p">)</span>
+
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">logFile</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s">&quot;utf-8&quot;</span> <span class="p">)</span> <span class="k">as</span> <span class="n">logf</span><span class="p">:</span>
+                    <span class="n">logf</span><span class="o">.</span><span class="n">writeline</span><span class="p">(</span> <span class="n">url</span> <span class="p">)</span>
+                    <span class="n">logf</span><span class="o">.</span><span class="n">writeline</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">tracb</span> <span class="p">)</span> <span class="p">)</span>
+
+            <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">&quot;It tooks: {0} seconds. </span><span class="se">\n</span><span class="s">---------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">now</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span> <span class="n">sleepInt</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="MultiScrapper.fetch_urls"><a class="viewcode-back" href="../../nourisher.html#nourisher.manager.MultiScrapper.fetch_urls">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_urls</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get urls from file and appends them to sourceURLs.</span>
+<span class="sd">        </span>
+<span class="sd">        This file must have one url address on every line, encoding utf-8.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">filePath</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s">&quot;utf-8&quot;</span> <span class="p">)</span> <span class="k">as</span> <span class="n">ifile</span><span class="p">:</span>
+            <span class="n">lurls</span> <span class="o">=</span> <span class="n">ifile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lurls</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceURLs</span> <span class="o">+=</span> <span class="n">urls</span>
+        <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceURLs</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span></div></div>
+</pre></div>
 
           </div>
         </div>

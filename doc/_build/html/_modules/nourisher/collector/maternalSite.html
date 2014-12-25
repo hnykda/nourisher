@@ -553,6 +553,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">scrapedData</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rankNames</span><span class="p">,</span> <span class="n">ranks</span> <span class="p">)</span> <span class="p">)</span>
 
+<span class="c"># da se nahradit</span>
+<span class="c"># rAlexa : http://moonsy.com/alexa_rank/, //*[@id=&quot;domain&quot;], //*[@id=&quot;l&quot;]/div[3]/h2[2]/b[2]</span>
+<span class="c"># rMozrank :http://moonsy.com/mozrank/, //*[@id=&quot;l&quot;]/div[3]/div[6]/table/tbody/tr[2]/td[1]</span>
+<span class="c"># rMozTrust : http://moonsy.com/moztrust/, //*[@id=&quot;l&quot;]/div[3]/div[6]/table/tbody/tr[2]/td[1]</span>
+<span class="c"># rCompete : http://moonsy.com/compete-rank/, //*[@id=&quot;domain&quot;]</span>
+<span class="c"># rGoogle : http://moonsy.com/pagerank_checker/, //*[@id=&quot;domain&quot;]</span>
+<span class="c"># pageAge : http://moonsy.com/domain_age/, //*[@id=&quot;l&quot;]/div[3]/div[5]/span[2]</span>
+<span class="c"># rBacklinks: http://moonsy.com/backlinks_checker/, //*[@id=&quot;l&quot;]/div[3]/div[6]/table/tbody/tr[2]/td[1]</span>
+<span class="c"># rLinkingIn : http://moonsy.com/link_popularity/, //*[@id=&quot;resId&quot;]</span>
+<span class="c"># YahooListing : http://moonsy.com/yahoo-directory-checker/, //*[@id=&quot;l&quot;]/div[3]/p[3]/b[1]</span>
+
 <span class="c"># def collect_alexa( maternalURL ):</span>
 <span class="c">#     alexa = Alexa( maternalURL, &quot;www.alexa.com&quot;, &#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39; )</span>
 <span class="c">#     alexa.collect_that_all()</span>

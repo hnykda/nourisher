@@ -3,7 +3,8 @@ Created on Dec 24, 2014
 
 @author: dan
 '''
-from nourisher import settings as setl, utiliser
+from nourisher import settings as setl
+from nourisher import utiliser
 
 """
 This module is for managing whole collection
@@ -173,3 +174,84 @@ class Collection():
 #             dataTotal.update( idIn )
 
 
+class MultiScrapper:
+    """This is for collecting data for multiple source URLs
+    
+    Attributes
+    ----------
+    sourceURLs : list of strings
+        list of URLs which we want to scrap
+    goodOnes : list of strings
+        urls which were processed correctly
+    badOnes  : list of strings
+        urls which were processed correctly
+    counter : int
+        number of processed URLs so far
+    """
+
+    sourceURLs = []
+    goodOnes = []
+    badOnes = []
+    counter = 0
+
+    def scrap_data( self, startingPoint = 0, sleepInt = 300, logFile = "scrap.log" ):
+        """Scrap all URLs from sourceURLs
+        
+        Parameters
+        ----------
+        startingPoint : int
+            from which url in sourceURLs should be started
+        sleepInt : int
+            number of seconds to wait between every loop (because of bans on some servers)
+        logFile : strings
+            path to file where you want to save log
+        """
+
+        import time
+        import sys
+        import traceback
+        from nourisher.nourisher import Nourisher
+
+        self.counter = startingPoint + 1
+        for url in self.sourceURLs:
+            now = time.time()
+            try:
+                utiliser.informer( "\nProcessing {0}/{1}: {2}".format( 
+                                          self.counter, len( self.sourceURLs ) , url ) )
+                nour = Nourisher( url )
+                nour.collect_all()
+                nour.retrieve_data()
+                nour.clean_data()
+                nour.update_object_db( "cleaned", nour.dataCleaned )
+                self.goodOnes.append( url )
+            except KeyboardInterrupt as ex:
+                # if ctrl+c is pressed exit
+                raise ex
+                utiliser.informer( "So far were processed {0} ({1}) URLs. ".format( self.counter, url ) )
+            except:
+                # but if anything else - continue
+                sysEr = sys.exc_info()
+                tracb = traceback.format_exc()
+                utiliser.informer( sysEr, tracb )
+                self.badOnes.append( ( url, tracb ) )
+
+                with open( logFile, "a", encoding = "utf-8" ) as logf:
+                    logf.writeline( url )
+                    logf.writeline( "\n".join( tracb ) )
+
+            utiliser.informer( "It tooks: {0} seconds. \n---------------\n".format( time.time() - now ) )
+            time.sleep( sleepInt )
+            self.counter += 1
+
+    def fetch_urls( self, filePath ):
+        """Get urls from file and appends them to sourceURLs.
+        
+        This file must have one url address on every line, encoding utf-8.
+        """
+
+        with open( filePath, "r", encoding = "utf-8" ) as ifile:
+            lurls = ifile.readlines()
+            urls = [line.split( "\n" )[0] for line in lurls]
+
+        self.sourceURLs += urls
+        utiliser.informer( self.sourceURLs, level = 2 )

@@ -103,7 +103,7 @@ class Collection():
 
         return( count )
 
-    def generate_nourisher_by_id( self, ide ):
+    def init_nourisher_by_id( self, ide ):
         """
         Takes ObjectID, tries to find out this ID in database, create 
         new Nourisher object initialized with dataID, dataretrieved and
@@ -127,6 +127,27 @@ class Collection():
         nour.retrieve_data()
         nour.clean_data()
         return( nour )
+
+#     def analyze_collection( self ):
+#         """
+#         Analyze number of missing values, return wrong items...
+#
+#         Note
+#         -----
+#         Memory consuming!
+#         """
+#
+#         if self.fetched == False:
+#             raise KeyError ( "Get IDs first!" )
+#
+#         evr = self.cur.find( {} )
+#
+#         # no data at all
+#         fetchEvr = [i for i in evr]
+#
+#         # missing data per domain
+#
+#         setattr( self, "collection_info", dataAnalysis )
 
 #     def collect_cols( self, lkeys ):
 #         """Collects keys in lkeys and make a collection from that

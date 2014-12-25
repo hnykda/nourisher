@@ -296,8 +296,9 @@ def clean_feedInfo( feedData ):
     if feedData["n_of_entries"] > 0:
         entries = wrangle_entries( feedData["entries"] )
         newData.update( entries )
+        newData.update( {"entries" : True} )
     elif feedData["n_of_entries"] == 0:
-        newData.update( {"entries" : None} )
+        newData.update( {"entries" : False} )
     return( newData )
 
 def clean_that_all( rawData ):

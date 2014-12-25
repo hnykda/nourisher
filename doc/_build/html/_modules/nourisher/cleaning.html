@@ -55,17 +55,17 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">from</span> <span class="nn">nourisher</span> <span class="kn">import</span> <span class="n">utiliser</span>
 <div class="viewcode-block" id="wrangle_numbers"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.wrangle_numbers">[docs]</a><span class="k">def</span> <span class="nf">wrangle_numbers</span><span class="p">(</span> <span class="n">vst</span> <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Converts string to numbers, if possible</span>
-<span class="sd">    </span>
-<span class="sd">    Handle even percents and also </span>
+    <span class="sd">&#39;&#39;&#39; Converts string to numbers, if possible. </span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    vst: string in form D%, D, D in en_US local, empty</span>
+<span class="sd">    vst: string </span>
+<span class="sd">        in several forms - these that are collected by scrapers</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
+<span class="sd">        wrangled number</span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>
 <span class="sd">    -----</span>
@@ -88,11 +88,13 @@
         <span class="k">if</span> <span class="n">numb</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;%&quot;</span><span class="p">:</span>
             <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">numb</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
 
-        <span class="k">elif</span> <span class="n">numb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">r&quot;$&quot;</span><span class="p">:</span>
-            <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">numb</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span>
-
-        <span class="c"># websiteout</span>
+        <span class="c"># websiteout and urlm worth</span>
         <span class="k">elif</span> <span class="p">(</span> <span class="s">&quot;Million&quot;</span> <span class="ow">in</span> <span class="n">numb</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="s">&quot;Billion&quot;</span> <span class="ow">in</span> <span class="n">numb</span> <span class="p">):</span>
+
+            <span class="c"># urlm</span>
+            <span class="k">if</span> <span class="n">numb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">r&quot;$&quot;</span><span class="p">:</span>
+                <span class="n">numb</span> <span class="o">=</span> <span class="n">numb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
             <span class="k">if</span> <span class="s">&#39;Million&#39;</span> <span class="ow">in</span> <span class="n">numb</span><span class="p">:</span>
                 <span class="n">spl</span> <span class="o">=</span> <span class="n">numb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot; &quot;</span> <span class="p">)</span>
                 <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="o">*</span> <span class="mi">1000000</span>
@@ -100,6 +102,10 @@
                 <span class="n">spl</span> <span class="o">=</span> <span class="n">numb</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&quot; &quot;</span> <span class="p">)</span>
                 <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="o">*</span> <span class="mi">1000000000</span>
         <span class="c"># some webs return slash when no information are provided</span>
+
+        <span class="k">elif</span> <span class="n">numb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">r&quot;$&quot;</span><span class="p">:</span>
+            <span class="n">vysl</span> <span class="o">=</span> <span class="n">atof</span><span class="p">(</span> <span class="n">numb</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span>
+
         <span class="k">elif</span> <span class="n">numb</span> <span class="o">==</span> <span class="s">&quot;-&quot;</span> <span class="ow">or</span> <span class="n">numb</span> <span class="o">==</span> <span class="s">&quot;--&quot;</span><span class="p">:</span>
             <span class="n">vysl</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -116,6 +122,18 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">vysl</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="time_to_dec"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.time_to_dec">[docs]</a><span class="k">def</span> <span class="nf">time_to_dec</span><span class="p">(</span> <span class="n">time</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convert time interval from MM:SS to MM.S</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    string of time</span>
+<span class="sd">        time in MM:SS format</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        time in minutes in decimal format</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="kn">from</span> <span class="nn">locale</span> <span class="kn">import</span> <span class="n">setlocale</span><span class="p">,</span> <span class="n">LC_ALL</span><span class="p">,</span> <span class="n">atof</span>
     <span class="n">setlocale</span><span class="p">(</span> <span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&quot;en_US.UTF8&quot;</span> <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -136,7 +154,9 @@
         <span class="k">return</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="numbs_from_list"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.numbs_from_list">[docs]</a><span class="k">def</span> <span class="nf">numbs_from_list</span><span class="p">(</span> <span class="n">diction</span><span class="p">,</span> <span class="n">keys</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Tries to wrangle every string from list to numbers&#39;&#39;&#39;</span>
 
+    <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Finding {0} in {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="n">diction</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">),</span> <span class="n">keys</span> <span class="p">),</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span>
     <span class="n">new</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrangle_numbers</span><span class="p">(</span> <span class="n">diction</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
@@ -144,6 +164,20 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">new</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="check_if_presents_list"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.check_if_presents_list">[docs]</a><span class="k">def</span> <span class="nf">check_if_presents_list</span><span class="p">(</span> <span class="n">diction</span><span class="p">,</span> <span class="n">keys</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns True if element from key is present and nonempty in diction</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    diction : dict</span>
+<span class="sd">        dictionary which should be checked</span>
+<span class="sd">    keys : list of strings</span>
+<span class="sd">        strings that should be as keys in diction</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        in form {key:bool, ...}</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">new</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -156,6 +190,18 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">new</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="wrangle_entries"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.wrangle_entries">[docs]</a><span class="k">def</span> <span class="nf">wrangle_entries</span><span class="p">(</span> <span class="n">entries</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Wrangle informations from entries, basically make numbers from them</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    entries : dict </span>
+<span class="sd">        of information about entries which are collected by feedInfo collector</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        wrangled informations about entries for the feed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">newE</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -200,7 +246,7 @@
                 <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">&quot;array is: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">entries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">standardDev</span><span class="p">,</span> <span class="n">meanOfAll</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
-            <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">r&quot;array is empty: [] ==&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">entries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">utiliser</span><span class="o">.</span><span class="n">informer</span><span class="p">(</span> <span class="s">r&quot;array is empty or full of None ==&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">entries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">),</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span>
 
         <span class="n">newE</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s">&quot;_STD&quot;</span><span class="p">],</span> <span class="n">newE</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s">&quot;_MEAN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">standardDev</span><span class="p">,</span> <span class="n">meanOfAll</span>
 
@@ -211,6 +257,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">newE</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="clean_websiteout"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.clean_websiteout">[docs]</a><span class="k">def</span> <span class="nf">clean_websiteout</span><span class="p">(</span> <span class="n">websData</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleaner for websiteoutlook.com&quot;&quot;&quot;</span>
 
     <span class="n">wanted_numeric</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;pageviewsPerDay&#39;</span><span class="p">,</span> <span class="s">&#39;backlingsYahoo&#39;</span><span class="p">,</span> <span class="s">&#39;pageRank&#39;</span><span class="p">,</span> <span class="s">&#39;dailyUSD&#39;</span><span class="p">,</span> <span class="s">&#39;estimatedWorth&#39;</span><span class="p">,</span> <span class="s">&#39;websiteoutRank&#39;</span><span class="p">,</span> <span class="s">&#39;traficRank&#39;</span><span class="p">]</span>
     <span class="c"># wanted_text = [&#39;link&#39;]</span>
@@ -222,6 +269,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">newData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="clean_alexa"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.clean_alexa">[docs]</a><span class="k">def</span> <span class="nf">clean_alexa</span><span class="p">(</span> <span class="n">alexData</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleaner for alexa.com&quot;&quot;&quot;</span>
 
     <span class="n">wanted_numeric</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;searchVisits&#39;</span><span class="p">,</span>
                      <span class="s">&#39;bounceRate&#39;</span><span class="p">,</span>
@@ -234,10 +282,12 @@
     <span class="c"># newData.update( {&#39;link&#39; : alexData[&#39;link&#39;]} )</span>
     <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;dailyTimeOnSite&#39;</span> <span class="p">:</span> <span class="n">time_to_dec</span><span class="p">(</span> <span class="n">alexData</span><span class="p">[</span><span class="s">&#39;dailyTimeOnSite&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
     <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">numbs_from_list</span><span class="p">(</span> <span class="n">alexData</span><span class="p">,</span> <span class="n">wanted_numeric</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;dailyTimeOnSite&#39;</span> <span class="p">:</span> <span class="bp">None</span> <span class="p">}</span> <span class="p">)</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">newData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="clean_urlm"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.clean_urlm">[docs]</a><span class="k">def</span> <span class="nf">clean_urlm</span><span class="p">(</span> <span class="n">urlmData</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleaner for urlm.co&quot;&quot;&quot;</span>
 
     <span class="n">wanted_numeric</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;valuePerVis&#39;</span><span class="p">,</span> <span class="s">&#39;numberOfPages&#39;</span><span class="p">,</span> <span class="s">&#39;globalRank&#39;</span><span class="p">,</span> <span class="s">&#39;externalLinks&#39;</span><span class="p">,</span> <span class="s">&#39;monthlyVisits&#39;</span><span class="p">,</span> <span class="s">&#39;monthlyPagesViewed&#39;</span><span class="p">]</span>
 
@@ -248,8 +298,8 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">newData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="clean_ranks"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.clean_ranks">[docs]</a><span class="k">def</span> <span class="nf">clean_ranks</span><span class="p">(</span> <span class="n">ranksData</span> <span class="p">):</span>
-    <span class="c"># wanted_numeric = [&#39;r_mozrank&#39;, &#39;r_seznam&#39;, &#39;r_plusone_g&#39;, &#39;r_compete&#39;, &#39;r_alexa&#39;,</span>
-    <span class="c">#                  &#39;r_twitter&#39;, &#39;r_majestic&#39;, &#39;r_google&#39;, &#39;r_facebook&#39;, &#39;r_site_explorer&#39;, &#39;r_jyxo&#39;]</span>
+    <span class="sd">&quot;&quot;&quot;Cleaner for ranks&quot;&quot;&quot;</span>
+
     <span class="n">wanted_numeric</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;rGoogle&#39;</span><span class="p">,</span>
          <span class="s">&#39;rAlexa&#39;</span><span class="p">,</span>
          <span class="s">&#39;rCompete&#39;</span><span class="p">,</span>
@@ -270,6 +320,7 @@
 
 </div>
 <div class="viewcode-block" id="clean_feedInfo"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.clean_feedInfo">[docs]</a><span class="k">def</span> <span class="nf">clean_feedInfo</span><span class="p">(</span> <span class="n">feedData</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleaner for feed info&quot;&quot;&quot;</span>
 
     <span class="n">newData</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -295,24 +346,27 @@
     <span class="k">if</span> <span class="n">feedData</span><span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">entries</span> <span class="o">=</span> <span class="n">wrangle_entries</span><span class="p">(</span> <span class="n">feedData</span><span class="p">[</span><span class="s">&quot;entries&quot;</span><span class="p">]</span> <span class="p">)</span>
         <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">entries</span> <span class="p">)</span>
+        <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;entries&quot;</span> <span class="p">:</span> <span class="bp">True</span><span class="p">}</span> <span class="p">)</span>
     <span class="k">elif</span> <span class="n">feedData</span><span class="p">[</span><span class="s">&quot;n_of_entries&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;entries&quot;</span> <span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="p">)</span>
+        <span class="n">newData</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;entries&quot;</span> <span class="p">:</span> <span class="bp">False</span><span class="p">}</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">newData</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="clean_that_all"><a class="viewcode-back" href="../../nourisher.html#nourisher.cleaning.clean_that_all">[docs]</a><span class="k">def</span> <span class="nf">clean_that_all</span><span class="p">(</span> <span class="n">rawData</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper for all cleaners&quot;&quot;&quot;</span>
 
     <span class="n">doms</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;urlm&#39;</span><span class="p">,</span> <span class="s">&#39;websiteout&#39;</span><span class="p">,</span> <span class="s">&#39;alexa&#39;</span><span class="p">,</span> <span class="s">&#39;feedInfo&#39;</span><span class="p">,</span> <span class="s">&#39;ranks&#39;</span><span class="p">]</span>
     <span class="n">funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">clean_urlm</span><span class="p">,</span> <span class="n">clean_websiteout</span><span class="p">,</span> <span class="n">clean_alexa</span><span class="p">,</span> <span class="n">clean_feedInfo</span><span class="p">,</span> <span class="n">clean_ranks</span><span class="p">]</span>
-
-    <span class="c"># prepro = [func( rawData[dom] ) for func, dom in zip( funcs, doms ) if (rawData[dom] != None) else None]</span>
 
     <span class="n">prepro</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">funcs</span><span class="p">,</span> <span class="n">doms</span> <span class="p">):</span>
         <span class="n">dataDomain</span> <span class="o">=</span> <span class="n">rawData</span><span class="p">[</span><span class="n">dom</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">dataDomain</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">prepro</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="p">)</span>
+            <span class="c"># False if there are no data available for this domain</span>
+            <span class="c"># and True if data were provided</span>
+            <span class="n">prepro</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="bp">False</span><span class="p">}</span> <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">prepro</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">func</span><span class="p">(</span> <span class="n">dataDomain</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">prepro</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="bp">True</span><span class="p">}</span> <span class="p">)</span>
 
     <span class="n">cleaned</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">diction</span> <span class="ow">in</span> <span class="n">prepro</span><span class="p">:</span>

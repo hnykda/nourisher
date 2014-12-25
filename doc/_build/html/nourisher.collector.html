@@ -67,7 +67,39 @@ saves them inside database and returns ObjectID</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>origUrl: original URL of the input feed</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>origUrl: string</strong></p>
+<blockquote class="last">
+<div><p>original URL of the input feed</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.collector.collector.collect_maternal">
+<tt class="descclassname">nourisher.collector.collector.</tt><tt class="descname">collect_maternal</tt><big>(</big><em>maternalURL, _deal=['websiteout', 'urlm', 'ranks', 'alexa']</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/collector.html#collect_maternal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.collector.collect_maternal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect data for maternal URL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>maternalURL</strong> : string</p>
+<blockquote>
+<div><p>maternal URL</p>
+</div></blockquote>
+<p><strong>deal</strong> : list of strings</p>
+<blockquote>
+<div><p>names of scrapers from which to get data from</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>scrapped data</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -293,12 +325,12 @@ ODO: Not sure what this is...</p>
 </table>
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Alexa.alexa_doubles">
-<tt class="descname">alexa_doubles</tt><em class="property"> = {'upstreamSites': ('//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[1]/a', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span'), 'whereGoNext': ('//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td/span[&#64;class=&quot;word-wrap&quot;]', '//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td[&#64;class=&quot;text-right&quot;]/span'), 'popKeywords': ('//*[&#64;id=&quot;keywords_top_keywords_table&quot;]/tbody/tr/td[1]/span[2]', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span')}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_doubles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">alexa_doubles</tt><em class="property"> = {'popKeywords': ('//*[&#64;id=&quot;keywords_top_keywords_table&quot;]/tbody/tr/td[1]/span[2]', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span'), 'upstreamSites': ('//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[1]/a', '//*[&#64;id=&quot;keywords_upstream_site_table&quot;]/tbody/tr/td[2]/span'), 'whereGoNext': ('//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td/span[&#64;class=&quot;word-wrap&quot;]', '//*[&#64;id=&quot;subdomain_table&quot;]/tbody/tr/td[&#64;class=&quot;text-right&quot;]/span')}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_doubles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Alexa.alexa_singles">
-<tt class="descname">alexa_singles</tt><em class="property"> = {'globalRank': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[1]/span/span/div/strong', 'relatedLinks': '//*[&#64;id=&quot;related_link_table&quot;]/tbody/tr/td/a', 'searchVisitsChange': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/span', 'dailyPagevPerVisChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/span', 'bounceRateChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/span', 'inCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/h4/a', 'link': '//*[&#64;id=&quot;js-li-last&quot;]/span[1]/a', 'dailyPagevPerVis': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/strong', 'rankInCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'dailyTimeOnSite': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/strong', 'totalSitesLinking': '//*[&#64;id=&quot;linksin-panel-content&quot;]/div[1]/span/div/span', 'dailyTimeOnSiteChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/span', 'globalRankChange': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'bounceRate': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/strong', 'searchVisits': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/strong'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_singles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">alexa_singles</tt><em class="property"> = {'dailyTimeOnSiteChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/span', 'searchVisitsChange': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/span', 'globalRank': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[1]/span/span/div/strong', 'dailyTimeOnSite': '//*[&#64;id=&quot;engagement-content&quot;]/span[3]/span/span/div/strong', 'dailyPagevPerVis': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/strong', 'bounceRateChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/span', 'searchVisits': '//*[&#64;id=&quot;keyword-content&quot;]/span[1]/span/span/div/strong', 'bounceRate': '//*[&#64;id=&quot;engagement-content&quot;]/span[1]/span/span/div/strong', 'dailyPagevPerVisChange': '//*[&#64;id=&quot;engagement-content&quot;]/span[2]/span/span/div/span', 'relatedLinks': '//*[&#64;id=&quot;related_link_table&quot;]/tbody/tr/td/a', 'globalRankChange': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'link': '//*[&#64;id=&quot;js-li-last&quot;]/span[1]/a', 'inCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/h4/a', 'rankInCountry': '//*[&#64;id=&quot;traffic-rank-content&quot;]/div/span[2]/div[2]/span/span/div/strong', 'totalSitesLinking': '//*[&#64;id=&quot;linksin-panel-content&quot;]/div[1]/span/div/span'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Alexa.alexa_singles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -695,17 +727,17 @@ who inherits from this class.</p>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Urlm.urlm_doubles">
-<tt class="descname">urlm_doubles</tt><em class="property"> = {'rankPerCountries': ('//*[&#64;id=&quot;summary&quot;]/div[5]/table/tr/td[1]', '//*[&#64;id=&quot;summary&quot;]/div[5]/table/tr/td[2]'), 'average90Days': ('//*[&#64;id=&quot;visitors&quot;]/table[3]/tr/th', '//*[&#64;id=&quot;visitors&quot;]/table[3]/tr/td[2]')}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_doubles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">urlm_doubles</tt><em class="property"> = {'average90Days': ('//*[&#64;id=&quot;visitors&quot;]/table[3]/tr/th', '//*[&#64;id=&quot;visitors&quot;]/table[3]/tr/td[2]'), 'rankPerCountries': ('//*[&#64;id=&quot;summary&quot;]/div[5]/table/tr/td[1]', '//*[&#64;id=&quot;summary&quot;]/div[5]/table/tr/td[2]')}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_doubles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Urlm.urlm_singles">
-<tt class="descname">urlm_singles</tt><em class="property"> = {'globalRank': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[2]/span[1]', 'category': '//*[&#64;id=&quot;web&quot;]/p[2]', 'inCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[2]', 'numberOfPages': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[6]/td[2]', 'rankInCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[1]', 'externalLinks': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[5]/td[2]', 'infoPerDay': '//*[&#64;id=&quot;web&quot;]/p[3]', 'topics': '//*[&#64;id=&quot;web&quot;]/p[1]', 'link': '/html/body/div[1]/div[2]/div/div[1]/div[1]/span', 'monthlyVisits': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[2]/td[2]', 'estimatedWorth': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[4]/td[2]', 'valuePerVis': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[3]/td[2]', 'monthlyPagesViewed': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[1]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">urlm_singles</tt><em class="property"> = {'monthlyVisits': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[2]/td[2]', 'globalRank': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[2]/span[1]', 'numberOfPages': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[6]/td[2]', 'topics': '//*[&#64;id=&quot;web&quot;]/p[1]', 'monthlyPagesViewed': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[1]/td[2]', 'category': '//*[&#64;id=&quot;web&quot;]/p[2]', 'estimatedWorth': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[4]/td[2]', 'infoPerDay': '//*[&#64;id=&quot;web&quot;]/p[3]', 'externalLinks': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[5]/td[2]', 'link': '/html/body/div[1]/div[2]/div/div[1]/div[1]/span', 'inCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[2]', 'rankInCountry': '//*[&#64;id=&quot;summary&quot;]/div[1]/p[1]/span[1]', 'valuePerVis': '//*[&#64;id=&quot;summary&quot;]/div[2]/table/tbody/tr[3]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Urlm.urlm_singles_lists">
-<tt class="descname">urlm_singles_lists</tt><em class="property"> = {'popPages': '//*[&#64;id=&quot;web&quot;]/ul[1]/li', 'sitesLinkingOut': '//*[&#64;id=&quot;web&quot;]/ul[3]/li', 'sitesLinkingIn': '//*[&#64;id=&quot;web&quot;]/ul[2]/li'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles_lists" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">urlm_singles_lists</tt><em class="property"> = {'sitesLinkingOut': '//*[&#64;id=&quot;web&quot;]/ul[3]/li', 'sitesLinkingIn': '//*[&#64;id=&quot;web&quot;]/ul[2]/li', 'popPages': '//*[&#64;id=&quot;web&quot;]/ul[1]/li'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Urlm.urlm_singles_lists" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -775,36 +807,40 @@ who inherits from this class.</p>
 
 <dl class="attribute">
 <dt id="nourisher.collector.maternalSite.Websiteout.webout_singles">
-<tt class="descname">webout_singles</tt><em class="property"> = {'backlingsYahoo': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[3]/td[2]', 'pageviewsPerDay': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[2]/td[2]', 'dailyUSD': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[3]/td[2]', 'traficRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[1]/td[2]', 'link': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[1]/td[2]/span/span', 'websiteoutRank': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[4]/td[2]/span[1]', 'pageRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[2]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout.webout_singles" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">webout_singles</tt><em class="property"> = {'pageRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[2]/td[2]', 'backlingsYahoo': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[3]/td[2]', 'link': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[1]/td[2]/span/span', 'websiteoutRank': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[4]/td[2]/span[1]', 'dailyUSD': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[3]/td[2]', 'traficRank': '//*[&#64;id=&quot;right&quot;]/table[2]/tbody/tr[1]/td[2]', 'pageviewsPerDay': '//*[&#64;id=&quot;right&quot;]/table[1]/tbody/tr[2]/td[2]'}</em><a class="headerlink" href="#nourisher.collector.maternalSite.Websiteout.webout_singles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
-<dt id="nourisher.collector.maternalSite.collect_alexa">
-<tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">collect_alexa</tt><big>(</big><em>maternalURL</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#collect_alexa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.collect_alexa" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.collector.maternalSite.collect_ranks">
-<tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">collect_ranks</tt><big>(</big><em>maternalURL</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#collect_ranks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.collect_ranks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.collector.maternalSite.collect_urlm">
-<tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">collect_urlm</tt><big>(</big><em>maternalURL</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#collect_urlm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.collect_urlm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.collector.maternalSite.collect_websiteout">
-<tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">collect_websiteout</tt><big>(</big><em>maternalURL</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#collect_websiteout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.collect_websiteout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="nourisher.collector.maternalSite.maternal_that_all">
-<tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">maternal_that_all</tt><big>(</big><em>maternalURL</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#maternal_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.maternal_that_all" title="Permalink to this definition">¶</a></dt>
-<dd><p>An ultimate function that will return information from all maternal scrapers</p>
-<p>This could even replace functions above</p>
+<tt class="descclassname">nourisher.collector.maternalSite.</tt><tt class="descname">maternal_that_all</tt><big>(</big><em>maternalURL, deal=['websiteout', 'urlm', 'ranks', 'alexa']</em><big>)</big><a class="reference internal" href="_modules/nourisher/collector/maternalSite.html#maternal_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.collector.maternalSite.maternal_that_all" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>An ultimate function for module that will return</dt>
+<dd>information from all scrapers.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>maternalURL</strong> : string</p>
+<blockquote>
+<div><p>URL for which we want to get informations</p>
+</div></blockquote>
+<p><strong>deal</strong> : list of strings (names of scrapers)</p>
+<blockquote>
+<div><p>name of scrapers in list from which we want to scrap data</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>dictionary that holdes all collected informations</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

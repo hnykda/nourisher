@@ -61,13 +61,18 @@
 <span class="sd">        </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    origUrl: original URL of the input feed</span>
+<span class="sd">    origUrl: string </span>
+<span class="sd">        original URL of the input feed</span>
 <span class="sd">    </span>
 <span class="sd">    Return</span>
 <span class="sd">    ------</span>
-<span class="sd">    ObjectID: ObjectID of data saved in database</span>
+<span class="sd">    ObjectID: ObjectID </span>
+<span class="sd">        of data saved in database</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">_feedInfo</span> <span class="o">=</span> <span class="n">feed_that_all</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">)</span>
@@ -83,10 +88,31 @@
     <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;feedInfo&quot;</span> <span class="p">:</span> <span class="n">feedInfo</span><span class="p">}</span> <span class="p">)</span>
     <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">maternalInfo</span> <span class="p">)</span>
     <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;origURL&quot;</span> <span class="p">:</span> <span class="n">origUrl</span><span class="p">}</span> <span class="p">)</span>
+    <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;maternalURL&quot;</span> <span class="p">:</span> <span class="n">maternalUrlByAlexa</span><span class="p">}</span> <span class="p">)</span>
 
     <span class="n">resID</span> <span class="o">=</span> <span class="n">push_to_db</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span>
+    <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Collection data took: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&quot; seconds&quot;</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span>
 
-    <span class="k">return</span><span class="p">(</span> <span class="n">resID</span> <span class="p">)</span></div>
+    <span class="k">return</span><span class="p">(</span> <span class="n">resID</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="collect_maternal"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.collector.collect_maternal">[docs]</a><span class="k">def</span> <span class="nf">collect_maternal</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">_deal</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;websiteout&quot;</span><span class="p">,</span> <span class="s">&quot;urlm&quot;</span><span class="p">,</span> <span class="s">&quot;ranks&quot;</span><span class="p">,</span> <span class="s">&quot;alexa&quot;</span><span class="p">]</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Collect data for maternal URL</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    maternalURL : string</span>
+<span class="sd">        maternal URL</span>
+<span class="sd">    deal : list of strings</span>
+<span class="sd">        names of scrapers from which to get data from</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        scrapped data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">maternal_that_all</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">_deal</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span></div>
 </pre></div>
 
           </div>

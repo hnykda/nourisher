@@ -82,68 +82,287 @@
 <dl class="function">
 <dt id="nourisher.cleaning.check_if_presents_list">
 <tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">check_if_presents_list</tt><big>(</big><em>diction</em>, <em>keys</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#check_if_presents_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.check_if_presents_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.clean_alexa">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_alexa</tt><big>(</big><em>alexData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_alexa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_alexa" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.clean_feedInfo">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_feedInfo</tt><big>(</big><em>feedData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_feedInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_feedInfo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.clean_ranks">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_ranks</tt><big>(</big><em>ranksData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_ranks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_ranks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.clean_that_all">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_that_all</tt><big>(</big><em>rawData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_that_all" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.clean_urlm">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_urlm</tt><big>(</big><em>urlmData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_urlm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_urlm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.clean_websiteout">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_websiteout</tt><big>(</big><em>websData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_websiteout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_websiteout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.numbs_from_list">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">numbs_from_list</tt><big>(</big><em>diction</em>, <em>keys</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#numbs_from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.numbs_from_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.time_to_dec">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">time_to_dec</tt><big>(</big><em>time</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#time_to_dec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.time_to_dec" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.wrangle_entries">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">wrangle_entries</tt><big>(</big><em>entries</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#wrangle_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.wrangle_entries" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="nourisher.cleaning.wrangle_numbers">
-<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">wrangle_numbers</tt><big>(</big><em>vst</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#wrangle_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.wrangle_numbers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts string to numbers, if possible</p>
-<p>Handle even percents and also</p>
+<dd><p>Returns True if element from key is present and nonempty in diction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vst: string in form D%, D, D in en_US local, empty</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>diction</strong> : dict</p>
+<blockquote>
+<div><p>dictionary which should be checked</p>
+</div></blockquote>
+<p><strong>keys</strong> : list of strings</p>
+<blockquote>
+<div><p>strings that should be as keys in diction</p>
+</div></blockquote>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>in form {key:bool, ...}</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.clean_alexa">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_alexa</tt><big>(</big><em>alexData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_alexa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_alexa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleaner for alexa.com</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.clean_feedInfo">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_feedInfo</tt><big>(</big><em>feedData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_feedInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_feedInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleaner for feed info</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.clean_ranks">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_ranks</tt><big>(</big><em>ranksData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_ranks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_ranks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleaner for ranks</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.clean_that_all">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_that_all</tt><big>(</big><em>rawData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_that_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_that_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for all cleaners</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.clean_urlm">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_urlm</tt><big>(</big><em>urlmData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_urlm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_urlm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleaner for urlm.co</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.clean_websiteout">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">clean_websiteout</tt><big>(</big><em>websData</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#clean_websiteout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.clean_websiteout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleaner for websiteoutlook.com</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.numbs_from_list">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">numbs_from_list</tt><big>(</big><em>diction</em>, <em>keys</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#numbs_from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.numbs_from_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries to wrangle every string from list to numbers</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.time_to_dec">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">time_to_dec</tt><big>(</big><em>time</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#time_to_dec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.time_to_dec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert time interval from MM:SS to MM.S</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>string of time</strong></p>
+<blockquote>
+<div><p>time in MM:SS format</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">time in minutes in decimal format</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.wrangle_entries">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">wrangle_entries</tt><big>(</big><em>entries</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#wrangle_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.wrangle_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrangle informations from entries, basically make numbers from them</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>entries</strong> : dict</p>
+<blockquote>
+<div><p>of information about entries which are collected by feedInfo collector</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>wrangled informations about entries for the feed</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nourisher.cleaning.wrangle_numbers">
+<tt class="descclassname">nourisher.cleaning.</tt><tt class="descname">wrangle_numbers</tt><big>(</big><em>vst</em><big>)</big><a class="reference internal" href="_modules/nourisher/cleaning.html#wrangle_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.cleaning.wrangle_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts string to numbers, if possible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vst: string</strong></p>
+<blockquote>
+<div><p>in several forms - these that are collected by scrapers</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">float</p>
+<blockquote class="last">
+<div><p>wrangled number</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nourisher.manager">
+<span id="nourisher-manager-module"></span><h2>nourisher.manager module<a class="headerlink" href="#module-nourisher.manager" title="Permalink to this headline">¶</a></h2>
+<p>Created on Dec 24, 2014</p>
+<p>&#64;author: dan</p>
+<dl class="class">
+<dt id="nourisher.manager.Collection">
+<em class="property">class </em><tt class="descclassname">nourisher.manager.</tt><tt class="descname">Collection</tt><a class="reference internal" href="_modules/nourisher/manager.html#Collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.Collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Collection for whole dataset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>datasetID</strong> : list of ObjectID</p>
+<blockquote class="last">
+<div><p>ObjectIDs of all objects in database</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="47%" />
+<col width="53%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>cur</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>datasetID</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.manager.Collection.count_nones" title="nourisher.manager.Collection.count_nones"><tt class="xref py py-obj docutils literal"><span class="pre">count_nones</span></tt></a>(key)</td>
+<td>Count None values in column</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nourisher.manager.Collection.get_collumn" title="nourisher.manager.Collection.get_collumn"><tt class="xref py py-obj docutils literal"><span class="pre">get_collumn</span></tt></a>(key)</td>
+<td>Get first level column of every fetched object</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.manager.Collection.get_ids" title="nourisher.manager.Collection.get_ids"><tt class="xref py py-obj docutils literal"><span class="pre">get_ids</span></tt></a>()</td>
+<td>Load ObjectIDs of items in collection</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nourisher.manager.Collection.init_nourisher_by_id" title="nourisher.manager.Collection.init_nourisher_by_id"><tt class="xref py py-obj docutils literal"><span class="pre">init_nourisher_by_id</span></tt></a>(ide)</td>
+<td>Takes ObjectID, tries to find out this ID in database, create  new Nourisher object initialized with dataID, dataretrieved and make a new cleaning on them.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="nourisher.manager.Collection.count_nones">
+<tt class="descname">count_nones</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/nourisher/manager.html#Collection.count_nones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.Collection.count_nones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count None values in column</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nourisher.manager.Collection.cur">
+<tt class="descname">cur</tt><em class="property"> = None</em><a class="headerlink" href="#nourisher.manager.Collection.cur" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nourisher.manager.Collection.datasetID">
+<tt class="descname">datasetID</tt><em class="property"> = None</em><a class="headerlink" href="#nourisher.manager.Collection.datasetID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nourisher.manager.Collection.fetched">
+<tt class="descname">fetched</tt><em class="property"> = False</em><a class="headerlink" href="#nourisher.manager.Collection.fetched" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nourisher.manager.Collection.get_collumn">
+<tt class="descname">get_collumn</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/nourisher/manager.html#Collection.get_collumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.Collection.get_collumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get first level column of every fetched object</p>
+<p>If key is not found, only None for given URL is returned</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : string</p>
+<blockquote>
+<div><p>one of key in database</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>in form {ObjectID1 : val1, ...}</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nourisher.manager.Collection.get_ids">
+<tt class="descname">get_ids</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/manager.html#Collection.get_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.Collection.get_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load ObjectIDs of items in collection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of ObjectID</p>
+<blockquote class="last">
+<div><p>ObjectIDs of all items in database, saves them to self.datasetID</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nourisher.manager.Collection.init_nourisher_by_id">
+<tt class="descname">init_nourisher_by_id</tt><big>(</big><em>ide</em><big>)</big><a class="reference internal" href="_modules/nourisher/manager.html#Collection.init_nourisher_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.manager.Collection.init_nourisher_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes ObjectID, tries to find out this ID in database, create 
+new Nourisher object initialized with dataID, dataretrieved and
+make a new cleaning on them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ide</strong></p>
+<blockquote>
+<div><p>ObjectID of wished object</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Nourisher instance</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -182,41 +401,43 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.add_to_object_db" title="nourisher.nourisher.Nourisher.add_to_object_db"><tt class="xref py py-obj docutils literal"><span class="pre">add_to_object_db</span></tt></a>(key,&nbsp;data)</td>
-<td>Updates current dataID object with wished key</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.check_response" title="nourisher.nourisher.Nourisher.check_response"><tt class="xref py py-obj docutils literal"><span class="pre">check_response</span></tt></a>(origUrl)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.check_response" title="nourisher.nourisher.Nourisher.check_response"><tt class="xref py py-obj docutils literal"><span class="pre">check_response</span></tt></a>(origUrl)</td>
 <td>Checks if page responds</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.clean_data" title="nourisher.nourisher.Nourisher.clean_data"><tt class="xref py py-obj docutils literal"><span class="pre">clean_data</span></tt></a>()</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.clean_data" title="nourisher.nourisher.Nourisher.clean_data"><tt class="xref py py-obj docutils literal"><span class="pre">clean_data</span></tt></a>()</td>
+<td>Runs cleaning on collected (or retrieved) data</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.collect_all" title="nourisher.nourisher.Nourisher.collect_all"><tt class="xref py py-obj docutils literal"><span class="pre">collect_all</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.collect_all" title="nourisher.nourisher.Nourisher.collect_all"><tt class="xref py py-obj docutils literal"><span class="pre">collect_all</span></tt></a>()</td>
 <td>Collects maximum of informations</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.collect_maternal" title="nourisher.nourisher.Nourisher.collect_maternal"><tt class="xref py py-obj docutils literal"><span class="pre">collect_maternal</span></tt></a>(maternalURL[,&nbsp;_deal])</td>
+<td>Collect data for maternal URL</td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.get_objectid" title="nourisher.nourisher.Nourisher.get_objectid"><tt class="xref py py-obj docutils literal"><span class="pre">get_objectid</span></tt></a>()</td>
-<td></td>
+<td>Try to find out by origFeedUrl if it is already in database</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.retrieve_data" title="nourisher.nourisher.Nourisher.retrieve_data"><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_data</span></tt></a>()</td>
 <td>Retrieve data from database based on self.dataID</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nourisher.nourisher.Nourisher.update_object_db" title="nourisher.nourisher.Nourisher.update_object_db"><tt class="xref py py-obj docutils literal"><span class="pre">update_object_db</span></tt></a>(key,&nbsp;data)</td>
+<td>Updates current dataID object with wished values under key</td>
+</tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="nourisher.nourisher.Nourisher.add_to_object_db">
-<tt class="descname">add_to_object_db</tt><big>(</big><em>key</em>, <em>data</em><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.add_to_object_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.add_to_object_db" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates current dataID object with wished key</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="nourisher.nourisher.Nourisher.check_response">
 <tt class="descname">check_response</tt><big>(</big><em>origUrl</em><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.check_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.check_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if page responds</p>
+<p>TODO: should return True or False, not True or exception</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Bool</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bool</p>
+<blockquote class="last">
+<div><p>True if page responds, else exception</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -225,7 +446,20 @@
 <dl class="method">
 <dt id="nourisher.nourisher.Nourisher.clean_data">
 <tt class="descname">clean_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.clean_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.clean_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Runs cleaning on collected (or retrieved) data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>with cleaned and wrangled data</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="nourisher.nourisher.Nourisher.collect_all">
@@ -235,12 +469,42 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">ObjectID: ObjectID to database (and corresponding collection)</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">ObjectID</p>
+<blockquote class="last">
+<div><p>under which are collected data in database</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>Time stamp should be included!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nourisher.nourisher.Nourisher.collect_maternal">
+<tt class="descname">collect_maternal</tt><big>(</big><em>maternalURL, _deal=['websiteout', 'urlm', 'ranks', 'alexa']</em><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.collect_maternal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.collect_maternal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect data for maternal URL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>maternalURL</strong> : string</p>
+<blockquote>
+<div><p>maternal URL</p>
+</div></blockquote>
+<p><strong>deal</strong> : list of strings</p>
+<blockquote>
+<div><p>names of scrapers from which to get data from</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>scrapped data</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -261,7 +525,22 @@
 <dl class="method">
 <dt id="nourisher.nourisher.Nourisher.get_objectid">
 <tt class="descname">get_objectid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.get_objectid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.get_objectid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Try to find out by origFeedUrl if it is already in database
+and if it is, it is returned</p>
+<p>When more than one are found, last one is returned</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">ObjectID</p>
+<blockquote class="last">
+<div><p>ObjectID of existing item in database which has been inserted as a lastone</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="nourisher.nourisher.Nourisher.origFeedUrl">
@@ -272,6 +551,46 @@
 <dt id="nourisher.nourisher.Nourisher.retrieve_data">
 <tt class="descname">retrieve_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.retrieve_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.retrieve_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve data from database based on self.dataID</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>object from database with current self.dataID</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nourisher.nourisher.Nourisher.update_object_db">
+<tt class="descname">update_object_db</tt><big>(</big><em>key</em>, <em>data</em><big>)</big><a class="reference internal" href="_modules/nourisher/nourisher.html#Nourisher.update_object_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.nourisher.Nourisher.update_object_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates current dataID object with wished values under key</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : string</p>
+<blockquote>
+<div><p>name of attribute under which to save the data</p>
+</div></blockquote>
+<p><strong>data</strong> : dict, something JSON seriazable</p>
+<blockquote>
+<div><p>data to save</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">ObjectID</p>
+<blockquote class="last">
+<div><p>ID under which were data saved (current dataID)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -284,7 +603,8 @@
 <dl class="function">
 <dt id="nourisher.settings.get_setings">
 <tt class="descclassname">nourisher.settings.</tt><tt class="descname">get_setings</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/nourisher/settings.html#get_setings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.settings.get_setings" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Print current settings</p>
+</dd></dl>
 
 </div>
 <div class="section" id="module-nourisher.utiliser">
@@ -293,9 +613,49 @@
 <p>&#64;author: dan</p>
 <p>Here are some utilities that might be useful</p>
 <dl class="function">
-<dt id="nourisher.utiliser.find_object_by_origurl">
-<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">find_object_by_origurl</tt><big>(</big><em>origUrl</em>, <em>dbName='testdb'</em>, <em>collection='feeds'</em>, <em>ip='localhost'</em>, <em>port=5432</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#find_object_by_origurl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.find_object_by_origurl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Try to find object by original URL of feed</p>
+<dt id="nourisher.utiliser.find_objects_by_origurl">
+<tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">find_objects_by_origurl</tt><big>(</big><em>origUrl</em>, <em>dbName='testdb'</em>, <em>collection='feeds'</em>, <em>ip='localhost'</em>, <em>port=5432</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#find_objects_by_origurl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.find_objects_by_origurl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to find object by original URL of feed and returns the LAST one inserted</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>origUrl</strong> : string of URL</p>
+<blockquote>
+<div><p>URL by which we should find in database</p>
+</div></blockquote>
+<p><strong>dbName: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, name of database to write into</p>
+</div></blockquote>
+<p><strong>collection: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, Name of collection to write into</p>
+</div></blockquote>
+<p><strong>ip: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, IP where is MongoDB running</p>
+</div></blockquote>
+<p><strong>port: interger, optional</strong></p>
+<blockquote>
+<div><p>default in settings, port where is MongoDB running</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">ObjectID</p>
+<blockquote>
+<div><p>of last inserted matching document</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError</strong></p>
+<blockquote class="last">
+<div><p>When no document is found</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -306,7 +666,27 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>idOfO: ID of object in database</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>idOfO: ID in string, ObjectID</strong></p>
+<blockquote>
+<div><p>of object which we want to retrieve data</p>
+</div></blockquote>
+<p><strong>dbName: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, name of database to write into</p>
+</div></blockquote>
+<p><strong>collection: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, Name of collection to write into</p>
+</div></blockquote>
+<p><strong>ip: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, IP where is MongoDB running</p>
+</div></blockquote>
+<p><strong>port: interger, optional</strong></p>
+<blockquote class="last">
+<div><p>default in settings, port where is MongoDB running</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -321,7 +701,29 @@ from pymongo import MongoClient</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">ObjectID: last inserted document to collection</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dbName: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, name of database to write into</p>
+</div></blockquote>
+<p><strong>collection: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, Name of collection to write into</p>
+</div></blockquote>
+<p><strong>ip: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, IP where is MongoDB running</p>
+</div></blockquote>
+<p><strong>port: interger, optional</strong></p>
+<blockquote>
+<div><p>default in settings, port where is MongoDB running</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ObjectID</strong> : ObjectID</p>
+<blockquote class="last">
+<div><p>last inserted document to collection</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -330,7 +732,37 @@ from pymongo import MongoClient</p>
 <dl class="function">
 <dt id="nourisher.utiliser.informer">
 <tt class="descclassname">nourisher.utiliser.</tt><tt class="descname">informer</tt><big>(</big><em>msg</em>, <em>*args</em>, <em>level=1</em>, <em>rewrite=False</em><big>)</big><a class="reference internal" href="_modules/nourisher/utiliser.html#informer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nourisher.utiliser.informer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Used for getting output from program</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>msg</strong> : everything what is possible to print</p>
+<blockquote>
+<div><p>whatever you want to see as an output</p>
+<p><strong>Warning</strong> Don&#8217;t mix str + int etc. which are not easily
+printed together. They can be added as <a href="#id1"><span class="problematic" id="id2">*</span></a>args.</p>
+</div></blockquote>
+<p><strong>*args</strong></p>
+<blockquote>
+<div><p>Everything passed as an argument is going to be printed</p>
+</div></blockquote>
+<p><strong>level</strong> : positive integer, currently implemented <cite>[0,1,2]</cite>, optional</p>
+<blockquote>
+<div><p>default 1, level of verbosity for which at least
+should be this message printed</p>
+</div></blockquote>
+<p><strong>rewrite</strong> : True or False, optional, default False</p>
+<blockquote class="last">
+<div><p>if <cite>True</cite>, then the output is going to be rewritten on the same 
+line as the previous. If <cite>False</cite>, then the outpus is going to 
+be printed on next line</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="nourisher.utiliser.maternal_url_extractor">
@@ -341,9 +773,17 @@ based on entries</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>True entries finalUrls</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>finalLinks</strong> : list</p>
+<blockquote>
+<div><p>true finalUrls of entries</p>
+</div></blockquote>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">string: maternal URL (in www.maternalurl.*)</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>maternal URL (in www.maternalurl.*)</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -357,9 +797,33 @@ based on entries</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inpObj: Series (is converted to dict), dict, or something pymongo can serialize to JSON</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>inpObj: dict, or something pymongo can serialize to JSON</strong></p>
+<blockquote>
+<div><p>Object which should be pushed to database</p>
+</div></blockquote>
+<p><strong>dbName: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, name of database to write into</p>
+</div></blockquote>
+<p><strong>collection: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, Name of collection to write into</p>
+</div></blockquote>
+<p><strong>ip: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, IP where is MongoDB running</p>
+</div></blockquote>
+<p><strong>port: interger, optional</strong></p>
+<blockquote>
+<div><p>default in settings, port where is MongoDB running</p>
+</div></blockquote>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ObjectID: ObjectID of inserted document</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">ObjectID: ObjectID</p>
+<blockquote class="last">
+<div><p>ObjectID of inserted document</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>
@@ -373,9 +837,40 @@ based on entries</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>finder: dict by which we should find {key</strong> : value}</p>
-<p><strong>key: under this name value will be added</strong></p>
-<p class="last"><strong>value: data to add under key</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>finder</strong> : dict</p>
+<blockquote>
+<div><p>by which we should find {key : value}</p>
+</div></blockquote>
+<p><strong>key: string</strong></p>
+<blockquote>
+<div><p>under this name value will be added</p>
+</div></blockquote>
+<p><strong>value: dict, somthing seriazable</strong></p>
+<blockquote>
+<div><p>data to add under key</p>
+</div></blockquote>
+<p><strong>dbName: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, name of database to write into</p>
+</div></blockquote>
+<p><strong>collection: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, Name of collection to write into</p>
+</div></blockquote>
+<p><strong>ip: string, optional</strong></p>
+<blockquote>
+<div><p>default in settings, IP where is MongoDB running</p>
+</div></blockquote>
+<p><strong>port: interger, optional</strong></p>
+<blockquote>
+<div><p>default in settings, port where is MongoDB running</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">ObjectID</p>
+<blockquote class="last">
+<div><p>of insterted document</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -400,6 +895,7 @@ based on entries</p>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-nourisher.cleaning">nourisher.cleaning module</a></li>
+<li><a class="reference internal" href="#module-nourisher.manager">nourisher.manager module</a></li>
 <li><a class="reference internal" href="#module-nourisher.nourisher">nourisher.nourisher module</a></li>
 <li><a class="reference internal" href="#module-nourisher.settings">nourisher.settings module</a></li>
 <li><a class="reference internal" href="#module-nourisher.utiliser">nourisher.utiliser module</a></li>

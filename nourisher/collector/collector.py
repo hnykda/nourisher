@@ -38,8 +38,28 @@ def collect_all( origUrl ):
     total.update( {"feedInfo" : feedInfo} )
     total.update( maternalInfo )
     total.update( {"origURL" : origUrl} )
+    total.update( {"maternalURL" : maternalUrlByAlexa} )
 
     resID = push_to_db( total )
     informer( "Collection data took: {0}".format( time.time() - startTime ) + " seconds", level = 2 )
 
     return( resID )
+
+def collect_maternal( maternalURL, _deal = ["websiteout", "urlm", "ranks", "alexa"] ):
+    """Collect data for maternal URL
+    
+    Parameters
+    ----------
+    maternalURL : string
+        maternal URL
+    deal : list of strings
+        names of scrapers from which to get data from
+    
+    Returns
+    -------
+    dict
+        scrapped data
+    """
+
+    data = maternal_that_all( maternalURL, _deal )
+    return( data )

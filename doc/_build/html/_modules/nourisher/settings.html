@@ -55,26 +55,50 @@
 <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Here are all customizables</span>
+<span class="sd">Here is possible to set customizables - global variables</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c">### DATABASE ###</span>
-<span class="n">DB_IP</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span>
-<span class="n">DB_PORT</span> <span class="o">=</span> <span class="mi">5432</span>
-<span class="n">DB_NAME</span> <span class="o">=</span> <span class="s">&quot;testdb&quot;</span>
-<span class="n">DB_COLLECTION</span> <span class="o">=</span> <span class="s">&quot;feeds&quot;</span>
+<span class="n">DB_IP</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span>  <span class="c"># IP where is MongoDB running</span>
+<span class="n">DB_PORT</span> <span class="o">=</span> <span class="mi">5432</span>  <span class="c"># port where is database running</span>
+<span class="n">DB_NAME</span> <span class="o">=</span> <span class="s">&quot;testdb&quot;</span>  <span class="c"># Name of default database</span>
+<span class="n">DB_COLLECTION</span> <span class="o">=</span> <span class="s">&quot;feeds&quot;</span>  <span class="c"># Name of collection in database</span>
 
 
 <span class="c">### MATERNALSITE ###</span>
+<span class="c"># which selenium.webdriver and settings</span>
+<span class="c"># should be used for scrapping. Possible values in maternaSite.Scraper</span>
 <span class="n">DEFAULT_DRIVER</span> <span class="o">=</span> <span class="s">&quot;phantomjs&quot;</span>
 
 <span class="c">### VERBOSITY ###</span>
-<span class="n">VERBOSITY</span> <span class="o">=</span> <span class="mi">1</span>
-
+<span class="n">VERBOSITY</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c"># Verbosity of std output (currently implemented 0, 1, 2)</span>
 
 <div class="viewcode-block" id="get_setings"><a class="viewcode-back" href="../../nourisher.html#nourisher.settings.get_setings">[docs]</a><span class="k">def</span> <span class="nf">get_setings</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span> <span class="n">DB_COLLECTION</span><span class="p">,</span> <span class="n">DB_PORT</span><span class="p">,</span> <span class="n">DB_IP</span><span class="p">,</span> <span class="n">DB_NAME</span><span class="p">,</span> <span class="n">DEFAULT_DRIVER</span><span class="p">,</span> <span class="n">VERBOSITY</span> <span class="p">)</span></div>
-</pre></div>
+    <span class="sd">&quot;&quot;&quot;Print current settings&quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span> <span class="n">DB_COLLECTION</span><span class="p">,</span> <span class="n">DB_PORT</span><span class="p">,</span> <span class="n">DB_IP</span><span class="p">,</span> <span class="n">DB_NAME</span><span class="p">,</span> <span class="n">DEFAULT_DRIVER</span><span class="p">,</span> <span class="n">VERBOSITY</span> <span class="p">)</span>
+
+<span class="c"># class SETTER:</span>
+<span class="c">#     ### DATABASE ###</span>
+<span class="c">#     DB_IP = &quot;localhost&quot;  # IP where is MongoDB running</span>
+<span class="c">#     DB_PORT = 5432  # port where is database running</span>
+<span class="c">#     DB_NAME = &quot;testdb&quot;  # Name of default database</span>
+<span class="c">#     DB_COLLECTION = &quot;feeds&quot;  # Name of collection in database</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c">#     ### MATERNALSITE ###</span>
+<span class="c">#     # which selenium.webdriver and settings</span>
+<span class="c">#     # should be used for scrapping. Possible values in maternaSite.Scraper</span>
+<span class="c">#     DEFAULT_DRIVER = &quot;phantomjs&quot;</span>
+<span class="c">#</span>
+<span class="c">#     ### VERBOSITY ###</span>
+<span class="c">#     VERBOSITY = 1  # Verbosity of std output (currently implemented 0, 1, 2)</span>
+<span class="c">#</span>
+<span class="c">#     def set_db_collection( self, name ):</span>
+<span class="c">#         self.DB_COLLECTION = name</span>
+<span class="c">#</span>
+<span class="c">#     def get_db_collection( self ):</span>
+<span class="c">#         return( self.DB_COLLECTION )</span>
+</pre></div></div>
 
           </div>
         </div>

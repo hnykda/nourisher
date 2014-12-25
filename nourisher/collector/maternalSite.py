@@ -503,31 +503,31 @@ class Ranker( Scraper ):
 
         self.scrapedData = dict( zip( self._rankNames, ranks ) )
 
-def collect_alexa( maternalURL ):
-    alexa = Alexa( maternalURL, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
-    alexa.collect_that_all()
-    alexa.close_driver()
-    return( alexa.scrapedData )
+# def collect_alexa( maternalURL ):
+#     alexa = Alexa( maternalURL, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
+#     alexa.collect_that_all()
+#     alexa.close_driver()
+#     return( alexa.scrapedData )
+#
+# def collect_websiteout( maternalURL ):
+#     websiteout = Websiteout( maternalURL, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' )
+#     websiteout.collect_that_all()
+#     websiteout.close_driver()
+#     return ( websiteout.scrapedData )
+#
+# def collect_urlm( maternalURL ):
+#     urlm = Urlm( maternalURL, "www.urlm.co", '//*[@id="url"]' )
+#     urlm.collect_that_all()
+#     urlm.close_driver()
+#     return( urlm.scrapedData )
+#
+# def collect_ranks( maternalURL ):
+#     ranks = Ranker( maternalURL, "pagerank.jklir.net", '//*[@id="url"]' )
+#     ranks.collect_that_all()
+#     ranks.close_driver()
+#     return( ranks.scrapedData )
 
-def collect_websiteout( maternalURL ):
-    websiteout = Websiteout( maternalURL, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' )
-    websiteout.collect_that_all()
-    websiteout.close_driver()
-    return ( websiteout.scrapedData )
-
-def collect_urlm( maternalURL ):
-    urlm = Urlm( maternalURL, "www.urlm.co", '//*[@id="url"]' )
-    urlm.collect_that_all()
-    urlm.close_driver()
-    return( urlm.scrapedData )
-
-def collect_ranks( maternalURL ):
-    ranks = Ranker( maternalURL, "pagerank.jklir.net", '//*[@id="url"]' )
-    ranks.collect_that_all()
-    ranks.close_driver()
-    return( ranks.scrapedData )
-
-def maternal_that_all( maternalURL ):
+def maternal_that_all( maternalURL, deal = ["websiteout", "urlm", "ranks", "alexa"] ):
     ''' An ultimate function for module that will return
      information from all scrapers.
      
@@ -535,34 +535,23 @@ def maternal_that_all( maternalURL ):
     ----------
     maternalURL : string
         URL for which we want to get informations
+    deal : list of strings (names of scrapers)
+        name of scrapers in list from which we want to scrap data
     
     Returns
     -------
     dict
         dictionary that holdes all collected informations
-    
-    
-    
-    TODO: This could even replace functions above
     '''
-
-#     classes = [Websiteout, Urlm, Ranker, Alexa]
-#     correspInit = [
-#                     ( "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' ),
-#                     ( "www.urlm.co", '//*[@id="url"]' ),
-#                     ( "pagerank.jklir.net", '//*[@id="url"]' ),
-#                     ( "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' ),
-#                     ]
-#     correspNames = ["websiteout", "urlm", "ranks", "alexa"]
-
     # every scraper must be named here in format:
     # {"nameOfScraper" : (ClassOfScrapper, baseURL, xPathOfInputField)}
-    rouse = {"websiteout" : ( Websiteout, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' ),
+    available_scrapers = {"websiteout" : ( Websiteout, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' ),
              "urlm": ( Urlm, "www.urlm.co", '//*[@id="url"]' ),
              "ranks" : ( Ranker, "pagerank.jklir.net", '//*[@id="url"]' ),
              "alexa" : ( Alexa, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
              }
 
+    rouse = dict( [( dom, inf ) for dom, inf in available_scrapers.items() if dom in deal] )
     total = {}
     for name, ( cls, baseURL, xpathOfInput ) in rouse.items():
         informer( "Trying to get data for {0} by {1}".format( maternalURL, name ), rewrite = True )
@@ -571,23 +560,9 @@ def maternal_that_all( maternalURL ):
             curcl.collect_that_all()
             curcl.close_driver()
             total.update( {name : curcl.scrapedData } )
-            informer( "Succeded.", rewrite = True )
+            informer( "\nSucceded.", rewrite = True )
         except RuntimeError:
-            informer( "Not successful." )
+            informer( "\nNot successful." )
             total.update( {name : None} )
 
     return( total )
-
-#     total = {}
-#     for dom, func in zip( ["websiteout", "urlm", "alexa", "ranks"],
-#                          [collect_websiteout, collect_urlm, collect_alexa, collect_ranks] ):
-#         informer( "Trying to get data for {0} by {1}".format( maternalURL, dom ), rewrite = True )
-#         try:
-#             total.update( {dom : func( maternalURL ) } )
-#             informer( "Succeded.", rewrite = True )
-#         except RuntimeError:
-#             informer( "Not successful." )
-#             total.update( {dom : None} )
-#
-#
-#     return( total )

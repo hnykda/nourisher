@@ -19,6 +19,14 @@ nourisher.cleaning module
     :undoc-members:
     :show-inheritance:
 
+nourisher.manager module
+------------------------
+
+.. automodule:: nourisher.manager
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 nourisher.nourisher module
 --------------------------
 

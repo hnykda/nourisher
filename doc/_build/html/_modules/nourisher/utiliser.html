@@ -60,6 +60,25 @@
 <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
 
 <div class="viewcode-block" id="informer"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.informer">[docs]</a><span class="k">def</span> <span class="nf">informer</span><span class="p">(</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">level</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used for getting output from program</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    msg : everything what is possible to print</span>
+<span class="sd">        whatever you want to see as an output</span>
+<span class="sd">        </span>
+<span class="sd">        **Warning** Don&#39;t mix str + int etc. which are not easily</span>
+<span class="sd">        printed together. They can be added as *args.</span>
+<span class="sd">    *args</span>
+<span class="sd">        Everything passed as an argument is going to be printed</span>
+<span class="sd">    level : positive integer, currently implemented `[0,1,2]`, optional </span>
+<span class="sd">        default 1, level of verbosity for which at least</span>
+<span class="sd">        should be this message printed</span>
+<span class="sd">    rewrite : True or False, optional, default False </span>
+<span class="sd">        if `True`, then the output is going to be rewritten on the same </span>
+<span class="sd">        line as the previous. If `False`, then the outpus is going to </span>
+<span class="sd">        be printed on next line</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># we don&#39;t want any errors from logging...</span>
     <span class="k">try</span><span class="p">:</span>
@@ -88,18 +107,29 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
-<span class="sd">    inpObj: Series (is converted to dict), dict, or something pymongo can serialize to JSON</span>
+<span class="sd">    inpObj: dict, or something pymongo can serialize to JSON</span>
+<span class="sd">        Object which should be pushed to database</span>
+<span class="sd">    dbName: string, optional</span>
+<span class="sd">        default in settings, name of database to write into</span>
+<span class="sd">    collection: string, optional</span>
+<span class="sd">        default in settings, Name of collection to write into</span>
+<span class="sd">    ip: string, optional</span>
+<span class="sd">        default in settings, IP where is MongoDB running</span>
+<span class="sd">    port: interger, optional</span>
+<span class="sd">        default in settings, port where is MongoDB running</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    ObjectID: ObjectID of inserted document    </span>
+<span class="sd">    ObjectID: ObjectID </span>
+<span class="sd">        ObjectID of inserted document    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
 
     <span class="n">insID</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="n">inpObj</span> <span class="p">)</span>
-    <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Saving to database under ObjectID: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="n">insID</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Saving to {0} database, {1} collection under ObjectID: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">dbName</span><span class="p">,</span> <span class="n">collection</span> <span class="p">)</span>
+              <span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="n">insID</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="n">client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 
@@ -112,10 +142,21 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
-<span class="sd">    idOfO: ID of object in database</span>
+<span class="sd">    idOfO: ID in string, ObjectID</span>
+<span class="sd">        of object which we want to retrieve data </span>
+<span class="sd">    dbName: string, optional</span>
+<span class="sd">        default in settings, name of database to write into</span>
+<span class="sd">    collection: string, optional</span>
+<span class="sd">        default in settings, Name of collection to write into</span>
+<span class="sd">    ip: string, optional</span>
+<span class="sd">        default in settings, IP where is MongoDB running</span>
+<span class="sd">    port: interger, optional</span>
+<span class="sd">        default in settings, port where is MongoDB running </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="kn">from</span> <span class="nn">bson.objectid</span> <span class="kn">import</span> <span class="n">ObjectId</span>
+    <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Looking in {0} database, {1} collection under ObjectID: {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">dbName</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">idOfO</span> <span class="p">)</span> <span class="p">)</span>
+
 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span> <span class="n">idOfO</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">idOfO</span> <span class="o">=</span> <span class="n">ObjectId</span><span class="p">(</span> <span class="n">idOfO</span> <span class="p">)</span>
@@ -134,10 +175,24 @@
     <span class="sd">&#39;&#39;&#39;Get ObjectID of last inserted document</span>
 <span class="sd">    from pymongo import MongoClient</span>
 <span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dbName: string, optional</span>
+<span class="sd">        default in settings, name of database to write into</span>
+<span class="sd">    collection: string, optional</span>
+<span class="sd">        default in settings, Name of collection to write into</span>
+<span class="sd">    ip: string, optional</span>
+<span class="sd">        default in settings, IP where is MongoDB running</span>
+<span class="sd">    port: interger, optional</span>
+<span class="sd">        default in settings, port where is MongoDB running </span>
+<span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    ObjectID: last inserted document to collection</span>
+<span class="sd">    ObjectID : ObjectID </span>
+<span class="sd">        last inserted document to collection</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Looking in {0} database, {1} collection for last item.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">dbName</span><span class="p">,</span> <span class="n">collection</span> <span class="p">)</span> <span class="p">)</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
 
@@ -149,9 +204,25 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
-<span class="sd">    finder: dict by which we should find {key : value}</span>
-<span class="sd">    key: under this name value will be added</span>
-<span class="sd">    value: data to add under key</span>
+<span class="sd">    finder : dict </span>
+<span class="sd">        by which we should find {key : value}</span>
+<span class="sd">    key: string</span>
+<span class="sd">        under this name value will be added</span>
+<span class="sd">    value: dict, somthing seriazable </span>
+<span class="sd">        data to add under key</span>
+<span class="sd">    dbName: string, optional</span>
+<span class="sd">        default in settings, name of database to write into</span>
+<span class="sd">    collection: string, optional</span>
+<span class="sd">        default in settings, Name of collection to write into</span>
+<span class="sd">    ip: string, optional</span>
+<span class="sd">        default in settings, IP where is MongoDB running</span>
+<span class="sd">    port: interger, optional</span>
+<span class="sd">        default in settings, port where is MongoDB running</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ObjectID</span>
+<span class="sd">        of insterted document</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
@@ -159,9 +230,33 @@
     <span class="n">res</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">finder</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;$set&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">}}</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">res</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="find_object_by_origurl"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.find_object_by_origurl">[docs]</a><span class="k">def</span> <span class="nf">find_object_by_origurl</span><span class="p">(</span> <span class="n">origUrl</span><span class="p">,</span> <span class="n">dbName</span> <span class="o">=</span> <span class="n">lset</span><span class="o">.</span><span class="n">DB_NAME</span><span class="p">,</span> <span class="n">collection</span> <span class="o">=</span> <span class="n">lset</span><span class="o">.</span><span class="n">DB_COLLECTION</span><span class="p">,</span>
+<div class="viewcode-block" id="find_objects_by_origurl"><a class="viewcode-back" href="../../nourisher.html#nourisher.utiliser.find_objects_by_origurl">[docs]</a><span class="k">def</span> <span class="nf">find_objects_by_origurl</span><span class="p">(</span> <span class="n">origUrl</span><span class="p">,</span> <span class="n">dbName</span> <span class="o">=</span> <span class="n">lset</span><span class="o">.</span><span class="n">DB_NAME</span><span class="p">,</span> <span class="n">collection</span> <span class="o">=</span> <span class="n">lset</span><span class="o">.</span><span class="n">DB_COLLECTION</span><span class="p">,</span>
                 <span class="n">ip</span> <span class="o">=</span> <span class="n">lset</span><span class="o">.</span><span class="n">DB_IP</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="n">lset</span><span class="o">.</span><span class="n">DB_PORT</span> <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Try to find object by original URL of feed&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;Try to find object by original URL of feed and returns the LAST one inserted</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origUrl : string of URL</span>
+<span class="sd">        URL by which we should find in database</span>
+<span class="sd">    dbName: string, optional</span>
+<span class="sd">        default in settings, name of database to write into</span>
+<span class="sd">    collection: string, optional</span>
+<span class="sd">        default in settings, Name of collection to write into</span>
+<span class="sd">    ip: string, optional</span>
+<span class="sd">        default in settings, IP where is MongoDB running</span>
+<span class="sd">    port: interger, optional</span>
+<span class="sd">        default in settings, port where is MongoDB running</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ObjectID</span>
+<span class="sd">        of last inserted matching document </span>
+<span class="sd">        </span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IndexError</span>
+<span class="sd">        When no document is found</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span> <span class="n">ip</span><span class="p">,</span> <span class="n">port</span> <span class="p">)</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">dbName</span><span class="p">][</span><span class="n">collection</span><span class="p">]</span>
@@ -171,7 +266,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">allRes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;_id&quot;</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">None</span>
-
+    <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Looking in {0} database, {1} collection for URL: {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">dbName</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">origUrl</span> <span class="p">)</span> <span class="p">)</span>
     <span class="c"># TODO: Slow! But after find is fetched by res, allRes is empty...</span>
     <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Object(s) by URL found: &quot;</span><span class="p">,</span> <span class="p">[(</span> <span class="n">obj</span><span class="p">[</span><span class="s">&quot;_id&quot;</span><span class="p">],</span> <span class="n">obj</span><span class="p">[</span><span class="s">&quot;_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">generation_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="p">)</span>
                                            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;origURL&quot;</span> <span class="p">:</span> <span class="n">origUrl</span><span class="p">}</span> <span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="s">&#39;_id&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)]</span> <span class="p">)</span>
@@ -183,11 +278,13 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    True entries finalUrls</span>
+<span class="sd">    finalLinks : list</span>
+<span class="sd">        true finalUrls of entries</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    string: maternal URL (in www.maternalurl.*)</span>
+<span class="sd">    string </span>
+<span class="sd">        maternal URL (in www.maternalurl.*)</span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>
 <span class="sd">    -----</span>

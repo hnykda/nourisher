@@ -70,7 +70,9 @@
 <span class="sd">    </span>
 <span class="sd">    1. Create descendant of Scraper - find out scrapper baseURL, </span>
 <span class="sd">    xpath of input field, xpaths for data to scrap, implement necessary</span>
-<span class="sd">    functions (e.g. `check_unavailability()` ), </span>
+<span class="sd">    functions (e.g. `check_unavailability()`, `collect_all()` ) </span>
+<span class="sd">    2. Add entry to maternal_that_all()</span>
+<span class="sd">    3. Implement methods for cleaning data</span>
 <span class="sd">        </span>
 <span class="sd">    Atributes</span>
 <span class="sd">    ---------</span>
@@ -137,7 +139,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_unavailability</span><span class="p">(</span> <span class="n">wdriver</span> <span class="p">)</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">wdriver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;No data from this scrapper.&quot;</span> <span class="p">)</span>
+                <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">No data from this scrapper.&quot;</span> <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span> <span class="p">(</span> <span class="s">&quot;No available data from this Scraper&quot;</span> <span class="p">)</span>
         <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
             <span class="k">pass</span>
@@ -550,74 +552,68 @@
         <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">to_digit</span><span class="p">(</span> <span class="n">lexNumb</span> <span class="p">)</span> <span class="k">for</span> <span class="n">lexNumb</span> <span class="ow">in</span> <span class="n">_ranks</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">scrapedData</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rankNames</span><span class="p">,</span> <span class="n">ranks</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="c"># def collect_alexa( maternalURL ):</span>
+<span class="c">#     alexa = Alexa( maternalURL, &quot;www.alexa.com&quot;, &#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39; )</span>
+<span class="c">#     alexa.collect_that_all()</span>
+<span class="c">#     alexa.close_driver()</span>
+<span class="c">#     return( alexa.scrapedData )</span>
+<span class="c">#</span>
+<span class="c"># def collect_websiteout( maternalURL ):</span>
+<span class="c">#     websiteout = Websiteout( maternalURL, &quot;www.websiteoutlook.com&quot;, &#39;//*[@id=&quot;header&quot;]/form/input[1]&#39; )</span>
+<span class="c">#     websiteout.collect_that_all()</span>
+<span class="c">#     websiteout.close_driver()</span>
+<span class="c">#     return ( websiteout.scrapedData )</span>
+<span class="c">#</span>
+<span class="c"># def collect_urlm( maternalURL ):</span>
+<span class="c">#     urlm = Urlm( maternalURL, &quot;www.urlm.co&quot;, &#39;//*[@id=&quot;url&quot;]&#39; )</span>
+<span class="c">#     urlm.collect_that_all()</span>
+<span class="c">#     urlm.close_driver()</span>
+<span class="c">#     return( urlm.scrapedData )</span>
+<span class="c">#</span>
+<span class="c"># def collect_ranks( maternalURL ):</span>
+<span class="c">#     ranks = Ranker( maternalURL, &quot;pagerank.jklir.net&quot;, &#39;//*[@id=&quot;url&quot;]&#39; )</span>
+<span class="c">#     ranks.collect_that_all()</span>
+<span class="c">#     ranks.close_driver()</span>
+<span class="c">#     return( ranks.scrapedData )</span>
 </div></div>
-<div class="viewcode-block" id="collect_alexa"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_alexa">[docs]</a><span class="k">def</span> <span class="nf">collect_alexa</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
-    <span class="n">alexa</span> <span class="o">=</span> <span class="n">Alexa</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.alexa.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39;</span> <span class="p">)</span>
-    <span class="n">alexa</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
-    <span class="n">alexa</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">alexa</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
-</div>
-<div class="viewcode-block" id="collect_websiteout"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_websiteout">[docs]</a><span class="k">def</span> <span class="nf">collect_websiteout</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
-    <span class="n">websiteout</span> <span class="o">=</span> <span class="n">Websiteout</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.websiteoutlook.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;header&quot;]/form/input[1]&#39;</span> <span class="p">)</span>
-    <span class="n">websiteout</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
-    <span class="n">websiteout</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">(</span> <span class="n">websiteout</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
-</div>
-<div class="viewcode-block" id="collect_urlm"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_urlm">[docs]</a><span class="k">def</span> <span class="nf">collect_urlm</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
-    <span class="n">urlm</span> <span class="o">=</span> <span class="n">Urlm</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;www.urlm.co&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">)</span>
-    <span class="n">urlm</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
-    <span class="n">urlm</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">urlm</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
-</div>
-<div class="viewcode-block" id="collect_ranks"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.collect_ranks">[docs]</a><span class="k">def</span> <span class="nf">collect_ranks</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
-    <span class="n">ranks</span> <span class="o">=</span> <span class="n">Ranker</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="s">&quot;pagerank.jklir.net&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">)</span>
-    <span class="n">ranks</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
-    <span class="n">ranks</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">ranks</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">)</span>
-</div>
-<div class="viewcode-block" id="maternal_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.maternal_that_all">[docs]</a><span class="k">def</span> <span class="nf">maternal_that_all</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; An ultimate function that will return information from all maternal scrapers</span>
+<div class="viewcode-block" id="maternal_that_all"><a class="viewcode-back" href="../../../nourisher.collector.html#nourisher.collector.maternalSite.maternal_that_all">[docs]</a><span class="k">def</span> <span class="nf">maternal_that_all</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">deal</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;websiteout&quot;</span><span class="p">,</span> <span class="s">&quot;urlm&quot;</span><span class="p">,</span> <span class="s">&quot;ranks&quot;</span><span class="p">,</span> <span class="s">&quot;alexa&quot;</span><span class="p">]</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; An ultimate function for module that will return</span>
+<span class="sd">     information from all scrapers.</span>
+<span class="sd">     </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    maternalURL : string</span>
+<span class="sd">        URL for which we want to get informations</span>
+<span class="sd">    deal : list of strings (names of scrapers)</span>
+<span class="sd">        name of scrapers in list from which we want to scrap data</span>
 <span class="sd">    </span>
-<span class="sd">    This could even replace functions above</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        dictionary that holdes all collected informations</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># every scraper must be named here in format:</span>
+    <span class="c"># {&quot;nameOfScraper&quot; : (ClassOfScrapper, baseURL, xPathOfInputField)}</span>
+    <span class="n">available_scrapers</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;websiteout&quot;</span> <span class="p">:</span> <span class="p">(</span> <span class="n">Websiteout</span><span class="p">,</span> <span class="s">&quot;www.websiteoutlook.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;header&quot;]/form/input[1]&#39;</span> <span class="p">),</span>
+             <span class="s">&quot;urlm&quot;</span><span class="p">:</span> <span class="p">(</span> <span class="n">Urlm</span><span class="p">,</span> <span class="s">&quot;www.urlm.co&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">),</span>
+             <span class="s">&quot;ranks&quot;</span> <span class="p">:</span> <span class="p">(</span> <span class="n">Ranker</span><span class="p">,</span> <span class="s">&quot;pagerank.jklir.net&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;url&quot;]&#39;</span> <span class="p">),</span>
+             <span class="s">&quot;alexa&quot;</span> <span class="p">:</span> <span class="p">(</span> <span class="n">Alexa</span><span class="p">,</span> <span class="s">&quot;www.alexa.com&quot;</span><span class="p">,</span> <span class="s">&#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39;</span> <span class="p">)</span>
+             <span class="p">}</span>
 
-<span class="c">#     classes = [Websiteout, Urlm, Ranker, Alexa]</span>
-<span class="c">#     correspInit = [</span>
-<span class="c">#                     ( &quot;www.websiteoutlook.com&quot;, &#39;//*[@id=&quot;header&quot;]/form/input[1]&#39; ),</span>
-<span class="c">#                     ( &quot;www.urlm.co&quot;, &#39;//*[@id=&quot;url&quot;]&#39; ),</span>
-<span class="c">#                     ( &quot;pagerank.jklir.net&quot;, &#39;//*[@id=&quot;url&quot;]&#39; )</span>
-<span class="c">#                     ( &quot;www.alexa.com&quot;, &#39;//*[@id=&quot;alx-content&quot;]/div/div/span/form/input&#39; ),</span>
-<span class="c">#                     ]</span>
-<span class="c">#     correspNames = [&quot;websiteout&quot;, &quot;urlm&quot;, &quot;alexa&quot;, &quot;ranks&quot;]</span>
-<span class="c">#</span>
-<span class="c">#     total = {}</span>
-<span class="c">#     for name, cls, ( baseURL, xpathOfInput ) in zip( correspNames, classes, correspInit ):</span>
-<span class="c">#         curcl = cls( maternalURL, baseURL, xpathOfInput )</span>
-<span class="c">#</span>
-<span class="c">#         informer( &quot;Trying to get data for {0} by {1}&quot;.format( maternalURL, dom ), rewrite = True )</span>
-<span class="c">#</span>
-<span class="c">#         try:</span>
-<span class="c">#             curcl.collect_that_all()</span>
-<span class="c">#             curcl.close_driver()</span>
-<span class="c">#             total.update( {name : curcl.scrapedData } )</span>
-<span class="c">#             informer( &quot;Succeded.&quot;, rewrite = True )</span>
-<span class="c">#         except RuntimeError:</span>
-<span class="c">#             informer( &quot;Not successful.&quot; )</span>
-<span class="c">#             total.update( {name : None} )</span>
-<span class="c">#</span>
-<span class="c">#     return( total )</span>
-
+    <span class="n">rouse</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="p">[(</span> <span class="n">dom</span><span class="p">,</span> <span class="n">inf</span> <span class="p">)</span> <span class="k">for</span> <span class="n">dom</span><span class="p">,</span> <span class="n">inf</span> <span class="ow">in</span> <span class="n">available_scrapers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dom</span> <span class="ow">in</span> <span class="n">deal</span><span class="p">]</span> <span class="p">)</span>
     <span class="n">total</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">dom</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="p">[</span><span class="s">&quot;websiteout&quot;</span><span class="p">,</span> <span class="s">&quot;urlm&quot;</span><span class="p">,</span> <span class="s">&quot;alexa&quot;</span><span class="p">,</span> <span class="s">&quot;ranks&quot;</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">collect_websiteout</span><span class="p">,</span> <span class="n">collect_urlm</span><span class="p">,</span> <span class="n">collect_alexa</span><span class="p">,</span> <span class="n">collect_ranks</span><span class="p">]</span> <span class="p">):</span>
-        <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Trying to get data for {0} by {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">dom</span> <span class="p">),</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">baseURL</span><span class="p">,</span> <span class="n">xpathOfInput</span> <span class="p">)</span> <span class="ow">in</span> <span class="n">rouse</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Trying to get data for {0} by {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">name</span> <span class="p">),</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="n">func</span><span class="p">(</span> <span class="n">maternalURL</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
-            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Succeded.&quot;</span><span class="p">,</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+            <span class="n">curcl</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">baseURL</span><span class="p">,</span> <span class="n">xpathOfInput</span> <span class="p">)</span>
+            <span class="n">curcl</span><span class="o">.</span><span class="n">collect_that_all</span><span class="p">()</span>
+            <span class="n">curcl</span><span class="o">.</span><span class="n">close_driver</span><span class="p">()</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">name</span> <span class="p">:</span> <span class="n">curcl</span><span class="o">.</span><span class="n">scrapedData</span> <span class="p">}</span> <span class="p">)</span>
+            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Succeded.&quot;</span><span class="p">,</span> <span class="n">rewrite</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Not successful.&quot;</span> <span class="p">)</span>
-            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">dom</span> <span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="p">)</span>
-
+            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Not successful.&quot;</span> <span class="p">)</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">name</span> <span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="p">)</span>
 
     <span class="k">return</span><span class="p">(</span> <span class="n">total</span> <span class="p">)</span></div>
 </pre></div>

@@ -122,6 +122,28 @@ class Nourisher:
 
         self.dataID = collector.collect_all( self.origFeedUrl )
 
+    def collect_maternal( self, maternalURL, _deal = ["websiteout", "urlm", "ranks", "alexa"] ):
+        """Collect data for maternal URL
+        
+        Parameters
+        ----------
+        maternalURL : string
+            maternal URL
+        deal : list of strings
+            names of scrapers from which to get data from
+        
+        Returns
+        -------
+        dict
+            scrapped data
+        """
+
+        from nourisher.collector.collector import collect_maternal
+
+        data = collect_maternal( maternalURL, _deal )
+
+        return( data )
+
     def retrieve_data( self ):
         """Retrieve data from database based on self.dataID
         
@@ -155,7 +177,7 @@ class Nourisher:
         informer( "Data have been cleaned." )
         return( cleaned )
 
-    def add_to_object_db( self, key, data ):
+    def update_object_db( self, key, data ):
         '''Updates current dataID object with wished values under key
         
         Parameters
@@ -175,5 +197,6 @@ class Nourisher:
 
         res = update_db_object( {"_id" : self.dataID}, key, data )
         print( res )
+
 
 

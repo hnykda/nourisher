@@ -48,14 +48,20 @@
           <div class="body">
             
   <h1>Source code for nourisher.nourisher</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">URLError</span><span class="p">,</span> <span class="n">HTTPError</span>
 <span class="kn">from</span> <span class="nn">nourisher.utiliser</span> <span class="kn">import</span> <span class="n">get_from_db</span><span class="p">,</span> <span class="n">push_to_db</span><span class="p">,</span> <span class="n">informer</span>
 <div class="viewcode-block" id="Nourisher"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher">[docs]</a><span class="k">class</span> <span class="nc">Nourisher</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;Top-holder for everything next</span>
 <span class="sd">    </span>
 <span class="sd">    Atributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    origFeedUrl: Input URL of web feed</span>
+<span class="sd">    origFeedUrl: string</span>
+<span class="sd">        Input URL of web feed</span>
+<span class="sd">    dataID : ObjectID</span>
+<span class="sd">        ObjectID of data in database</span>
+<span class="sd">    dataLoaded : dict </span>
+<span class="sd">        retrieved data from database</span>
+<span class="sd">    dataCleaned : dict</span>
+<span class="sd">        data cleaned</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">origFeedUrl</span> <span class="o">=</span> <span class="bp">None</span>
@@ -63,7 +69,16 @@
     <span class="n">dataLoaded</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">dataCleaned</span> <span class="o">=</span> <span class="bp">None</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_origUrlofFeed</span><span class="p">,</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">_origUrlofFeed</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Init</span>
+<span class="sd">        </span>
+<span class="sd">        Checks if feed responds.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        _origUrlOfFeed: string</span>
+<span class="sd">            feed of url which should be examined&#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">origFeedUrl</span> <span class="o">=</span> <span class="n">_origUrlofFeed</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_response</span><span class="p">(</span> <span class="n">_origUrlofFeed</span> <span class="p">)</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
@@ -72,20 +87,35 @@
             <span class="c"># if no response is given, just push this to databse and</span>
             <span class="c"># it means that there is nothing to collect</span>
             <span class="n">push_to_db</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;origURL&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">origFeedUrl</span><span class="p">}</span> <span class="p">)</span>
-            <span class="k">raise</span> <span class="n">URLError</span><span class="p">(</span> <span class="s">&quot;Can&#39;t connect to feed&quot;</span> <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConnectionError</span><span class="p">(</span> <span class="s">&quot;Can&#39;t connect to feed&quot;</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="Nourisher.get_objectid"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.get_objectid">[docs]</a>    <span class="k">def</span> <span class="nf">get_objectid</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try to find out by origFeedUrl if it is already in database</span>
+<span class="sd">        and if it is, it is returned</span>
+<span class="sd">        </span>
+<span class="sd">        When more than one are found, last one is returned</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ObjectID</span>
+<span class="sd">            ObjectID of existing item in database which has been inserted as a lastone</span>
+<span class="sd">            </span>
+<span class="sd">        Raise</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If no data have been collected yet, RuntimError is raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataID</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span> <span class="s">&quot;Trying to find out if is already in database&quot;</span> <span class="p">)</span>
-            <span class="kn">from</span> <span class="nn">.utiliser</span> <span class="kn">import</span> <span class="n">find_object_by_origurl</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">find_object_by_origurl</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">origFeedUrl</span> <span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span> <span class="s">&quot;Trying to find out if this URL is already in database&quot;</span> <span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">.utiliser</span> <span class="kn">import</span> <span class="n">find_objects_by_origurl</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">find_objects_by_origurl</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">origFeedUrl</span> <span class="p">)</span>
             <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span> <span class="p">(</span> <span class="s">&quot;Data hasn&#39;t been collected yet. Run collect_all()&quot;</span> <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">obj</span>
                 <span class="c"># Mongodb have UTC time, not local</span>
-                <span class="k">print</span><span class="p">(</span> <span class="s">&quot;Data have been already collected in  &quot;</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">generation_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="p">)</span>
+                <span class="c"># print( &quot;Data have been already collected in  &quot;, res.generation_time.isoformat() )</span>
                 <span class="k">return</span><span class="p">(</span> <span class="n">res</span> <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataID</span> <span class="p">)</span>
@@ -93,37 +123,43 @@
 <div class="viewcode-block" id="Nourisher.check_response"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.check_response">[docs]</a>    <span class="k">def</span> <span class="nf">check_response</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">origUrl</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Checks if page responds</span>
 <span class="sd">        </span>
+<span class="sd">        TODO: should return True or False, not True or exception </span>
+<span class="sd">        </span>
 <span class="sd">        Atributes</span>
 <span class="sd">        ---------</span>
-<span class="sd">        Original URL of feed</span>
+<span class="sd">        origUrl : string</span>
+<span class="sd">            Original URL of feed</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Bool</span>
+<span class="sd">            True if page responds, else exception</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+        <span class="kn">import</span> <span class="nn">requests</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">sta</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">)</span><span class="o">.</span><span class="n">status</span>
-            <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Page {0} is responding: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">sta</span> <span class="p">)</span> <span class="p">)</span>
-            <span class="k">return</span><span class="p">(</span> <span class="bp">True</span> <span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span> <span class="n">ConnectionResetError</span><span class="p">,</span> <span class="n">URLError</span><span class="p">,</span> <span class="n">HTTPError</span> <span class="p">):</span>
-            <span class="k">pass</span>
+            <span class="n">gmet</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">origUrl</span><span class="p">,</span> <span class="n">timeout</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span>
+            <span class="n">statusCode</span> <span class="o">=</span> <span class="n">gmet</span><span class="o">.</span><span class="n">status_code</span>
+
+            <span class="k">if</span> <span class="n">statusCode</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ConnectionError</span> <span class="p">(</span> <span class="s">&quot;Page is not responding 404&quot;</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span><span class="p">(</span> <span class="bp">True</span> <span class="p">)</span>
+                <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Page {0} is responding: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">origUrl</span> <span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span> <span class="n">statusCode</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">except</span> <span class="p">(</span> <span class="n">ConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span> <span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ex</span>
 
 
 </div>
 <div class="viewcode-block" id="Nourisher.collect_all"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.collect_all">[docs]</a>    <span class="k">def</span> <span class="nf">collect_all</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Collects maximum of informations</span>
 <span class="sd">        </span>
-<span class="sd">        Notes</span>
-<span class="sd">        ------</span>
-<span class="sd">        </span>
-<span class="sd">        Time stamp should be included!</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ObjectID: ObjectID to database (and corresponding collection)</span>
+<span class="sd">        ObjectID</span>
+<span class="sd">            under which are collected data in database</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_response</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">origFeedUrl</span> <span class="p">)</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
@@ -136,8 +172,36 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dataID</span> <span class="o">=</span> <span class="n">collector</span><span class="o">.</span><span class="n">collect_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">origFeedUrl</span> <span class="p">)</span>
 </div>
+<div class="viewcode-block" id="Nourisher.collect_maternal"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.collect_maternal">[docs]</a>    <span class="k">def</span> <span class="nf">collect_maternal</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">_deal</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;websiteout&quot;</span><span class="p">,</span> <span class="s">&quot;urlm&quot;</span><span class="p">,</span> <span class="s">&quot;ranks&quot;</span><span class="p">,</span> <span class="s">&quot;alexa&quot;</span><span class="p">]</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Collect data for maternal URL</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        maternalURL : string</span>
+<span class="sd">            maternal URL</span>
+<span class="sd">        deal : list of strings</span>
+<span class="sd">            names of scrapers from which to get data from</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            scrapped data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">nourisher.collector.collector</span> <span class="kn">import</span> <span class="n">collect_maternal</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">collect_maternal</span><span class="p">(</span> <span class="n">maternalURL</span><span class="p">,</span> <span class="n">_deal</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+</div>
 <div class="viewcode-block" id="Nourisher.retrieve_data"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.retrieve_data">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_data</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Retrieve data from database based on self.dataID&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve data from database based on self.dataID</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            object from database with current self.dataID</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">objID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_objectid</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">get_from_db</span><span class="p">(</span> <span class="n">objID</span> <span class="p">)</span>
@@ -146,10 +210,16 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Nourisher.clean_data"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.clean_data">[docs]</a>    <span class="k">def</span> <span class="nf">clean_data</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs cleaning on collected (or retrieved) data</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            with cleaned and wrangled data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataLoaded</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span> <span class="s">&quot;Retrieve data first!&quot;</span> <span class="p">)</span>
-            <span class="k">raise</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span> <span class="s">&quot;Retrieve data first!&quot;</span> <span class="p">)</span>
 
         <span class="kn">from</span> <span class="nn">.cleaning</span> <span class="kn">import</span> <span class="n">clean_that_all</span>
         <span class="n">cleaned</span> <span class="o">=</span> <span class="n">clean_that_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataLoaded</span> <span class="p">)</span>
@@ -157,8 +227,22 @@
         <span class="n">informer</span><span class="p">(</span> <span class="s">&quot;Data have been cleaned.&quot;</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">cleaned</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Nourisher.add_to_object_db"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.add_to_object_db">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_object_db</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Updates current dataID object with wished key&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Nourisher.update_object_db"><a class="viewcode-back" href="../../nourisher.html#nourisher.nourisher.Nourisher.update_object_db">[docs]</a>    <span class="k">def</span> <span class="nf">update_object_db</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Updates current dataID object with wished values under key</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : string</span>
+<span class="sd">            name of attribute under which to save the data</span>
+<span class="sd">        data : dict, something JSON seriazable</span>
+<span class="sd">            data to save</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ObjectID</span>
+<span class="sd">            ID under which were data saved (current dataID)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="kn">from</span> <span class="nn">.utiliser</span> <span class="kn">import</span> <span class="n">update_db_object</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">update_db_object</span><span class="p">(</span> <span class="p">{</span><span class="s">&quot;_id&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataID</span><span class="p">},</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span>

@@ -88,7 +88,7 @@ class Scraper:
         # what happens if no informations are available
         try:
             if self.check_unavailability( wdriver ) == True:
-                wdriver.close()
+                wdriver.quit()
                 informer( "\nNo data from this scrapper." )
                 raise RuntimeError ( "No available data from this Scraper" )
         except NoSuchElementException:
@@ -97,6 +97,13 @@ class Scraper:
         # TODO: get printscreen of that page and save it
 
         self.driver = wdriver
+
+    def __del__(self):
+        """If driver haven't been closed, do it now!"""
+        try:
+            driver.quit()
+        except:
+            pass
 
     def check_unavailability( self, wdriver ):
         """Checks if information of scrapper are available
@@ -267,8 +274,8 @@ class Scraper:
 
         raise NotImplementedError
 
-    def close_driver( self ):
-        self.driver.close()
+    def quit_driver( self ):
+        self.driver.quit()
 
 class Alexa( Scraper ):
     ''' This holder for Alexa.com informations
@@ -503,40 +510,6 @@ class Ranker( Scraper ):
 
         self.scrapedData = dict( zip( self._rankNames, ranks ) )
 
-# da se nahradit
-# rAlexa : http://moonsy.com/alexa_rank/, //*[@id="domain"], //*[@id="l"]/div[3]/h2[2]/b[2]
-# rMozrank :http://moonsy.com/mozrank/, //*[@id="l"]/div[3]/div[6]/table/tbody/tr[2]/td[1]
-# rMozTrust : http://moonsy.com/moztrust/, //*[@id="l"]/div[3]/div[6]/table/tbody/tr[2]/td[1]
-# rCompete : http://moonsy.com/compete-rank/, //*[@id="domain"]
-# rGoogle : http://moonsy.com/pagerank_checker/, //*[@id="domain"]
-# pageAge : http://moonsy.com/domain_age/, //*[@id="l"]/div[3]/div[5]/span[2]
-# rBacklinks: http://moonsy.com/backlinks_checker/, //*[@id="l"]/div[3]/div[6]/table/tbody/tr[2]/td[1]
-# rLinkingIn : http://moonsy.com/link_popularity/, //*[@id="resId"]
-# YahooListing : http://moonsy.com/yahoo-directory-checker/, //*[@id="l"]/div[3]/p[3]/b[1]
-
-# def collect_alexa( maternalURL ):
-#     alexa = Alexa( maternalURL, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input' )
-#     alexa.collect_that_all()
-#     alexa.close_driver()
-#     return( alexa.scrapedData )
-#
-# def collect_websiteout( maternalURL ):
-#     websiteout = Websiteout( maternalURL, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]' )
-#     websiteout.collect_that_all()
-#     websiteout.close_driver()
-#     return ( websiteout.scrapedData )
-#
-# def collect_urlm( maternalURL ):
-#     urlm = Urlm( maternalURL, "www.urlm.co", '//*[@id="url"]' )
-#     urlm.collect_that_all()
-#     urlm.close_driver()
-#     return( urlm.scrapedData )
-#
-# def collect_ranks( maternalURL ):
-#     ranks = Ranker( maternalURL, "pagerank.jklir.net", '//*[@id="url"]' )
-#     ranks.collect_that_all()
-#     ranks.close_driver()
-#     return( ranks.scrapedData )
 
 def maternal_that_all( maternalURL, deal = ["websiteout", "urlm", "ranks", "alexa"] ):
     ''' An ultimate function for module that will return
@@ -569,7 +542,7 @@ def maternal_that_all( maternalURL, deal = ["websiteout", "urlm", "ranks", "alex
         try:
             curcl = cls( maternalURL, baseURL, xpathOfInput )
             curcl.collect_that_all()
-            curcl.close_driver()
+            curcl.quit_driver()
             total.update( {name : curcl.scrapedData } )
             informer( "\nSucceded.", rewrite = True )
         except RuntimeError:

@@ -98,10 +98,10 @@ class Scraper:
 
         self.driver = wdriver
 
-    def __del__(self):
+    def __del__( self ):
         """If driver haven't been closed, do it now!"""
         try:
-            driver.quit()
+            self.driver.quit()
         except:
             pass
 

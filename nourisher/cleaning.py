@@ -100,7 +100,7 @@ def time_to_dec( time ):
         return( ttime )
 
     except:
-        print( "Nelze: ", time )
+        #print( "Nelze: ", time )
         return( None )
 
 def numbs_from_list( diction, keys ):
@@ -232,7 +232,7 @@ def clean_alexa( alexData ):
     # newData.update( {'link' : alexData['link']} )
     newData.update( {'dailyTimeOnSite' : time_to_dec( alexData['dailyTimeOnSite'] ) } )
     newData.update( numbs_from_list( alexData, wanted_numeric ) )
-    newData.update( {'dailyTimeOnSite' : None } )
+    #newData.update( {'dailyTimeOnSite' : None } )
 
     return( newData )
 

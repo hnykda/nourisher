@@ -16,15 +16,27 @@ def publication_frequency( publishedTimes ):
     float
         Number of entries per hour
     """
-
+    
+    print("Pozor - netestovaná funkce!")
+    if type(publishedTimes) == float:
+        # when just one article is there
+        return(None)
+    if len(publishedTimes) <= 1:
+        return(None)    
+    
     from time import mktime, struct_time
-
+    
     _times = publishedTimes
-    times = [mktime( struct_time( x ) ) for x in _times]
+    times = [mktime( struct_time( x ) ) for x in _times if x != None]
+    if len(times) <= 1:
+        return(None)
     first = min( times )
     last = max( times )
     # number of entries per hour
-    pub_freq = len( times ) / ( ( last - first ) / 3600 )
+    try:
+        pub_freq = len( times ) / ( ( last - first ) / 3600 )
+    except ZeroDivisionError:
+        return(None)
     return( pub_freq )
 
 
@@ -94,7 +106,8 @@ def extract_feed_info( url ):
         ifs["n_of_entries"] = None
 
     try:
-        ifs["pub_freq"] = publication_frequency( entries["published_parsed"] )
+        print("Toto není odtestováno - funguje?")
+        ifs["pub_freq"] = publication_frequency( [ tuple(i["published_parsed"]) for i in entries] )
     except:
         ifs["pub_freq"] = None
 

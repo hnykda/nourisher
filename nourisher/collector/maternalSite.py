@@ -384,7 +384,7 @@ class Websiteout( Scraper ):
             potVal = splText[iDofWorth - 2]
             if potVal in ["Million", "Billion"]:
                 worth += " " + potVal
-        except ValueError:
+        except ( ValueError, IndexError ):
             worth = None
         total.update( {'estimatedWorth' :  worth} )
 

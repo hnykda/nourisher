@@ -8,8 +8,8 @@ import os
 os.chdir( "../" )
 print( os.path.abspath( "." ) )
 
-testingUrl = 'www.huffingtonpost.com'
-# testingUrl = 'http://smittyspeaks.weebly.com/1/feed'
+# testingUrl = 'http://www.allonlinecoupons.com/rss/teachers-school-supply.xml'
+testingUrl = 'http://smittyspeaks.weebly.com/1/feed'
 # testingUrl = 'www.pornoquantum.tumblr.com'
 
 
@@ -24,6 +24,7 @@ class Testfeeder( unittest.TestCase ):
 
         nour.collect_all()
         nour.retrieve_data()
+        nour.clean_data()
         retr = get_from_db( nour.dataID )
 
         self.assertEqual( nour.dataLoaded["origURL"], retr["origURL"] )

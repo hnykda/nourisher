@@ -5,9 +5,9 @@ Created on Dec 22, 2014
 '''
 import unittest
 
-# testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
+testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
 # testingUrl = 'http://www.irinnews.org/top10.xml'
-testingUrl = 'http://css-tricks.com/frosting-glass-css-filters/feed/'
+# testingUrl = 'http://css-tricks.com/frosting-glass-css-filters/feed/'
 
 from nourisher.utiliser import push_to_db, get_from_db
 from nourisher.collector.feeder import feed_that_all

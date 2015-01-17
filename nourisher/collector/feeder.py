@@ -17,7 +17,6 @@ def publication_frequency( publishedTimes ):
         Number of entries per hour
     """
 
-    print( "Pozor - netestovaná funkce!" )
     if type( publishedTimes ) == float:
         # when just one article is there
         return( None )
@@ -106,7 +105,6 @@ def extract_feed_info( url ):
         ifs["n_of_entries"] = None
 
     try:
-        print( "Toto není odtestováno - funguje?" )
         ifs["pub_freq"] = publication_frequency( [ tuple( i["published_parsed"] ) for i in entries] )
     except:
         ifs["pub_freq"] = None

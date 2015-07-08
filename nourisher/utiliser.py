@@ -9,7 +9,6 @@ Here are some utilities that might be useful
 from nourisher import settings as lset
 from pymongo import MongoClient
 
-
 def informer(msg, *args, level=1, rewrite=False):
     """Used for getting output from program
     
@@ -227,7 +226,7 @@ def find_objects_by_origurl(origUrl, dbName=lset.DB_NAME, collection=lset.DB_COL
     return res
 
 
-def maternal_url_extractor(finalLinks):
+def maternal_url_extractor(finalLinks, wdriver):
     """ Try to find out most probable maternal URL
     based on entries
 
@@ -250,10 +249,6 @@ def maternal_url_extractor(finalLinks):
     # beru adresu prvniho clanku
     testUrl = finalLinks[0]
 
-    from selenium import webdriver
-
-    wdriver = webdriver.PhantomJS()
-    # wdriver = webdriver.Firefox()
     wdriver.get(r'http://www.alexa.com/')
     inputField = wdriver.find_element_by_xpath('//*[@id="alx-content"]/div/div/span/form/input')
     inputField.clear()
@@ -265,35 +260,35 @@ def maternal_url_extractor(finalLinks):
     informer("Alexa thinks that the maternal URL is: " + str("www." + text))
     return 'www.' + text
 
-    # OK, NECHAME TO NA ALEXE!
 
-#     from tldextract import tldextract
-#
-#     # these are domains, which host another websites - for them
-#     # there must be added subdomain
-#     stopSites = ["blogpost.com", "wordpress.com"]
-#
-#     # these are stop words which are boring - like feeds, feed
-#     stopWords = ["feed", "feeds"]
-#
-#     regDom = []
-#     subDom = []
-#     origDom = []
-#
-#     for link in finalLinks:
-#         extr = tldextract.extract( link )
-#         reg = extr.registered_domain
-#         regDom.append( reg )
-#
-#         _sub = extr.subdomain.split( "." )
-#         subDom.append( _sub )
-#
-#
-#         if _sub[-1] == 'www':
-#             origDom = 'www' + reg
-#         # this is bad - maybe even lower higher domains should be joined
-#         elif reg in stopSites:
-#             origDom = _sub[-1] + reg
-#         elif _sub[-1] in stopWords:
-#             origDom = 'www' + reg
-#         else:
+def get_webdriver(browser = lset.DEFAULT_DRIVER):
+    """Initialize the webdriver
+
+    Parameters
+    ------------
+    browser: string, optinal
+
+        Defaults to nourisher.settings.DEFAULT_DRIVER
+
+        One of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR"]
+
+        Specify which browser you want to use for scrapping and if you want
+        to use TOR version or not (TOR must be running at localhost:9050, socks5!)
+    """
+    from selenium import webdriver
+
+    if browser == "phantomjs":
+        wdriver = webdriver.PhantomJS()
+    elif browser == "phantomjsTOR":
+        serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']
+        wdriver = webdriver.PhantomJS(service_args=serviceArgs)
+    elif browser == "firefox":
+        wdriver = webdriver.Firefox()
+    elif browser == "firefoxTOR":
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('network.proxy.type', 1)
+        profile.set_preference('network.proxy.socks', 'localhost')
+        profile.set_preference('network.proxy.socks_port', 9050)
+        wdriver = webdriver.Firefox(profile)
+
+    return wdriver

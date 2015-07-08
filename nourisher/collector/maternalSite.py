@@ -1,6 +1,4 @@
-from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from nourisher.settings import DEFAULT_DRIVER
 from nourisher.utiliser import informer
 
 
@@ -33,7 +31,7 @@ class Scraper:
         URL of maternal website of feed we want to get info about
     scrapedData : dict
         Data scraped from the website
-    driver : selenium.webdriver
+    wdriver : selenium.webdriver
         webdriver used for scraping of current instance
     """
 
@@ -42,7 +40,7 @@ class Scraper:
     scrapedData = None
     driver = None
 
-    def __init__(self, _maternalURL, _baseURL, _xpathOfInputField, browser=DEFAULT_DRIVER):
+    def __init__(self, _maternalURL, _baseURL, _xpathOfInputField, wdriver):
         """ Init
 
         Parameters
@@ -53,31 +51,11 @@ class Scraper:
             URL address without http:// of the webpage from which data should be scraped of
         _xpathOfInputField: string
             name of field where is the input field for maternal URL
-        browser: string, optinal
-
-            Defaults to nourisher.settings.DEFAULT_DRIVER
-
-            One of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR"]
-
-            Specify which browser you want to use for scrapping and if you want
-            to use TOR version or not (TOR must be running at localhost:9050, socks5!)
+        wdriver : selenium.webdriver
+            driver which should be used for scrapping
         """
 
         self.baseURL = _baseURL
-
-        if browser == "phantomjs":
-            wdriver = webdriver.PhantomJS()
-        elif browser == "phantomjsTOR":
-            serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']
-            wdriver = webdriver.PhantomJS(service_args=serviceArgs)
-        elif browser == "firefox":
-            wdriver = webdriver.Firefox()
-        elif browser == "firefoxTOR":
-            profile = webdriver.FirefoxProfile()
-            profile.set_preference('network.proxy.type', 1)
-            profile.set_preference('network.proxy.socks', 'localhost')
-            profile.set_preference('network.proxy.socks_port', 9050)
-            wdriver = webdriver.Firefox(profile)
 
         wdriver.get(r'http://' + _baseURL)
         inputField = wdriver.find_element_by_xpath(_xpathOfInputField)
@@ -610,7 +588,7 @@ class RankerDist(Scraper):
 #         self.scrapedData = dict(zip(self._rankNames, ranks))
 
 
-def maternal_that_all(maternalURL, deal=None):
+def maternal_that_all(maternalURL, webdriver, deal=None):
     """ An ultimate function for module that will return
      information from all scrapers.
 
@@ -641,7 +619,7 @@ def maternal_that_all(maternalURL, deal=None):
     for name, (cls, baseURL, xpathOfInput) in rouse.items():
         informer("Trying to get data for {0} by {1}".format(maternalURL, name), rewrite=True)
         try:
-            curcl = cls(maternalURL, baseURL, xpathOfInput)
+            curcl = cls(maternalURL, baseURL, xpathOfInput, webdriver)
             curcl.collect_that_all()
             curcl.quit_driver()
             total.update({name: curcl.scrapedData})

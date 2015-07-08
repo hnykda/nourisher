@@ -1,7 +1,7 @@
 from .feeder import feed_that_all
 from .maternalSite import maternal_that_all
 
-from ..utiliser import maternal_url_extractor, push_to_db
+from ..utiliser import maternal_url_extractor, push_to_db, get_webdriver
 from nourisher.utiliser import informer
 
 
@@ -29,11 +29,11 @@ def collect_all(origUrl):
     feedInfo = _feedInfo[0]
     informer("feedInfo collected.")
 
-    # this is hack - no list needed
-    finUrls = _feedInfo[1]
-    maternalUrlByAlexa = maternal_url_extractor(finUrls)
+    webdriver = get_webdriver()  # initialize webdriver only once and not every scrapper
+    finUrls = _feedInfo[1]  # this is hack - no list needed
+    maternalUrlByAlexa = maternal_url_extractor(finUrls, webdriver)
 
-    maternalInfo = maternal_that_all(maternalUrlByAlexa)
+    maternalInfo = maternal_that_all(maternalUrlByAlexa, webdriver)
 
     total.update({"feedInfo": feedInfo})
     total.update(maternalInfo)
@@ -48,6 +48,8 @@ def collect_all(origUrl):
 
 def collect_maternal(maternalURL, _deal=None):
     """Collect data for maternal URL
+
+    Only for testing
     
     Parameters
     ----------

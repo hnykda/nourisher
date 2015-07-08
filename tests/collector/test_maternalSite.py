@@ -5,61 +5,36 @@ Created on Dec 21, 2014
 '''
 
 from nourisher.collector.maternalSite import maternal_that_all
-from nourisher.collector.maternalSite import collect_alexa, collect_ranks, collect_urlm, collect_websiteout
-from nourisher.utiliser import push_to_db, get_from_db
+from nourisher.collector.maternalSite import Urlm, Alexa, Websiteout, RankerDist
+from nourisher.utiliser import push_to_db, get_from_db, get_webdriver
 
 import unittest
 from unittest.suite import TestSuite
 
 # maternalURL = 'www.huffingtonpost.com'
 BadmaternalURL = 'www.asdsgsdfgdfgdfgdfgxxsa.com'
-maternalURL = "www.google.com"
-
+maternalURL = "www.ihned.cz"
+webdriver = get_webdriver()
 class Test( unittest.TestCase ):
-#     def test_Alexa( self ):
-#         res = collect_alexa( maternalURL )
-#         insId = push_to_db( res )
-#
-#         retr = get_from_db( insId )
-#
-#         self.maxDiff = None
-#         self.assertDictEqual( res, retr )
-#         self.assertRaises( RuntimeError, collect_alexa, BadmaternalURL )
 
-#     def test_Websiteout( self ):
-#         res = collect_websiteout( maternalURL )
-#         insId = push_to_db( res )
-#
-#         retr = get_from_db( insId )
-#
-#         self.maxDiff = None
-#         self.assertDictEqual( res, retr )
-#         self.assertRaises( RuntimeError, collect_websiteout, BadmaternalURL )
+    # def test_Urlm( self ):
+    #    urlm = Urlm(maternalURL, "www.urlm.co", '//*[@id="url"]', webdriver)
+    #    urlm.collect_that_all()
+    #
+    # def test_Alexa( self ):
+    #     alexa = Alexa(maternalURL, "www.alexa.com", '//*[@id="search-bar"]/form/input', webdriver)
+    #     alexa.collect_that_all()
+    #
+    # def test_Ranks( self ):
+    #     ranks = RankerDist(maternalURL, "www.google.com", '//*[@id="lst-ib"]', webdriver)
+    #     ranks.collect_that_all()
 
-#     def test_Urlm( self ):
-#         res = collect_urlm( maternalURL )
-#         insId = push_to_db( res )
-#
-#         retr = get_from_db( insId )
-#
-#         self.maxDiff = None
-#         self.assertDictEqual( res, retr )
-#         self.assertRaises( RuntimeError, collect_urlm, BadmaternalURL )
-#
-#     def test_Ranks( self ):
-#         res = collect_ranks( maternalURL )
-#         insId = push_to_db( res )
-#
-#         retr = get_from_db( insId )
-#         self.maxDiff = None
-#         self.assertDictEqual( res, retr )
-        # self.assertRaises( RuntimeError, collect_ranks, BadmaternalURL )
+    # def test_Webout( self ):
+    #     webout = Websiteout(maternalURL,"www.websiteoutlook.com", '//*[@id="analyse"]/div/input', webdriver)
+    #     webout.collect_that_all()
 
-        def test_maternal( self ):
-            idecko = maternal_that_all( maternalURL )
-            from nourisher.cleaning import clean_that_all
-            clean_that_all( idecko )
-            print( idecko )
+    def test_maternal( self ):
+        idecko = maternal_that_all( maternalURL, webdriver)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

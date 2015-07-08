@@ -1,6 +1,7 @@
 from selenium.common.exceptions import NoSuchElementException
 from nourisher.utiliser import informer
-
+from time import sleep
+ST = 0.5
 
 class Scraper:
     """ This is common interface for all scrapers,
@@ -106,6 +107,12 @@ class Scraper:
         # children must implement
         raise NotImplementedError
 
+    def fex(self, xpath):
+        """Find elements by xpath
+        """
+        sleep(ST)
+        return self.driver.find_element_by_xpath(xpath)
+
     def selxs(self, xpath):
         """this is just shorthand for finding text from ALL matching fields
 
@@ -125,7 +132,7 @@ class Scraper:
             res = [value.text for value in elems]
         except NoSuchElementException:
             res = None
-
+        sleep(0.5)
         return res
 
     def selx(self, xpath):
@@ -143,7 +150,7 @@ class Scraper:
         """
 
         try:
-            res = self.driver.find_element_by_xpath(xpath).text
+            res = self.fex(xpath).text
         except NoSuchElementException:
             res = None
 
@@ -252,9 +259,6 @@ class Scraper:
 
         raise NotImplementedError
 
-    def quit_driver(self):
-        self.driver.quit()
-
 
 class Alexa(Scraper):
     """ This holder for Alexa.com informations
@@ -358,12 +362,7 @@ class Websiteout(Scraper):
     def collect_that_all(self):
 
         try:
-            from selenium.webdriver.support.ui import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-            self.driver.find_element_by_xpath('//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[9]/td/form/button').click()
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-                self.driver.find_element_by_xpath(
-                    '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[1]/td[2]/span')))
+            self.fex('//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[9]/td/form/button').click()
         except NoSuchElementException:
             pass
 
@@ -418,7 +417,7 @@ class Urlm(Scraper):
 
     def check_unavailability(self, driver):
 
-        status = driver.find_element_by_xpath('/html/body/div/div[2]/div/div/div/div/h3').text
+        status = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div/div/div/div/h3').text
 
         if "Sorry, we do not have data on this website" in status:
             return True
@@ -517,24 +516,55 @@ class RankerDist(Scraper):
         return res
 
     def get_compete(self):
+        sleep(1)
         self.driver.get('http://moonsy.com/compete-rank/')
-        self.driver.find_element_by_xpath('//*[@id="domain"]').clear()
-        self.driver.find_element_by_xpath('//*[@id="domain"]').send_keys(self.maternalURL)
+        self.fex('//*[@id="domain"]').clear()
+        self.fex('//*[@id="domain"]').send_keys(self.maternalURL)
+        self.fex('//*[@id="form1"]/input[3]').click()
         return {"rCompete": self.selx('//*[@id="l"]/div[3]/p[4]/strong')}
+
+    def login_majestic(self):
+        #self.driver.get('https://majestic.com/account/login')
+        self.fex('//*[@id="emailPlaceholder1"]').click()
+        from time import sleep
+        sleep(0.5)
+        self.fex('//*[@id="email1"]').send_keys('kotrfa@gmail.com')
+        self.fex('//*[@id="passwordPlaceholder1"]').click()
+        sleep(0.5)
+        self.fex('//*[@id="password1"]').send_keys('seznam12')
+        #chkb = self.fex('//*[@id="RememberMe"]')
+        #if not chkb.is_selected():
+            #sleep(0.5)
+            #chkb.click()
+        sleep(0.5)
+        self.fex('//*[@id="password1"]').submit()
+
 
     def get_majestic(self):
         self.driver.get('https://majestic.com/reports/site-explorer?q={}'.format(self.maternalURL))
+        try:
+            if "Quickly! Register for a FREE account now to continue." in self.selx('//*[@id="usage_blocked"]/div[1]/h3'):
+                self.login_majestic()
+                #self.driver.get('https://majestic.com/reports/site-explorer?q={}'.format(self.maternalURL))
+        except NoSuchElementException:
+            pass
+
         return {"rMajestic" : self.selx('//*[@id="summary_container"]/div[2]/table[1]/tbody/tr[1]/td[1]/div/p[2]/b')}
 
     def get_gbacklinks(self):
-        self.driver.get('https://checker.monitorbacklinks.com/seo-tools/free-backlink-checker/{}'.format(self.maternalURL))
+        self.driver.get('https://checker.monitorbacklinks.com/seo-tools/free-backlink-checker/')
+        self.fex('//*[@id="checkbacklinksform"]/fieldset[1]/div/p/input').send_keys(self.maternalURL)
+        self.fex('//*[@id="checkbacklinksform"]/fieldset[1]/p/button').click()
+
         return {"rBacklingsG": self.selx('/html/body/div[3]/ul/li[1]/p')}
 
 
     def collect_that_all(self):
         d = {}
         # not needed thanks to websiteout: [self.get_fb_total(),self.get_mozrank(), self.get_twitter(), self.get_seznam()]
-        _ranks = [self.get_compete(),  self.get_gbacklinks(),self.get_majestic()]
+        _ranks = [self.get_compete()]
+                  #self.get_gbacklinks(),
+                  #self.get_majestic()]
 
         for dic in _ranks:
             d.update(dic)
@@ -587,7 +617,7 @@ class RankerDist(Scraper):
 #     def check_unavailability(self, wdriver):
 #
 #         try:
-#             wdriver.find_element_by_xpath('//*[@id="content"]/center/table[1]/tbody/tr/td[1]/a/img')
+#             wfex('//*[@id="content"]/center/table[1]/tbody/tr/td[1]/a/img')
 #             return False
 #         except NoSuchElementException:
 #             raise RuntimeError("Problem! Pravdepodobne jsem dostal ban!")
@@ -622,7 +652,7 @@ def maternal_that_all(maternalURL, webdriver, deal=None):
     available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com", '//*[@id="analyse"]/div/input'),
                           "urlm": (Urlm, "www.urlm.co", '//*[@id="url"]'),
                           "ranks": (RankerDist, "www.google.com", '//*[@id="lst-ib"]'),
-                          "alexa": (Alexa, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input')
+                          "alexa": (Alexa, "www.alexa.com", '//*[@id="search-bar"]/form/input')
                           }
 
     rouse = dict([(dom, inf) for dom, inf in available_scrapers.items() if dom in deal])
@@ -632,9 +662,9 @@ def maternal_that_all(maternalURL, webdriver, deal=None):
         try:
             curcl = cls(maternalURL, baseURL, xpathOfInput, webdriver)
             curcl.collect_that_all()
-            curcl.quit_driver()
             total.update({name: curcl.scrapedData})
             informer("\nSucceded.", rewrite=True)
+            sleep(ST)
         except RuntimeError:
             informer("\nNot successful.")
             total.update({name: None})

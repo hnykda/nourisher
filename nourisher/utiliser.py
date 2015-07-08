@@ -250,7 +250,7 @@ def maternal_url_extractor(finalLinks, wdriver):
     testUrl = finalLinks[0]
 
     wdriver.get(r'http://www.alexa.com/')
-    inputField = wdriver.find_element_by_xpath('//*[@id="alx-content"]/div/div/span/form/input')
+    inputField = wdriver.find_element_by_xpath('//*[@id="search-bar"]/form/input')
     inputField.clear()
     inputField.send_keys(testUrl)
     inputField.submit()
@@ -270,7 +270,7 @@ def get_webdriver(browser = lset.DEFAULT_DRIVER):
 
         Defaults to nourisher.settings.DEFAULT_DRIVER
 
-        One of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR"]
+        One of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR", "chromium"]
 
         Specify which browser you want to use for scrapping and if you want
         to use TOR version or not (TOR must be running at localhost:9050, socks5!)
@@ -284,6 +284,8 @@ def get_webdriver(browser = lset.DEFAULT_DRIVER):
         wdriver = webdriver.PhantomJS(service_args=serviceArgs)
     elif browser == "firefox":
         wdriver = webdriver.Firefox()
+    elif browser == "chromium":
+        wdriver = webdriver.Chrome('chromedriver')
     elif browser == "firefoxTOR":
         profile = webdriver.FirefoxProfile()
         profile.set_preference('network.proxy.type', 1)

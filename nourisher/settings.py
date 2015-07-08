@@ -18,7 +18,7 @@ DB_COLLECTION = "feeds"  # Name of collection in database
 ### MATERNALSITE ###
 # which selenium.webdriver and settings
 # should be used for scrapping. Possible values in maternaSite.Scraper
-DEFAULT_DRIVER = "phantomjs"
+DEFAULT_DRIVER = 'chromium'#"phantomjs"
 
 ### VERBOSITY ###
 VERBOSITY = 1  # Verbosity of std output (currently implemented 0, 1, 2)

@@ -327,13 +327,23 @@ class Websiteout(Scraper):
     """
 
     webout_singles = {
-        "link": '//*[@id="right"]/table[1]/tbody/tr[1]/td[2]/span/span',
-        "pageviewsPerDay": '//*[@id="right"]/table[1]/tbody/tr[2]/td[2]',
-        "dailyUSD": '//*[@id="right"]/table[1]/tbody/tr[3]/td[2]',
-        "websiteoutRank": '//*[@id="right"]/table[1]/tbody/tr[4]/td[2]/span[1]',
-        "backlingsYahoo": '//*[@id="right"]/table[2]/tbody/tr[3]/td[2]',
-        "traficRank": '//*[@id="right"]/table[2]/tbody/tr[1]/td[2]',
-        'pageRank': '//*[@id="right"]/table[2]/tbody/tr[2]/td[2]',
+        #"link": '//*[@id="right"]/table[1]/tbody/tr[1]/td[2]/span/span',
+        "pageviewsPerDay": '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[7]/td[2]/span',
+        "backlingsWebout": '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[3]/td[2]/span',
+        'rAlexa' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[1]/td[2]/span',
+        'rGoogle': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[2]/td[2]/span',
+        'rGooglePlus': '//*[@id="google"]',
+        'rFacebook' : '//*[@id="facebook"]',
+        'rTwitter' : '//*[@id="twitter"]',
+        'rLinkedin' : '//*[@id="linkedin"]',
+        'rMozrank' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[6]/td[2]/span',
+        'rSemrush' : '//*[@id="sem"]/div[2]/table/tbody/tr[1]/td[2]',
+        'rDomainAuthority' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[5]/td[2]/span',
+        'rPageAuthority' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[4]/td[2]/span',
+        'topKeywords' : '//*[@id="sem"]/div[2]/table/tbody/tr[2]/td[2]',
+        'organicTraffic' : '//*[@id="sem"]/div[2]/table/tbody/tr[3]/td[2]',
+        'worth' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[8]/td[2]/span',
+        'cost' : '//*[@id="sem"]/div[2]/table/tbody/tr[4]/td[2]',
     }
 
     def check_unavailability(self, driver):
@@ -346,6 +356,17 @@ class Websiteout(Scraper):
             return False
 
     def collect_that_all(self):
+
+        try:
+            from selenium.webdriver.support.ui import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
+            self.driver.find_element_by_xpath('//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[9]/td/form/button').click()
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
+                self.driver.find_element_by_xpath(
+                    '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[1]/td[2]/span')))
+        except NoSuchElementException:
+            pass
+
         total = {}
         singles = self.collect_textual_singles(self.webout_singles)
 
@@ -353,19 +374,9 @@ class Websiteout(Scraper):
 
         otherSites = self.selxs('//*[@id="right"]/table[7]/tbody/tr[2]/td[1]/ol/li/a')
 
-        # estimated worth
-        try:
-            text = self.selxs('//*[@id="right"]/div[3]/p')
-            splText = text[0].split()
-            splText.reverse()
-            iDofWorth = splText.index("USD")
-            worth = splText[iDofWorth - 1]
-            potVal = splText[iDofWorth - 2]
-            if potVal in ["Million", "Billion"]:
-                worth += " " + potVal
-        except (ValueError, IndexError):
-            worth = None
-        total.update({'estimatedWorth': worth})
+        total.update({'textRatio' : self.selx('//*[@id="website"]/div[2]/dl/dd[17]').split("%")[0],
+             'pageSize' : self.selx('//*[@id="website"]/div[2]/dl/dd[16]').split("Kb")[0],
+             })
 
         total.update(singles)
         total.update({'categories': categories})
@@ -439,16 +450,16 @@ class Urlm(Scraper):
 class RankerDist(Scraper):
     """Holder for ranks"""
 
-    _rankNames = ['rGoogle',
+    _rankNames = [#'rGoogle',
                   'rCompete',
-                  'rMozrank',
+                  #'rMozrank',
                   'rSeznam',
                   'rBacklinksG',
                   'rMajestic',
                   'rSiteExplorer',
-                  'rFacebook',
-                  'rTwitter',
-                  'rPlusoneG'
+                  #'rFacebook',
+                  #'rTwitter',
+                   #'rPlusoneG'
                   ]
 
     @staticmethod
@@ -491,10 +502,10 @@ class RankerDist(Scraper):
         r = requests.get("https://api.facebook.com/method/links.getStats?urls={}&format=json".format(self.maternalURL))
         return {"rFacebook" : eval(r.content.decode("utf8"))[0]["total_count"]}
 
-    def get_seznam_google_jyxo(self):
+    def get_seznam(self):
         self.driver.get(self.maternalURL)
         res = {
-        "rGoogle" : self.selx('//*[@id="val1"]'),
+        #"rGoogle" : self.selx('//*[@id="val1"]'),
         "rSeznam" : self.selx('//*[@id="val2"]'),
         }
         return res
@@ -522,9 +533,9 @@ class RankerDist(Scraper):
 
     def collect_that_all(self):
         d = {}
-        _ranks = [self.get_compete(), self.get_fb_total(), self.get_gbacklinks(),
-                  self.get_majestic(), self.get_mozrank(), self.get_seznam_google_jyxo(),
-                  self.get_twitter()]
+        # not needed thanks to websiteout: [self.get_fb_total(),self.get_mozrank(), self.get_twitter(), self.get_seznam()]
+        _ranks = [self.get_compete(),  self.get_gbacklinks(),self.get_majestic()]
+
         for dic in _ranks:
             d.update(dic)
 
@@ -608,7 +619,7 @@ def maternal_that_all(maternalURL, webdriver, deal=None):
         deal = ["websiteout", "urlm", "ranks", "alexa"]
     # every scraper must be named here in format:
     # {"nameOfScraper" : (ClassOfScrapper, baseURL, xPathOfInputField)}
-    available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]'),
+    available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com", '//*[@id="analyse"]/div/input'),
                           "urlm": (Urlm, "www.urlm.co", '//*[@id="url"]'),
                           "ranks": (RankerDist, "www.google.com", '//*[@id="lst-ib"]'),
                           "alexa": (Alexa, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input')

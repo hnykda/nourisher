@@ -1,15 +1,16 @@
-'''
+"""
 Created on Dec 20, 2014
 
 @author: dan
 
 Here are some utilities that might be useful
-'''
+"""
 
 from nourisher import settings as lset
 from pymongo import MongoClient
 
-def informer( msg, *args, level = 1, rewrite = False ):
+
+def informer(msg, *args, level=1, rewrite=False):
     """Used for getting output from program
     
     Parameters
@@ -35,26 +36,27 @@ def informer( msg, *args, level = 1, rewrite = False ):
         if lset.VERBOSITY < level:
             pass
         elif lset.VERBOSITY >= level:
-            if rewrite == False:
-                print( msg )
+            if not rewrite:
+                print(msg)
                 if args:
                     for arg in args:
-                        print( arg )
-            elif rewrite == True:
-                print( "\r" + msg, end = "" )
+                        print(arg)
+            elif rewrite:
+                print("\r" + msg, end="")
                 if args:
                     for arg in args:
-                        print( "\r" + arg, end = "" )
+                        print("\r" + arg, end="")
 
     except:
         import sys
-        print( "Can't print message because of ", sys.exc_info() )
 
-def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
-                ip = lset.DB_IP, port = lset.DB_PORT ):
+        print("Can't print message because of ", sys.exc_info())
 
-    ''' Saves inpObj to MongoDB and returns it's _id
-    
+
+def push_to_db(inpObj, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
+               ip=lset.DB_IP, port=lset.DB_PORT):
+    """ Saves inpObj to MongoDB and returns it's _id
+
     Parameters
     -----------
     inpObj: dict, or something pymongo can serialize to JSON
@@ -67,33 +69,33 @@ def push_to_db( inpObj, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
         default in settings, IP where is MongoDB running
     port: interger, optional
         default in settings, port where is MongoDB running
-    
+
     Returns
     -------
-    ObjectID: ObjectID 
-        ObjectID of inserted document    
-    '''
+    ObjectID: ObjectID
+        ObjectID of inserted document
+    """
 
-    client = MongoClient( ip, port )
+    client = MongoClient(ip, port)
     db = client[dbName][collection]
 
-    insID = db.insert( inpObj )
-    informer( "Saving to {0} database, {1} collection under ObjectID: ".format( dbName, collection )
-              , str( insID ) )
+    insID = db.insert(inpObj)
+    informer("Saving to {0} database, {1} collection under ObjectID: ".format(dbName, collection)
+             , str(insID))
 
     client.disconnect()
 
-    return( insID )
+    return insID
 
-def get_from_db( idOfO, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
-                ip = lset.DB_IP, port = lset.DB_PORT ):
 
-    ''' Get info from db by it's _id or objectid
-    
+def get_from_db(idOfO, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
+                ip=lset.DB_IP, port=lset.DB_PORT):
+    """ Get info from db by it's _id or objectid
+
     Parameters
     -----------
     idOfO: ID in string, ObjectID
-        of object which we want to retrieve data 
+        of object which we want to retrieve data
     dbName: string, optional
         default in settings, name of database to write into
     collection: string, optional
@@ -101,30 +103,31 @@ def get_from_db( idOfO, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
     ip: string, optional
         default in settings, IP where is MongoDB running
     port: interger, optional
-        default in settings, port where is MongoDB running 
-    '''
+        default in settings, port where is MongoDB running
+    """
 
     from bson.objectid import ObjectId
-    informer( "Looking in {0} database, {1} collection under ObjectID: {2}".format( dbName, collection, idOfO ) )
 
+    informer("Looking in {0} database, {1} collection under ObjectID: {2}".format(dbName, collection, idOfO))
 
-    if type( idOfO ) == str:
-        idOfO = ObjectId( idOfO )
+    if type(idOfO) == str:
+        idOfO = ObjectId(idOfO)
 
-    client = MongoClient( ip, port )
+    client = MongoClient(ip, port)
     db = client[dbName][collection]
 
-    outData = db.find_one( {'_id' : idOfO}, {"_id" : 0} )
+    outData = db.find_one({'_id': idOfO}, {"_id": 0})
 
     client.disconnect()
 
-    return( outData )
+    return outData
 
-def get_id_of_last_inserted( dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
-                ip = lset.DB_IP, port = lset.DB_PORT ):
-    '''Get ObjectID of last inserted document
+
+def get_id_of_last_inserted(dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
+                            ip=lset.DB_IP, port=lset.DB_PORT):
+    """Get ObjectID of last inserted document
     from pymongo import MongoClient
-    
+
     Parameters
     ----------
     dbName: string, optional
@@ -134,31 +137,32 @@ def get_id_of_last_inserted( dbName = lset.DB_NAME, collection = lset.DB_COLLECT
     ip: string, optional
         default in settings, IP where is MongoDB running
     port: interger, optional
-        default in settings, port where is MongoDB running 
-    
+        default in settings, port where is MongoDB running
+
     Returns
     -------
-    ObjectID : ObjectID 
+    ObjectID : ObjectID
         last inserted document to collection
-    '''
+    """
 
-    informer( "Looking in {0} database, {1} collection for last item.".format( dbName, collection ) )
-    client = MongoClient( ip, port )
+    informer("Looking in {0} database, {1} collection for last item.".format(dbName, collection))
+    client = MongoClient(ip, port)
     db = client[dbName][collection]
 
-    return ( db.find().sort( '_id', -1 )[0]["_id"] )
+    return db.find().sort('_id', -1)[0]["_id"]
 
-def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
-                ip = lset.DB_IP, port = lset.DB_PORT ):
-    '''Update object in db
-    
+
+def update_db_object(finder, key, value, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
+                     ip=lset.DB_IP, port=lset.DB_PORT):
+    """Update object in db
+
     Parameters
     -----------
-    finder : dict 
+    finder : dict
         by which we should find {key : value}
     key: string
         under this name value will be added
-    value: dict, somthing seriazable 
+    value: dict, somthing seriazable
         data to add under key
     dbName: string, optional
         default in settings, name of database to write into
@@ -168,22 +172,23 @@ def update_db_object( finder, key, value, dbName = lset.DB_NAME, collection = ls
         default in settings, IP where is MongoDB running
     port: interger, optional
         default in settings, port where is MongoDB running
-        
+
     Returns
     -------
     ObjectID
         of insterted document
-    '''
-    client = MongoClient( ip, port )
+    """
+    client = MongoClient(ip, port)
     db = client[dbName][collection]
 
-    res = db.update( finder, {"$set" : {key: value}} )
-    return( res )
+    res = db.update(finder, {"$set": {key: value}})
+    return res
 
-def find_objects_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.DB_COLLECTION,
-                ip = lset.DB_IP, port = lset.DB_PORT ):
-    '''Try to find object by original URL of feed and returns the LAST one inserted
-    
+
+def find_objects_by_origurl(origUrl, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
+                            ip=lset.DB_IP, port=lset.DB_PORT):
+    """Try to find object by original URL of feed and returns the LAST one inserted
+
     Parameters
     ----------
     origUrl : string of URL
@@ -196,51 +201,52 @@ def find_objects_by_origurl( origUrl, dbName = lset.DB_NAME, collection = lset.D
         default in settings, IP where is MongoDB running
     port: interger, optional
         default in settings, port where is MongoDB running
-        
+
     Returns
     -------
     ObjectID
-        of last inserted matching document 
-        
+        of last inserted matching document
+
     Raises
     ------
     IndexError
         When no document is found
-    '''
+    """
 
-    client = MongoClient( ip, port )
+    client = MongoClient(ip, port)
     db = client[dbName][collection]
 
     try:
-        allRes = db.find( {"origURL" : origUrl} ).sort( '_id', -1 )
+        allRes = db.find({"origURL": origUrl}).sort('_id', -1)
         res = allRes[0]["_id"]
     except IndexError:
         res = None
-    informer( "Looking in {0} database, {1} collection for URL: {2}".format( dbName, collection, origUrl ) )
+    informer("Looking in {0} database, {1} collection for URL: {2}".format(dbName, collection, origUrl))
     # TODO: Slow! But after find is fetched by res, allRes is empty...
-    informer( "Object(s) by URL found: ", [( obj["_id"], obj["_id"].generation_time.isoformat() )
-                                           for obj in db.find( {"origURL" : origUrl} ).sort( '_id', -1 )] )
-    return( res )
+    informer("Object(s) by URL found: ", [(obj["_id"], obj["_id"].generation_time.isoformat())
+                                          for obj in db.find({"origURL": origUrl}).sort('_id', -1)])
+    return res
 
-def maternal_url_extractor( finalLinks ):
-    ''' Try to find out most probable maternal URL 
+
+def maternal_url_extractor(finalLinks):
+    """ Try to find out most probable maternal URL
     based on entries
-    
+
     Parameters
     ----------
     finalLinks : list
         true finalUrls of entries
-    
+
     Returns
     -------
-    string 
+    string
         maternal URL (in www.maternalurl.*)
-    
+
     Note
     -----
     Alexa is maybe better!
-    
-    '''
+
+    """
 
     # beru adresu prvniho clanku
     testUrl = finalLinks[0]
@@ -249,18 +255,19 @@ def maternal_url_extractor( finalLinks ):
 
     wdriver = webdriver.PhantomJS()
     # wdriver = webdriver.Firefox()
-    wdriver.get( r'http://www.alexa.com/' )
-    inputField = wdriver.find_element_by_xpath( '//*[@id="alx-content"]/div/div/span/form/input' )
+    wdriver.get(r'http://www.alexa.com/')
+    inputField = wdriver.find_element_by_xpath('//*[@id="alx-content"]/div/div/span/form/input')
     inputField.clear()
-    inputField.send_keys( testUrl )
+    inputField.send_keys(testUrl)
     inputField.submit()
 
-    text = wdriver.find_element_by_xpath( '//*[@id="js-li-last"]/span[1]/a' ).text
+    text = wdriver.find_element_by_xpath('//*[@id="js-li-last"]/span[1]/a').text
 
-    informer( "Alexa thinks that the maternal URL is: " + str( "www." + text ) )
-    return( 'www.' + text )
+    informer("Alexa thinks that the maternal URL is: " + str("www." + text))
+    return 'www.' + text
 
     # OK, NECHAME TO NA ALEXE!
+
 #     from tldextract import tldextract
 #
 #     # these are domains, which host another websites - for them

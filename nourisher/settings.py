@@ -1,8 +1,8 @@
-'''
+"""
 Created on Dec 22, 2014
 
 @author: dan
-'''
+"""
 
 """
 Here is possible to set customizables - global variables
@@ -48,5 +48,3 @@ def get_setings():
 #
 #     def get_db_collection( self ):
 #         return( self.DB_COLLECTION )
-
-

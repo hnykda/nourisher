@@ -234,7 +234,7 @@ def clean_alexa(alexData):
                       'bounceRate',
                       'dailyPagevPerVis',
                       'totalSitesLinking',
-                      'globalRank']
+                      'rAlexa']
 
     newData = {}
     # newData.update( {'link' : alexData['link']} )
@@ -261,16 +261,17 @@ def clean_ranks(ranksData):
     """Cleaner for ranks"""
 
     wanted_numeric = ['rGoogle',
-                      'rAlexa',
+                      #'rAlexa',
                       'rCompete',
                       'rMozrank',
                       'rSeznam',
                       'rJyxo',
                       'rMajestic',
+                      'rBacklingsG'
                       'rSiteExplorer',
                       'rFacebook',
                       'rTwitter',
-                      'rPlusoneG'
+                      #'rPlusoneG'
                       ]
 
     newData = {}

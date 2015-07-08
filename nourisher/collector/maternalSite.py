@@ -97,6 +97,7 @@ class Scraper:
         # TODO: get printscreen of that page and save it
 
         self.driver = wdriver
+        self.maternalURL = _maternalURL
 
     def __del__(self):
         """If driver haven't been closed, do it now!"""
@@ -283,7 +284,8 @@ class Alexa(Scraper):
 
     alexa_singles = {
         'link': '//*[@id="js-li-last"]/span[1]/a',
-        'globalRank': '//*[@id="traffic-rank-content"]/div/span[2]/div[1]/span/span/div/strong',
+        #'globalRank': '//*[@id="traffic-rank-content"]/div/span[2]/div[1]/span/span/div/strong',
+        'rAlexa': '//*[@id="traffic-rank-content"]/div/span[2]/div[1]/span/span/div/strong',
         'globalRankChange': '//*[@id="traffic-rank-content"]/div/span[2]/div[2]/span/span/div/strong',
         'inCountry': '//*[@id="traffic-rank-content"]/div/span[2]/div[2]/span/span/h4/a',
         'rankInCountry': '//*[@id="traffic-rank-content"]/div/span[2]/div[2]/span/span/div/strong',
@@ -456,15 +458,13 @@ class Urlm(Scraper):
 
 ### RANKS ###
 
-class Ranker(Scraper):
+class RankerDist(Scraper):
     """Holder for ranks"""
 
     _rankNames = ['rGoogle',
-                  'rAlexa',
                   'rCompete',
                   'rMozrank',
                   'rSeznam',
-                  'rJyxo',
                   'rBacklinksG',
                   'rMajestic',
                   'rSiteExplorer',
@@ -498,18 +498,116 @@ class Ranker(Scraper):
         return numb
 
     def check_unavailability(self, wdriver):
+        # workarround
+        return False
 
-        try:
-            wdriver.find_element_by_xpath('//*[@id="content"]/center/table[1]/tbody/tr/td[1]/a/img')
-            return False
-        except NoSuchElementException:
-            raise RuntimeError("Problem! Pravdepodobne jsem dostal ban!")
+    def get_twitter(self):
+        import requests
+
+        r = requests.get("http://urls.api.twitter.com/1/urls/count.json?url={}".format(self.maternalURL))
+        return {"rTwitter":eval(r.content.decode("utf8"))["count"]}
+
+    def get_fb_total(self):
+        import requests
+
+        r = requests.get("https://api.facebook.com/method/links.getStats?urls={}&format=json".format(self.maternalURL))
+        return {"rFacebook" : eval(r.content.decode("utf8"))[0]["total_count"]}
+
+    def get_seznam_google_jyxo(self):
+        self.driver.get(self.maternalURL)
+        res = {
+        "rGoogle" : self.selx('//*[@id="val1"]'),
+        "rSeznam" : self.selx('//*[@id="val2"]'),
+        }
+        return res
+
+    def get_mozrank(self):
+        self.driver.get('https://moz.com/researchtools/ose/comparisons?site={}'.format(self.maternalURL))
+        res = {"rMozrank" : self.selx('//*[@id="main"]/div/section[2]/div/section[2]/div/div[1]/div/div[2]/table/tbody/tr[2]/td[2]'),
+               "rSiteExplorer" : self.selx('//*[@id="main"]/div/section[2]/div/section[2]/div/div[1]/div/div[2]/table/tbody/tr[5]/td[2]')}
+        return res
+
+    def get_compete(self):
+        self.driver.get('http://moonsy.com/compete-rank/')
+        self.driver.find_element_by_xpath('//*[@id="domain"]').clear()
+        self.driver.find_element_by_xpath('//*[@id="domain"]').send_keys(self.maternalURL)
+        return {"rCompete": self.selx('//*[@id="l"]/div[3]/p[4]/strong')}
+
+    def get_majestic(self):
+        self.driver.get('https://majestic.com/reports/site-explorer?q={}'.format(self.maternalURL))
+        return {"rMajestic" : self.selx('//*[@id="summary_container"]/div[2]/table[1]/tbody/tr[1]/td[1]/div/p[2]/b')}
+
+    def get_gbacklinks(self):
+        self.driver.get('https://checker.monitorbacklinks.com/seo-tools/free-backlink-checker/{}'.format(self.maternalURL))
+        return {"rBacklingsG": self.selx('/html/body/div[3]/ul/li[1]/p')}
+
 
     def collect_that_all(self):
-        _ranks = self.selxs('//*[@id="content"]/center/table/tbody/tr/td[2]')
-        ranks = [self.to_digit(lexNumb) for lexNumb in _ranks]
+        d = {}
+        _ranks = [self.get_compete(), self.get_fb_total(), self.get_gbacklinks(),
+                  self.get_majestic(), self.get_mozrank(), self.get_seznam_google_jyxo(),
+                  self.get_twitter()]
+        for dic in _ranks:
+            d.update(dic)
 
-        self.scrapedData = dict(zip(self._rankNames, ranks))
+        ranks = dict([(rankname, self.to_digit(lexNumb)) for rankname, lexNumb in d.items()])
+
+        self.scrapedData = ranks
+
+
+# class RankerJklir(Scraper):
+#     """Holder for ranks"""
+#
+#     _rankNames = ['rGoogle',
+#                   'rAlexa',
+#                   'rCompete',
+#                   'rMozrank',
+#                   'rSeznam',
+#                   'rBacklinksG',
+#                   'rMajestic',
+#                   'rSiteExplorer',
+#                   'rFacebook',
+#                   'rTwitter',
+#                   #'rPlusoneG'
+#                   ]
+#
+#     @staticmethod
+#     def to_digit(lex_numb):
+#         """Prevede rank na cislo, je-li to mozne"""
+#         from locale import atof
+#
+#         try:
+#             if lex_numb == "N/A":
+#                 numb = None
+#             elif "/" in lex_numb:
+#                 val = lex_numb.split("/")[0]
+#                 if "-" in val:
+#                     numb = None
+#                 else:
+#                     numb = atof(val)
+#             # for google backlinks
+#             elif ";" in lex_numb:
+#                 numb = lex_numb
+#             else:
+#                 numb = atof(lex_numb)
+#         except ValueError:
+#             # print( "Chyba prevodu: ", lex_numb, ". Vracim stejny string." )
+#             numb = lex_numb
+#         return numb
+#
+#     def check_unavailability(self, wdriver):
+#
+#         try:
+#             wdriver.find_element_by_xpath('//*[@id="content"]/center/table[1]/tbody/tr/td[1]/a/img')
+#             return False
+#         except NoSuchElementException:
+#             raise RuntimeError("Problem! Pravdepodobne jsem dostal ban!")
+#
+#     def collect_that_all(self):
+#         _ranks = self.selxs('//*[@id="content"]/center/table/tbody/tr/td[2]')
+#         ranks = [self.to_digit(lexNumb) for lexNumb in _ranks]
+#
+#         self.scrapedData = dict(zip(self._rankNames, ranks))
 
 
 def maternal_that_all(maternalURL, deal=None):
@@ -534,7 +632,7 @@ def maternal_that_all(maternalURL, deal=None):
     # {"nameOfScraper" : (ClassOfScrapper, baseURL, xPathOfInputField)}
     available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com", '//*[@id="header"]/form/input[1]'),
                           "urlm": (Urlm, "www.urlm.co", '//*[@id="url"]'),
-                          "ranks": (Ranker, "pagerank.jklir.net", '//*[@id="url"]'),
+                          "ranks": (RankerDist, "www.google.com", '//*[@id="lst-ib"]'),
                           "alexa": (Alexa, "www.alexa.com", '//*[@id="alx-content"]/div/div/span/form/input')
                           }
 

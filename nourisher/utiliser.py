@@ -49,7 +49,6 @@ def informer(msg, *args, level=1, rewrite=False):
 
     except:
         import sys
-
         print("Can't print message because of ", sys.exc_info())
 
 

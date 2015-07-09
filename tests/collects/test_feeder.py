@@ -10,7 +10,7 @@ urls = ['http://www.huffingtonpost.com/news/authors/feed/',
             'http://css-tricks.com/frosting-glass-css-filters/feed/'
             ]
 
-from nourisher.collector.feeder import feed_that_all
+from nourisher.collects.feeder import feed_that_all
 
 class Test( unittest.TestCase ):
 

@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 """
 Created on Dec 22, 2014
 
@@ -25,7 +28,7 @@ VERBOSITY = 1  # Verbosity of std output (currently implemented 0, 1, 2)
 
 def get_setings():
     """Print current settings"""
-    print( DB_COLLECTION, DB_PORT, DB_IP, DB_NAME, DEFAULT_DRIVER, VERBOSITY )
+    print(DB_COLLECTION, DB_PORT, DB_IP, DB_NAME, DEFAULT_DRIVER, VERBOSITY )
 
 # class SETTER:
 #     ### DATABASE ###

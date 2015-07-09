@@ -37,6 +37,7 @@ def main():
     if args.debug:
         log.setLevel(logging.DEBUG)
     log.debug("Log level set to {}".format(log.level))
+
     try:
         from nourisher import settings
         settings.VERBOSITY = 1
@@ -48,27 +49,31 @@ def main():
         from nourisher.nourisher import Nourisher
 
         urls = load_data(args.url_input)
+
+        from .collects.collector import Collector
+        collector = Collector()
+
         counter = 0
         dobre = []
         spatne = []
         for url in urls:
             now = time.time()
-            print(counter, "Beru: ", url)
+            log.info(counter + ". Beru: " + url)
             try:
                 nour = Nourisher(url)
-                nour.collect_all()
-                nour.retrieve_data()
+                nour.collect_all(collector)
                 nour.clean_data()
                 nour.update_object_db("cleaned", nour.dataCleaned)
                 dobre.append(url)
-                print("Zabralo to:", time.time() - now, "sekund.\n----------\n")
                 time.sleep(args.sleep)
             except:
-                print(sys.exc_info())
+                log.error("Chyba. Nelze zpracovat.")
+                log.error(sys.exc_info())
                 tracb = traceback.format_exc()
-                print(tracb)
+                log.error(tracb)
                 spatne.append((url, tracb))
-                print("Zabralo to:", time.time() - now, "sekund.\n----------\n")
+            finally:
+                log.info("Zabralo to:" + str(time.time() - now) + "sekund.\n----------\n")
             counter += 1
     except KeyboardInterrupt as ex:
         log.warning("Termined by user.")
@@ -79,6 +84,7 @@ def main():
         spatne.append((url, tracb))
         print("Zabralo to:", time.time() - now, "sekund.\n----------\n")
     finally:
+        log.info("Zapisuji dobre a spatne url.")
         import json
         with open("spatne_url.txt", "w") as ofile:
             json.dump(spatne, ofile)

@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 from collections import defaultdict
 from nourisher import settings as setl, utiliser
 

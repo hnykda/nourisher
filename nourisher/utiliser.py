@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 """
 Created on Dec 20, 2014
 
@@ -264,7 +267,7 @@ def get_webdriver(browser = lset.DEFAULT_DRIVER):
 
 def scraper_prep(scraper_name, webdriver):
 
-    from nourisher.collector.maternalSite import Websiteout, Urlm, RankerDist, Alexa
+    from nourisher.collects.maternalSite import Websiteout, Urlm, RankerDist, Alexa
     scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com"),
                       "urlm": (Urlm, "www.urlm.co"),
                       "ranks": (RankerDist, "www.google.com"),

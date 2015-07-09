@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 """
 Created on Dec 22, 2014
 
@@ -152,7 +155,7 @@ def wrangle_entries(entries):
     Parameters
     ----------
     entries : dict
-        of information about entries which are collected by feedInfo collector
+        of information about entries which are collected by feedInfo collects
 
     Returns
     -------

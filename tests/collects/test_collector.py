@@ -4,7 +4,7 @@ Created on Dec 21, 2014
 @author: dan
 '''
 
-from nourisher.collector.collector import Collector
+from nourisher.collects.collector import Collector
 
 import unittest
 testurl1 = 'http://www.huffingtonpost.com/news/authors/feed/'

@@ -1,5 +1,7 @@
-from nourisher.utiliser import get_from_db, push_to_db, informer
+import logging
+log = logging.getLogger(__name__)
 
+from nourisher.utiliser import get_from_db, push_to_db, informer
 
 class Nourisher:
     """Top-holder for everything next
@@ -10,7 +12,7 @@ class Nourisher:
         Input URL of web feed
     dataID : ObjectID
         ObjectID of data in database
-    dataLoaded : dict
+    data : dict
         retrieved data from database
     dataCleaned : dict
         data cleaned
@@ -18,7 +20,7 @@ class Nourisher:
 
     origFeedUrl = None
     dataID = None
-    dataLoaded = None
+    data = None
     dataCleaned = None
 
     def __init__(self, _origUrlofFeed):
@@ -105,13 +107,8 @@ class Nourisher:
         except (ConnectionError, requests.exceptions.Timeout) as ex:
             raise ex
 
-    def collect_all(self):
+    def collect_all(self, collector):
         """Collects maximum of informations
-
-        Returns
-        -------
-        ObjectID
-            under which are collected data in database
         """
 
         if self.check_response(self.origFeedUrl):
@@ -120,9 +117,11 @@ class Nourisher:
             print("Page is not responding! Returning None!")
             return None
 
-        from .collector import collector
+        total = collector.collect_for_orig(self.origFeedUrl)
 
-        self.dataID = collector.collect_all(self.origFeedUrl)
+        resID = push_to_db(total)
+        self.dataID = resID
+        self.data = total
 
     @staticmethod
     def collect_maternal(maternalURL, _deal=None):
@@ -143,7 +142,7 @@ class Nourisher:
         if not _deal:
             _deal = ["websiteout", "urlm", "ranks", "alexa"]
 
-        from nourisher.collector.collector import collect_maternal
+        from nourisher.collects.collector import collect_maternal
 
         data = collect_maternal(maternalURL, _deal)
 
@@ -160,7 +159,7 @@ class Nourisher:
 
         objID = self.get_objectid()
         data = get_from_db(objID)
-        self.dataLoaded = data
+        self.data = data
         informer("Data retrieved for {0}".format(objID))
         return data
 
@@ -173,12 +172,12 @@ class Nourisher:
             with cleaned and wrangled data
         """
 
-        if self.dataLoaded is None:
+        if self.data is None:
             raise RuntimeError("Retrieve data first!")
 
         from .cleaning import clean_that_all
 
-        cleaned = clean_that_all(self.dataLoaded)
+        cleaned = clean_that_all(self.data)
         self.dataCleaned = cleaned
         informer("Data have been cleaned.")
         return cleaned

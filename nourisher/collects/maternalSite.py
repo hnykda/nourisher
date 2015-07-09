@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 from selenium.common.exceptions import NoSuchElementException
 from nourisher.utiliser import informer
 from time import sleep

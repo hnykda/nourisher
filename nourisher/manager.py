@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 """
 Created on Dec 24, 2014
 

@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 from .feeder import feed_that_all
 
 from ..utiliser import push_to_db, informer, scraper_prep, get_webdriver
@@ -21,9 +24,11 @@ class Collector():
 
         # alexa must be first, because she returns the
         # true address
+        log.debug("Nechavama alexu uhadnout adresu.")
         article_url = finUrls[0] # url of first article
         self.alexa.get_maternal(article_url)
         maternal_url = self.alexa.guessed_maternal_url
+        log.debug("Alexa sbira data.")
         self.alexa.collect_that_all()
         total.update({"alexa": self.alexa.scrapedData})
 
@@ -31,14 +36,15 @@ class Collector():
                 "websitout": self.websiteout,
                 "ranks" : self.ranks}
         for sname, scrpr in rest.items():
+            log.debug(sname + " sbira data.")
             try:
                 scrpr.get_maternal(maternal_url)
                 scrpr.collect_that_all()
                 total.update({sname: scrpr.scrapedData})
-                informer("\nSucceded.", rewrite=True)
+                log.debug("Succeded.")
                 #sleep(ST)
             except RuntimeError:
-                informer("\nNot successful.")
+                log.debug("Scrapper neuspel")
                 total.update({sname: None})
 
         return total, maternal_url
@@ -58,7 +64,5 @@ class Collector():
         total.update({"origURL": orig_url})
         total.update({"maternalURL": maternal_url})
 
-        resID = push_to_db(total)
         informer("Collecting data took: {0}".format(time.time() - startTime) + " seconds", level=2)
-
-        return resID
+        return total

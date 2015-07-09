@@ -12,8 +12,8 @@ import unittest
 from unittest.suite import TestSuite
 
 # maternalURL = 'www.huffingtonpost.com'
-BadmaternalURL = 'www.asdsgsdfgdfgdfgdfgxxsa.com'
-maternalURL = "www.ihned.cz"
+maternalURL = 'www.asdsgsdfgdfgdfgdfgxxsa.com'
+#maternalURL = "www.ihned.cz"
 webdriver = get_webdriver()
 class Test( unittest.TestCase ):
 
@@ -29,12 +29,14 @@ class Test( unittest.TestCase ):
     #     ranks = RankerDist(maternalURL, "www.google.com", '//*[@id="lst-ib"]', webdriver)
     #     ranks.collect_that_all()
 
-    # def test_Webout( self ):
-    #     webout = Websiteout(maternalURL,"www.websiteoutlook.com", '//*[@id="analyse"]/div/input', webdriver)
-    #     webout.collect_that_all()
+    def test_Webout( self ):
+        with self.assertRaises(RuntimeError) as cm:
+            webout = Websiteout(maternalURL,"www.websiteoutlook.com", '//*[@id="analyse"]/div/input', webdriver)
+            webout.collect_that_all()
 
-    def test_maternal( self ):
-        idecko = maternal_that_all( maternalURL, webdriver)
+#    def test_maternal( self ):
+#        idecko = maternal_that_all( maternalURL, webdriver)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

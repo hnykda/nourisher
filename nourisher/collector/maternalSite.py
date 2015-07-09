@@ -56,17 +56,19 @@ class Scraper:
             driver which should be used for scrapping
         """
 
+        self.driver = wdriver
         self.baseURL = _baseURL
+        self.maternalURL = _maternalURL
 
-        wdriver.get(r'http://' + _baseURL)
-        inputField = wdriver.find_element_by_xpath(_xpathOfInputField)
-        inputField.clear()
-        inputField.send_keys(_maternalURL)
-        inputField.submit()
+        self.driver.get(r'http://' + _baseURL + "/" + _maternalURL)
+        #inputField = wdriver.find_element_by_xpath(_xpathOfInputField)
+        #inputField.clear()
+        #inputField.send_keys(_maternalURL)
+        #inputField.submit()
 
         # what happens if no informations are available
         try:
-            if self.check_unavailability(wdriver):
+            if self.check_unavailability():
                 #wdriver.quit()
                 informer("\nNo data from this scrapper.")
                 raise RuntimeError("No available data from this Scraper")
@@ -75,8 +77,6 @@ class Scraper:
 
         # TODO: get printscreen of that page and save it
 
-        self.driver = wdriver
-        self.maternalURL = _maternalURL
 
     # def __del__(self):
     #     """If driver haven't been closed, do it now!"""
@@ -85,7 +85,7 @@ class Scraper:
     #     except:
     #         pass
 
-    def check_unavailability(self, wdriver):
+    def check_unavailability(self):
         """Checks if information of scrapper are available
         
         Note
@@ -110,7 +110,7 @@ class Scraper:
     def fex(self, xpath):
         """Find elements by xpath
         """
-        sleep(ST)
+        #sleep(ST)
         return self.driver.find_element_by_xpath(xpath)
 
     def selxs(self, xpath):
@@ -132,7 +132,7 @@ class Scraper:
             res = [value.text for value in elems]
         except NoSuchElementException:
             res = None
-        sleep(0.5)
+        #sleep(0.5)
         return res
 
     def selx(self, xpath):
@@ -292,9 +292,9 @@ class Alexa(Scraper):
                         '//*[@id="subdomain_table"]/tbody/tr/td[@class="text-right"]/span')
     }
 
-    def check_unavailability(self, driver):
+    def check_unavailability(self):
 
-        status = driver.find_element_by_xpath('//*[@id="no-enough-data"]/div/div/span[1]/span/strong').text
+        status = self.driver.find_element_by_xpath('//*[@id="no-enough-data"]/div/div/span[1]/span/strong').text
 
         # usually not even here it gets...
         if "We don't have enough data to rank this website." in status:
@@ -350,14 +350,33 @@ class Websiteout(Scraper):
         'cost' : '//*[@id="sem"]/div[2]/table/tbody/tr[4]/td[2]',
     }
 
-    def check_unavailability(self, driver):
+    def check_unavailability(self):
 
-        status = driver.find_element_by_xpath('/html/body').text
-
-        if "Not a Valid Domain#2" in status or "no data" in status:
-            return True
-        else:
+        # pokus o sber
+        try:
+            status = self.selx('/html/body/div/div[2]/p')
+        except NoSuchElementException:
             return False
+        if (status is not None) and ("not analyzed please click" in status):
+            self.fex('//*[@id="go"]').click()
+            try:
+                if "No enough Data available" in self.selx('/html/body'):
+                    return True
+                else:
+                    return False
+            except NoSuchElementException:
+                return False
+
+        if "Not Found" in self.selx('/html/body/h1'):
+            self.driver.get('http://' + 'www.' + self.maternalURL)
+            try:
+                if self.notfound_counter:
+                    return True
+            except AttributeError:
+                self.notfound_counter = True
+                self.check_unavailability()
+
+        return False
 
     def collect_that_all(self):
 
@@ -373,9 +392,18 @@ class Websiteout(Scraper):
 
         otherSites = self.selxs('//*[@id="right"]/table[7]/tbody/tr[2]/td[1]/ol/li/a')
 
-        total.update({'textRatio' : self.selx('//*[@id="website"]/div[2]/dl/dd[17]').split("%")[0],
-             'pageSize' : self.selx('//*[@id="website"]/div[2]/dl/dd[16]').split("Kb")[0],
-             })
+        txtpg = {'textRatio' : (self.selx('//*[@id="website"]/div[2]/dl/dd[17]'), r"%") ,
+                 'pageSize' : (self.selx('//*[@id="website"]/div[2]/dl/dd[16]'), "Kb")
+                }
+
+        for tag, (txt, sp) in txtpg.items():
+            try:
+                a = txt.split(sp)[0]
+                txtpg[tag] = a
+            except AttributeError:
+                pass
+
+        total.update(txtpg)
 
         total.update(singles)
         total.update({'categories': categories})
@@ -415,9 +443,9 @@ class Urlm(Scraper):
                                       '//*[@id="visitors"]/table[3]/tr/td[2]'),
                     }
 
-    def check_unavailability(self, driver):
+    def check_unavailability(self):
 
-        status = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div/div/div/div/h3').text
+        status = self.driver.find_element_by_xpath('/html/body/div[1]/div[2]/div/div/div/div/h3').text
 
         if "Sorry, we do not have data on this website" in status:
             return True
@@ -467,7 +495,9 @@ class RankerDist(Scraper):
         from locale import atof
 
         try:
-            if lex_numb == "N/A":
+            if lex_numb == None:
+                numb = None
+            elif lex_numb == "N/A":
                 numb = None
             elif "/" in lex_numb:
                 val = lex_numb.split("/")[0]
@@ -485,9 +515,13 @@ class RankerDist(Scraper):
             numb = lex_numb
         return numb
 
-    def check_unavailability(self, wdriver):
+    def check_unavailability(self):
         # workarround
-        return False
+        try:
+            if "is not ranked by" in self.selx('//*[@id="l"]/div[3]/p[3]'):
+                return True
+        except (NoSuchElementException, TypeError):
+            return False
 
     def get_twitter(self):
         import requests
@@ -652,7 +686,7 @@ def maternal_that_all(maternalURL, webdriver, deal=None):
     available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com", '//*[@id="analyse"]/div/input'),
                           "urlm": (Urlm, "www.urlm.co", '//*[@id="url"]'),
                           "ranks": (RankerDist, "www.google.com", '//*[@id="lst-ib"]'),
-                          "alexa": (Alexa, "www.alexa.com", '//*[@id="search-bar"]/form/input')
+                          "alexa": (Alexa, "www.alexa.com/siteinfo", '//*[@id="search-bar"]/form/input')
                           }
 
     rouse = dict([(dom, inf) for dom, inf in available_scrapers.items() if dom in deal])
@@ -664,7 +698,7 @@ def maternal_that_all(maternalURL, webdriver, deal=None):
             curcl.collect_that_all()
             total.update({name: curcl.scrapedData})
             informer("\nSucceded.", rewrite=True)
-            sleep(ST)
+            #sleep(ST)
         except RuntimeError:
             informer("\nNot successful.")
             total.update({name: None})

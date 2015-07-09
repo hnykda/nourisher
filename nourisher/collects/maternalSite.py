@@ -2,7 +2,6 @@ import logging
 log = logging.getLogger(__name__)
 
 from selenium.common.exceptions import NoSuchElementException
-from nourisher.utiliser import informer
 from time import sleep
 
 ST = 0.5
@@ -69,12 +68,12 @@ class Scraper:
         self.maternalURL = _maternalURL
         addr = r'http://' + self.baseURL + "/" + _maternalURL
         self.driver.get(addr)
-        informer("Going to {}".format(addr))
+        log.debug("Going to {}".format(addr))
 
         # what happens if no informations are available
         try:
             if self.check_unavailability():
-                informer("\nNo data from this scrapper.")
+                log.debug("\nNo data from this scrapper.")
                 raise RuntimeError("No available data from this Scraper")
         except NoSuchElementException:
             pass
@@ -307,12 +306,12 @@ class Alexa(Scraper):
 
         text = self.selx('//*[@id="js-li-last"]/span[1]/a')
 
-        informer("Alexa thinks that the maternal URL is: " + str("www." + text))
+        log.debug("Alexa thinks that the maternal URL is: " + str("www." + text))
         self.guessed_maternal_url = "www." + text
 
         try:
             if self.check_unavailability():
-                informer("\nNo data from this scrapper.")
+                log.debug("\nNo data from this scrapper.")
                 raise RuntimeError("No available data from this Scraper")
         except NoSuchElementException:
             pass

@@ -12,48 +12,6 @@ Here are some utilities that might be useful
 from nourisher import settings as lset
 from pymongo import MongoClient
 
-def informer(msg, *args, level=1, rewrite=False):
-    """Used for getting output from program
-    
-    Parameters
-    ----------
-    msg : everything what is possible to print
-        whatever you want to see as an output
-        
-        **Warning** Don't mix str + int etc. which are not easily
-        printed together. They can be added as *args.
-    *args
-        Everything passed as an argument is going to be printed
-    level : positive integer, currently implemented `[0,1,2]`, optional 
-        default 1, level of verbosity for which at least
-        should be this message printed
-    rewrite : True or False, optional, default False 
-        if `True`, then the output is going to be rewritten on the same 
-        line as the previous. If `False`, then the outpus is going to 
-        be printed on next line
-    """
-
-    # we don't want any errors from logging...
-    try:
-        if lset.VERBOSITY < level:
-            pass
-        elif lset.VERBOSITY >= level:
-            if not rewrite:
-                print(msg)
-                if args:
-                    for arg in args:
-                        print(arg)
-            elif rewrite:
-                print("\r" + msg, end="")
-                if args:
-                    for arg in args:
-                        print("\r" + arg, end="")
-
-    except:
-        import sys
-        print("Can't print message because of ", sys.exc_info())
-
-
 def push_to_db(inpObj, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
                ip=lset.DB_IP, port=lset.DB_PORT):
     """ Saves inpObj to MongoDB and returns it's _id
@@ -81,8 +39,7 @@ def push_to_db(inpObj, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
     db = client[dbName][collection]
 
     insID = db.insert(inpObj)
-    informer("Saving to {0} database, {1} collection under ObjectID: ".format(dbName, collection)
-             , str(insID))
+    log.debug("Saving to {0} database, {1} collection under ObjectID: ".format(dbName, collection) + str(insID))
 
     client.close()
 
@@ -109,7 +66,7 @@ def get_from_db(idOfO, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
 
     from bson.objectid import ObjectId
 
-    informer("Looking in {0} database, {1} collection under ObjectID: {2}".format(dbName, collection, idOfO))
+    log.debug("Looking in {0} database, {1} collection under ObjectID: {2}".format(dbName, collection, idOfO))
 
     if type(idOfO) == str:
         idOfO = ObjectId(idOfO)
@@ -146,7 +103,7 @@ def get_id_of_last_inserted(dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
         last inserted document to collection
     """
 
-    informer("Looking in {0} database, {1} collection for last item.".format(dbName, collection))
+    log.debug("Looking in {0} database, {1} collection for last item.".format(dbName, collection))
     client = MongoClient(ip, port)
     db = client[dbName][collection]
 
@@ -222,10 +179,10 @@ def find_objects_by_origurl(origUrl, dbName=lset.DB_NAME, collection=lset.DB_COL
         res = allRes[0]["_id"]
     except IndexError:
         res = None
-    informer("Looking in {0} database, {1} collection for URL: {2}".format(dbName, collection, origUrl))
+    log.debug("Looking in {0} database, {1} collection for URL: {2}".format(dbName, collection, origUrl))
     # TODO: Slow! But after find is fetched by res, allRes is empty...
-    informer("Object(s) by URL found: ", [(obj["_id"], obj["_id"].generation_time.isoformat())
-                                          for obj in db.find({"origURL": origUrl}).sort('_id', -1)])
+    #informer("Object(s) by URL found: ", [(obj["_id"], obj["_id"].generation_time.isoformat())
+    #                                      for obj in db.find({"origURL": origUrl}).sort('_id', -1)])
     return res
 
 def get_webdriver(browser = lset.DEFAULT_DRIVER):
@@ -245,8 +202,8 @@ def get_webdriver(browser = lset.DEFAULT_DRIVER):
     from selenium import webdriver
 
     if browser == "phantomjs":
-        _service_args = ['--load-images=no']
-        wdriver = webdriver.PhantomJS(service_args=_service_args)
+        _service_args = ['--load-images=no', "--webdriver-loglevel=ERROR"]
+        wdriver = webdriver.PhantomJS(service_args=_service_args, service_log_path='/tmp/ghostdriver.log')
 
     elif browser == "phantomjsTOR":
         serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']

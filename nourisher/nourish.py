@@ -1,7 +1,7 @@
 import logging
 log = logging.getLogger(__name__)
 
-from nourisher.utiliser import get_from_db, push_to_db, informer
+from nourisher.utiliser import get_from_db, push_to_db
 
 class Nourisher:
     """Top-holder for everything next
@@ -101,7 +101,7 @@ class Nourisher:
             if statusCode == 404:
                 raise ConnectionError("Page is not responding 404")
             else:
-                informer("Page {0} is responding: ".format(origUrl) + str(statusCode))
+                log.debug("Page {0} is responding: ".format(origUrl) + str(statusCode))
                 return True
 
         except (ConnectionError, requests.exceptions.Timeout) as ex:
@@ -160,7 +160,7 @@ class Nourisher:
         objID = self.get_objectid()
         data = get_from_db(objID)
         self.data = data
-        informer("Data retrieved for {0}".format(objID))
+        log.debug("Data retrieved for {0}".format(objID))
         return data
 
     def clean_data(self):
@@ -175,11 +175,11 @@ class Nourisher:
         if self.data is None:
             raise RuntimeError("Retrieve data first!")
 
-        from .cleaning import clean_that_all
+        from cleaning import clean_that_all
 
         cleaned = clean_that_all(self.data)
         self.dataCleaned = cleaned
-        informer("Data have been cleaned.")
+        log.debug("Data have been cleaned.")
         return cleaned
 
     def update_object_db(self, key, data):

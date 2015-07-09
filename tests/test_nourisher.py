@@ -5,7 +5,7 @@ Created on Dec 19, 2014
 '''
 import unittest
 
-from nourisher.nourisher import  Nourisher
+from nourisher.nourish import  Nourisher
 
 testingUrl = 'http://www.huffingtonpost.com/news/authors/feed/'
 fakeBadUrl = 'http://nonexistingurljustfortests.badass'

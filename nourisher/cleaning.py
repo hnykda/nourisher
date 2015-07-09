@@ -74,7 +74,7 @@ def wrangle_numbers(vst):
     elif vst == "" or vst == []:
         vysl = None
 
-    utiliser.informer("Wrangling from: " + str(vst) + " to:\t " + str(vysl), level=2)
+    log.debug("Wrangling from: " + str(vst) + " to:\t " + str(vysl))
     return vysl
 
 
@@ -114,7 +114,7 @@ def time_to_dec(time):
 def numbs_from_list(diction, keys):
     """Tries to wrangle every string from list to numbers"""
 
-    utiliser.informer("Finding {0} in {1}".format(list(diction.keys()), keys), level=2)
+    log.debug("Finding {0} in {1}".format(list(diction.keys()), keys))
     new = {}
     for key in keys:
         new[key] = wrangle_numbers(diction[key])
@@ -203,10 +203,10 @@ def wrangle_entries(entries):
                 meanOfAll = mean(x)
             except StatisticsError:
                 standardDev, meanOfAll = None, None
-                utiliser.informer("array is: " + str(entries[key]))
+                log.debug("array is: " + str(entries[key]))
         elif len(x) == 0:
             standardDev, meanOfAll = None, None
-            utiliser.informer(r"array is empty or full of None ==" + str(entries[key]), level=2)
+            log.debug(r"array is empty or full of None ==" + str(entries[key]))
 
         newE[key + "_STD"], newE[key + "_MEAN"] = standardDev, meanOfAll
 

@@ -200,7 +200,7 @@ def get_entries_info(links):
 
     dtb = defaultdict(list)
 
-    utiliser.informer("Parsing links... ")
+    log.debug("Parsing links... ")
 
     # just for process checking
     counterI = 1
@@ -211,7 +211,7 @@ def get_entries_info(links):
             # hence it ends up on true address
             artURL = requests.get(plink).url
             dtb["finalUrl"].append(artURL)
-            utiliser.informer("Parsing link {0}/{1}: ".format(counterI, len(links)) + str(artURL), level=1,
+            log.debug("Parsing link {0}/{1}: ".format(counterI, len(links)) + str(artURL), level=1,
                               rewrite=True)
             counterI += 1
 
@@ -302,10 +302,10 @@ def get_entries_info(links):
                 requests.exceptions.ConnectionError) as ex:
             import traceback
 
-            utiliser.informer("\nError when parsing an article", ex)
-            utiliser.informer(traceback.format_exc())
+            log.warning("\nError when parsing an article", ex)
+            print(traceback.format_exc())
     # utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
-    utiliser.informer("\nNumber of parsed articles: {0}".format(len(dtb['finalUrl'])), level=1)
+    log.debug("Number of parsed articles: {0}".format(len(dtb['finalUrl'])))
     return dict(dtb)
 
 
@@ -407,7 +407,7 @@ def feed_that_all(url):
         # for finding maternalURL
         finalUrls = entrieInfo["finalUrl"]
     elif defaultInfo["n_of_entries"] == 0:
-        utiliser.informer("No entries are found!")
+        log.error("No entries have been found!")
         entriesTotal = None
         # nothing else to do...
         finalUrls = [defaultInfo["href"]]

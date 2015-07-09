@@ -85,7 +85,7 @@ class Collection:
             raise KeyError("No such key in any of objects")
 
         setattr(self, key, total)
-        utiliser.informer(
+        log.debug(
             "Data saved under {0} attribut. Number of None values: {1}".format(key, self.count_nones(key)))
 
         return getattr(self, key)
@@ -120,11 +120,11 @@ class Collection:
         Nourisher instance
         """
 
-        from nourisher import nourisher
+        from nourisher import nourish
 
         raw_data = utiliser.get_from_db(ide)
         url = raw_data["origURL"]
-        nour = nourisher.Nourisher(url)
+        nour = nourish.Nourisher(url)
         nour.dataID = nour.get_objectid()
         nour.retrieve_data()
         nour.clean_data()
@@ -214,14 +214,13 @@ class MultiScrapper:
         import time
         import sys
         import traceback
-        from nourisher.nourisher import Nourisher
+        from nourisher.nourish import Nourisher
 
         self.counter = startingPoint + 1
         for url in self.sourceURLs:
             now = time.time()
             try:
-                utiliser.informer("\nProcessing {0}/{1}: {2}".format(
-                    self.counter, len(self.sourceURLs), url))
+                log.debug("\nProcessing {0}/{1}: {2}".format(self.counter, len(self.sourceURLs), url))
                 nour = Nourisher(url)
                 nour.collect_all()
                 nour.retrieve_data()
@@ -230,20 +229,20 @@ class MultiScrapper:
                 self.goodOnes.append(url)
             except KeyboardInterrupt as ex:
                 # if ctrl+c is pressed exit
-                utiliser.informer("So far were processed {0} ({1}) URLs. ".format(self.counter, url))
+                log.debug("So far were processed {0} ({1}) URLs. ".format(self.counter, url))
                 raise ex
             except:
                 # but if anything else - continue
                 sysEr = sys.exc_info()
                 tracb = traceback.format_exc()
-                utiliser.informer(sysEr, tracb)
+                log.debug(sysEr + tracb)
                 self.badOnes.append((url, tracb))
 
                 with open(logFile, "a", encoding="utf-8") as logf:
                     logf.writeline(url)
                     logf.writeline("\n".join(tracb))
 
-            utiliser.informer("It tooks: {0} seconds. \n---------------\n".format(time.time() - now))
+            log.debug("It tooks: {0} seconds. \n---------------\n".format(time.time() - now))
             time.sleep(sleepInt)
             self.counter += 1
 
@@ -258,4 +257,4 @@ class MultiScrapper:
             urls = [line.split("\n")[0] for line in lurls]
 
         self.sourceURLs += urls
-        utiliser.informer(self.sourceURLs, level=2)
+        log.debug(self.sourceURLs)

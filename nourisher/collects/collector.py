@@ -3,7 +3,7 @@ log = logging.getLogger(__name__)
 
 from .feeder import feed_that_all
 
-from ..utiliser import push_to_db, informer, scraper_prep, get_webdriver
+from ..utiliser import scraper_prep, get_webdriver
 
 class Collector():
     """ Wrapper for collecting
@@ -33,7 +33,7 @@ class Collector():
         total.update({"alexa": self.alexa.scrapedData})
 
         rest = {"urlm" : self.urlm,
-                "websitout": self.websiteout,
+                "websiteout": self.websiteout,
                 "ranks" : self.ranks}
         for sname, scrpr in rest.items():
             log.debug(sname + " sbira data.")
@@ -64,5 +64,5 @@ class Collector():
         total.update({"origURL": orig_url})
         total.update({"maternalURL": maternal_url})
 
-        informer("Collecting data took: {0}".format(time.time() - startTime) + " seconds", level=2)
+        log.info("Collecting data took: {0}".format(time.time() - startTime) + " seconds")
         return total

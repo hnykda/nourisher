@@ -67,7 +67,7 @@ class Scraper:
         # what happens if no informations are available
         try:
             if self.check_unavailability(wdriver):
-                wdriver.quit()
+                #wdriver.quit()
                 informer("\nNo data from this scrapper.")
                 raise RuntimeError("No available data from this Scraper")
         except NoSuchElementException:
@@ -78,12 +78,12 @@ class Scraper:
         self.driver = wdriver
         self.maternalURL = _maternalURL
 
-    def __del__(self):
-        """If driver haven't been closed, do it now!"""
-        try:
-            self.driver.quit()
-        except:
-            pass
+    # def __del__(self):
+    #     """If driver haven't been closed, do it now!"""
+    #     try:
+    #         self.driver.quit()
+    #     except:
+    #         pass
 
     def check_unavailability(self, wdriver):
         """Checks if information of scrapper are available

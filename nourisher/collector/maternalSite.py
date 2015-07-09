@@ -1,7 +1,9 @@
 from selenium.common.exceptions import NoSuchElementException
 from nourisher.utiliser import informer
 from time import sleep
+
 ST = 0.5
+
 
 class Scraper:
     """ This is common interface for all scrapers,
@@ -41,7 +43,7 @@ class Scraper:
     scrapedData = None
     driver = None
 
-    def __init__(self, _maternalURL, _baseURL, _xpathOfInputField, wdriver):
+    def __init__(self, _baseURL, wdriver):
         """ Init
 
         Parameters
@@ -58,32 +60,23 @@ class Scraper:
 
         self.driver = wdriver
         self.baseURL = _baseURL
-        self.maternalURL = _maternalURL
 
-        self.driver.get(r'http://' + _baseURL + "/" + _maternalURL)
-        #inputField = wdriver.find_element_by_xpath(_xpathOfInputField)
-        #inputField.clear()
-        #inputField.send_keys(_maternalURL)
-        #inputField.submit()
+    def get_maternal(self, _maternalURL):
+
+        self.maternalURL = _maternalURL
+        addr = r'http://' + self.baseURL + "/" + _maternalURL
+        self.driver.get(addr)
+        informer("Going to {}".format(addr))
 
         # what happens if no informations are available
         try:
             if self.check_unavailability():
-                #wdriver.quit()
                 informer("\nNo data from this scrapper.")
                 raise RuntimeError("No available data from this Scraper")
         except NoSuchElementException:
             pass
 
-        # TODO: get printscreen of that page and save it
-
-
-    # def __del__(self):
-    #     """If driver haven't been closed, do it now!"""
-    #     try:
-    #         self.driver.quit()
-    #     except:
-    #         pass
+            # TODO: get printscreen of that page and save it
 
     def check_unavailability(self):
         """Checks if information of scrapper are available
@@ -110,7 +103,7 @@ class Scraper:
     def fex(self, xpath):
         """Find elements by xpath
         """
-        #sleep(ST)
+        # sleep(ST)
         return self.driver.find_element_by_xpath(xpath)
 
     def selxs(self, xpath):
@@ -132,7 +125,7 @@ class Scraper:
             res = [value.text for value in elems]
         except NoSuchElementException:
             res = None
-        #sleep(0.5)
+        # sleep(0.5)
         return res
 
     def selx(self, xpath):
@@ -266,7 +259,7 @@ class Alexa(Scraper):
 
     alexa_singles = {
         'link': '//*[@id="js-li-last"]/span[1]/a',
-        #'globalRank': '//*[@id="traffic-rank-content"]/div/span[2]/div[1]/span/span/div/strong',
+        # 'globalRank': '//*[@id="traffic-rank-content"]/div/span[2]/div[1]/span/span/div/strong',
         'rAlexa': '//*[@id="traffic-rank-content"]/div/span[2]/div[1]/span/span/div/strong',
         'globalRankChange': '//*[@id="traffic-rank-content"]/div/span[2]/div[2]/span/span/div/strong',
         'inCountry': '//*[@id="traffic-rank-content"]/div/span[2]/div[2]/span/span/h4/a',
@@ -291,6 +284,35 @@ class Alexa(Scraper):
         'whereGoNext': ('//*[@id="subdomain_table"]/tbody/tr/td/span[@class="word-wrap"]',
                         '//*[@id="subdomain_table"]/tbody/tr/td[@class="text-right"]/span')
     }
+
+    def get_maternal(self, orig_url):
+        """ This overrides the default, because Alexa is needed for
+        guessing true web address. Previously it needed to be done
+        in separate step, but now it's just in one
+
+        Parameters
+        ----------
+            orig_url : str
+                url address of !feed!
+        """
+
+        self.driver.get(r'http://www.alexa.com/')
+        inputField = self.fex('//*[@id="search-bar"]/form/input')
+        inputField.clear()
+        inputField.send_keys(orig_url)
+        inputField.submit()
+
+        text = self.selx('//*[@id="js-li-last"]/span[1]/a')
+
+        informer("Alexa thinks that the maternal URL is: " + str("www." + text))
+        self.guessed_maternal_url = "www." + text
+
+        try:
+            if self.check_unavailability():
+                informer("\nNo data from this scrapper.")
+                raise RuntimeError("No available data from this Scraper")
+        except NoSuchElementException:
+            pass
 
     def check_unavailability(self):
 
@@ -331,51 +353,35 @@ class Websiteout(Scraper):
     """
 
     webout_singles = {
-        #"link": '//*[@id="right"]/table[1]/tbody/tr[1]/td[2]/span/span',
+        # "link": '//*[@id="right"]/table[1]/tbody/tr[1]/td[2]/span/span',
         "pageviewsPerDay": '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[7]/td[2]/span',
         "backlingsWebout": '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[3]/td[2]/span',
-        'rAlexa' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[1]/td[2]/span',
+        'rAlexa': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[1]/td[2]/span',
         'rGoogle': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[2]/td[2]/span',
         'rGooglePlus': '//*[@id="google"]',
-        'rFacebook' : '//*[@id="facebook"]',
-        'rTwitter' : '//*[@id="twitter"]',
-        'rLinkedin' : '//*[@id="linkedin"]',
-        'rMozrank' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[6]/td[2]/span',
-        'rSemrush' : '//*[@id="sem"]/div[2]/table/tbody/tr[1]/td[2]',
-        'rDomainAuthority' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[5]/td[2]/span',
-        'rPageAuthority' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[4]/td[2]/span',
-        'topKeywords' : '//*[@id="sem"]/div[2]/table/tbody/tr[2]/td[2]',
-        'organicTraffic' : '//*[@id="sem"]/div[2]/table/tbody/tr[3]/td[2]',
-        'worth' : '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[8]/td[2]/span',
-        'cost' : '//*[@id="sem"]/div[2]/table/tbody/tr[4]/td[2]',
+        'rFacebook': '//*[@id="facebook"]',
+        'rTwitter': '//*[@id="twitter"]',
+        'rLinkedin': '//*[@id="linkedin"]',
+        'rMozrank': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[6]/td[2]/span',
+        'rSemrush': '//*[@id="sem"]/div[2]/table/tbody/tr[1]/td[2]',
+        'rDomainAuthority': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[5]/td[2]/span',
+        'rPageAuthority': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[4]/td[2]/span',
+        'topKeywords': '//*[@id="sem"]/div[2]/table/tbody/tr[2]/td[2]',
+        'organicTraffic': '//*[@id="sem"]/div[2]/table/tbody/tr[3]/td[2]',
+        'worth': '//*[@id="basic"]/div[2]/div[2]/table/tbody/tr[8]/td[2]/span',
+        'cost': '//*[@id="sem"]/div[2]/table/tbody/tr[4]/td[2]',
     }
 
     def check_unavailability(self):
-
         # pokus o sber
-        try:
-            status = self.selx('/html/body/div/div[2]/p')
-        except NoSuchElementException:
-            return False
+        status = self.selx('/html/body/div/div[2]/p')
         if (status is not None) and ("not analyzed please click" in status):
             self.fex('//*[@id="go"]').click()
-            try:
-                if "No enough Data available" in self.selx('/html/body'):
-                    return True
-                else:
-                    return False
-            except NoSuchElementException:
+            resp = self.selx('/html/body')
+            if (resp is not None) and ("No enough Data available" in resp):
+                return True
+            else:
                 return False
-
-        if "Not Found" in self.selx('/html/body/h1'):
-            self.driver.get('http://' + 'www.' + self.maternalURL)
-            try:
-                if self.notfound_counter:
-                    return True
-            except AttributeError:
-                self.notfound_counter = True
-                self.check_unavailability()
-
         return False
 
     def collect_that_all(self):
@@ -392,9 +398,9 @@ class Websiteout(Scraper):
 
         otherSites = self.selxs('//*[@id="right"]/table[7]/tbody/tr[2]/td[1]/ol/li/a')
 
-        txtpg = {'textRatio' : (self.selx('//*[@id="website"]/div[2]/dl/dd[17]'), r"%") ,
-                 'pageSize' : (self.selx('//*[@id="website"]/div[2]/dl/dd[16]'), "Kb")
-                }
+        txtpg = {'textRatio': (self.selx('//*[@id="website"]/div[2]/dl/dd[17]'), r"%"),
+                 'pageSize': (self.selx('//*[@id="website"]/div[2]/dl/dd[16]'), "Kb")
+                 }
 
         for tag, (txt, sp) in txtpg.items():
             try:
@@ -445,10 +451,12 @@ class Urlm(Scraper):
 
     def check_unavailability(self):
 
-        status = self.driver.find_element_by_xpath('/html/body/div[1]/div[2]/div/div/div/div/h3').text
-
-        if "Sorry, we do not have data on this website" in status:
+        status = self.selx('/html/body/div[1]/div[2]/div/div/div/div/h3')
+        resp = self.selx('/html/body')
+        if (status is not None) and ("Sorry, we do not have data on this website" in status):
             return True
+        elif (resp is not None) and (resp == '404'):
+                return True
         else:
             return False
 
@@ -477,17 +485,17 @@ class Urlm(Scraper):
 class RankerDist(Scraper):
     """Holder for ranks"""
 
-    _rankNames = [#'rGoogle',
-                  'rCompete',
-                  #'rMozrank',
-                  'rSeznam',
-                  'rBacklinksG',
-                  'rMajestic',
-                  'rSiteExplorer',
-                  #'rFacebook',
-                  #'rTwitter',
-                   #'rPlusoneG'
-                  ]
+    _rankNames = [  # 'rGoogle',
+                    'rCompete',
+                    # 'rMozrank',
+                    'rSeznam',
+                    'rBacklinksG',
+                    'rMajestic',
+                    'rSiteExplorer',
+                    # 'rFacebook',
+                    # 'rTwitter',
+                    # 'rPlusoneG'
+                    ]
 
     @staticmethod
     def to_digit(lex_numb):
@@ -514,76 +522,88 @@ class RankerDist(Scraper):
             # print( "Chyba prevodu: ", lex_numb, ". Vracim stejny string." )
             numb = lex_numb
         return numb
+    def get_maternal(self, _maternalURL):
+
+        self.maternalURL = _maternalURL
 
     def check_unavailability(self):
         # workarround
-        try:
-            if "is not ranked by" in self.selx('//*[@id="l"]/div[3]/p[3]'):
-                return True
-        except (NoSuchElementException, TypeError):
-            return False
+        pass
 
     def get_twitter(self):
         import requests
 
         r = requests.get("http://urls.api.twitter.com/1/urls/count.json?url={}".format(self.maternalURL))
-        return {"rTwitter":eval(r.content.decode("utf8"))["count"]}
+        return {"rTwitter": eval(r.content.decode("utf8"))["count"]}
 
     def get_fb_total(self):
         import requests
 
         r = requests.get("https://api.facebook.com/method/links.getStats?urls={}&format=json".format(self.maternalURL))
-        return {"rFacebook" : eval(r.content.decode("utf8"))[0]["total_count"]}
+        return {"rFacebook": eval(r.content.decode("utf8"))[0]["total_count"]}
 
     def get_seznam(self):
         self.driver.get(self.maternalURL)
         res = {
-        #"rGoogle" : self.selx('//*[@id="val1"]'),
-        "rSeznam" : self.selx('//*[@id="val2"]'),
+            # "rGoogle" : self.selx('//*[@id="val1"]'),
+            "rSeznam": self.selx('//*[@id="val2"]'),
         }
         return res
 
     def get_mozrank(self):
         self.driver.get('https://moz.com/researchtools/ose/comparisons?site={}'.format(self.maternalURL))
-        res = {"rMozrank" : self.selx('//*[@id="main"]/div/section[2]/div/section[2]/div/div[1]/div/div[2]/table/tbody/tr[2]/td[2]'),
-               "rSiteExplorer" : self.selx('//*[@id="main"]/div/section[2]/div/section[2]/div/div[1]/div/div[2]/table/tbody/tr[5]/td[2]')}
+        res = {"rMozrank": self.selx(
+            '//*[@id="main"]/div/section[2]/div/section[2]/div/div[1]/div/div[2]/table/tbody/tr[2]/td[2]'),
+               "rSiteExplorer": self.selx(
+                   '//*[@id="main"]/div/section[2]/div/section[2]/div/div[1]/div/div[2]/table/tbody/tr[5]/td[2]')}
         return res
 
     def get_compete(self):
-        sleep(1)
         self.driver.get('http://moonsy.com/compete-rank/')
+        sleep(1)
         self.fex('//*[@id="domain"]').clear()
+        sleep(1)
         self.fex('//*[@id="domain"]').send_keys(self.maternalURL)
+        sleep(1)
         self.fex('//*[@id="form1"]/input[3]').click()
+        sleep(1)
+
+        try:
+            if "is not ranked by" in self.selx('//*[@id="l"]/div[3]/p[3]'):
+                raise RuntimeError
+        except (NoSuchElementException, TypeError):
+            pass
+
         return {"rCompete": self.selx('//*[@id="l"]/div[3]/p[4]/strong')}
 
     def login_majestic(self):
-        #self.driver.get('https://majestic.com/account/login')
+        # self.driver.get('https://majestic.com/account/login')
         self.fex('//*[@id="emailPlaceholder1"]').click()
         from time import sleep
+
         sleep(0.5)
         self.fex('//*[@id="email1"]').send_keys('kotrfa@gmail.com')
         self.fex('//*[@id="passwordPlaceholder1"]').click()
         sleep(0.5)
         self.fex('//*[@id="password1"]').send_keys('seznam12')
-        #chkb = self.fex('//*[@id="RememberMe"]')
-        #if not chkb.is_selected():
-            #sleep(0.5)
-            #chkb.click()
+        # chkb = self.fex('//*[@id="RememberMe"]')
+        # if not chkb.is_selected():
+        # sleep(0.5)
+        # chkb.click()
         sleep(0.5)
         self.fex('//*[@id="password1"]').submit()
-
 
     def get_majestic(self):
         self.driver.get('https://majestic.com/reports/site-explorer?q={}'.format(self.maternalURL))
         try:
-            if "Quickly! Register for a FREE account now to continue." in self.selx('//*[@id="usage_blocked"]/div[1]/h3'):
+            if "Quickly! Register for a FREE account now to continue." in self.selx(
+                    '//*[@id="usage_blocked"]/div[1]/h3'):
                 self.login_majestic()
-                #self.driver.get('https://majestic.com/reports/site-explorer?q={}'.format(self.maternalURL))
+                # self.driver.get('https://majestic.com/reports/site-explorer?q={}'.format(self.maternalURL))
         except NoSuchElementException:
             pass
 
-        return {"rMajestic" : self.selx('//*[@id="summary_container"]/div[2]/table[1]/tbody/tr[1]/td[1]/div/p[2]/b')}
+        return {"rMajestic": self.selx('//*[@id="summary_container"]/div[2]/table[1]/tbody/tr[1]/td[1]/div/p[2]/b')}
 
     def get_gbacklinks(self):
         self.driver.get('https://checker.monitorbacklinks.com/seo-tools/free-backlink-checker/')
@@ -592,13 +612,12 @@ class RankerDist(Scraper):
 
         return {"rBacklingsG": self.selx('/html/body/div[3]/ul/li[1]/p')}
 
-
     def collect_that_all(self):
         d = {}
         # not needed thanks to websiteout: [self.get_fb_total(),self.get_mozrank(), self.get_twitter(), self.get_seznam()]
         _ranks = [self.get_compete()]
-                  #self.get_gbacklinks(),
-                  #self.get_majestic()]
+        # self.get_gbacklinks(),
+        # self.get_majestic()]
 
         for dic in _ranks:
             d.update(dic)
@@ -607,100 +626,44 @@ class RankerDist(Scraper):
 
         self.scrapedData = ranks
 
-
-# class RankerJklir(Scraper):
-#     """Holder for ranks"""
+# def maternal_that_all(maternalURL, webdriver, deal=None):
+#     """ An ultimate function for module that will return
+#      information from all scrapers.
 #
-#     _rankNames = ['rGoogle',
-#                   'rAlexa',
-#                   'rCompete',
-#                   'rMozrank',
-#                   'rSeznam',
-#                   'rBacklinksG',
-#                   'rMajestic',
-#                   'rSiteExplorer',
-#                   'rFacebook',
-#                   'rTwitter',
-#                   #'rPlusoneG'
-#                   ]
+#     Parameters
+#     ----------
+#     maternalURL : string
+#         URL for which we want to get informations
+#     deal : list of strings (names of scrapers)
+#         name of scrapers in list from which we want to scrap data
 #
-#     @staticmethod
-#     def to_digit(lex_numb):
-#         """Prevede rank na cislo, je-li to mozne"""
-#         from locale import atof
+#     Returns
+#     -------
+#     dict
+#         dictionary that holdes all collected informations
+#     """
+#     if not deal:
+#         deal = ["websiteout", "urlm", "ranks", "alexa"]
+#     # every scraper must be named here in format:
+#     # {"nameOfScraper" : (ClassOfScrapper, baseURL, xPathOfInputField)}
+#     available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com"),
+#                           "urlm": (Urlm, "www.urlm.co"),
+#                           "ranks": (RankerDist, "www.google.com"),
+#                           "alexa": (Alexa, "www.alexa.com/siteinfo")
+#                           }
 #
+#     rouse = dict([(dom, inf) for dom, inf in available_scrapers.items() if dom in deal])
+#     total = {}
+#     for name, (cls, baseURL) in rouse.items():
+#         informer("Trying to get data for {0} by {1}".format(maternalURL, name), rewrite=True)
 #         try:
-#             if lex_numb == "N/A":
-#                 numb = None
-#             elif "/" in lex_numb:
-#                 val = lex_numb.split("/")[0]
-#                 if "-" in val:
-#                     numb = None
-#                 else:
-#                     numb = atof(val)
-#             # for google backlinks
-#             elif ";" in lex_numb:
-#                 numb = lex_numb
-#             else:
-#                 numb = atof(lex_numb)
-#         except ValueError:
-#             # print( "Chyba prevodu: ", lex_numb, ". Vracim stejny string." )
-#             numb = lex_numb
-#         return numb
+#             curcl = cls(baseURL, webdriver)
+#             curcl.collect_that_all()
+#             total.update({name: curcl.scrapedData})
+#             informer("\nSucceded.", rewrite=True)
+#             #sleep(ST)
+#         except RuntimeError:
+#             informer("\nNot successful.")
+#             total.update({name: None})
 #
-#     def check_unavailability(self, wdriver):
-#
-#         try:
-#             wfex('//*[@id="content"]/center/table[1]/tbody/tr/td[1]/a/img')
-#             return False
-#         except NoSuchElementException:
-#             raise RuntimeError("Problem! Pravdepodobne jsem dostal ban!")
-#
-#     def collect_that_all(self):
-#         _ranks = self.selxs('//*[@id="content"]/center/table/tbody/tr/td[2]')
-#         ranks = [self.to_digit(lexNumb) for lexNumb in _ranks]
-#
-#         self.scrapedData = dict(zip(self._rankNames, ranks))
-
-
-def maternal_that_all(maternalURL, webdriver, deal=None):
-    """ An ultimate function for module that will return
-     information from all scrapers.
-
-    Parameters
-    ----------
-    maternalURL : string
-        URL for which we want to get informations
-    deal : list of strings (names of scrapers)
-        name of scrapers in list from which we want to scrap data
-
-    Returns
-    -------
-    dict
-        dictionary that holdes all collected informations
-    """
-    if not deal:
-        deal = ["websiteout", "urlm", "ranks", "alexa"]
-    # every scraper must be named here in format:
-    # {"nameOfScraper" : (ClassOfScrapper, baseURL, xPathOfInputField)}
-    available_scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com", '//*[@id="analyse"]/div/input'),
-                          "urlm": (Urlm, "www.urlm.co", '//*[@id="url"]'),
-                          "ranks": (RankerDist, "www.google.com", '//*[@id="lst-ib"]'),
-                          "alexa": (Alexa, "www.alexa.com/siteinfo", '//*[@id="search-bar"]/form/input')
-                          }
-
-    rouse = dict([(dom, inf) for dom, inf in available_scrapers.items() if dom in deal])
-    total = {}
-    for name, (cls, baseURL, xpathOfInput) in rouse.items():
-        informer("Trying to get data for {0} by {1}".format(maternalURL, name), rewrite=True)
-        try:
-            curcl = cls(maternalURL, baseURL, xpathOfInput, webdriver)
-            curcl.collect_that_all()
-            total.update({name: curcl.scrapedData})
-            informer("\nSucceded.", rewrite=True)
-            #sleep(ST)
-        except RuntimeError:
-            informer("\nNot successful.")
-            total.update({name: None})
-
-    return total
+#     return total

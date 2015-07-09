@@ -1,70 +1,64 @@
 from .feeder import feed_that_all
-from .maternalSite import maternal_that_all
 
-from ..utiliser import maternal_url_extractor, push_to_db, get_webdriver
-from nourisher.utiliser import informer
+from ..utiliser import push_to_db, informer, scraper_prep, get_webdriver
 
-
-def collect_all(origUrl):
-    """Collects maximum informations about the feed,
-    saves them inside database and returns ObjectID
-
-    Parameters
-    ----------
-    origUrl: string
-        original URL of the input feed
-
-    Return
-    ------
-    ObjectID: ObjectID
-        of data saved in database
+class Collector():
+    """ Wrapper for collecting
     """
 
-    import time
-
-    startTime = time.time()
-    total = {}
-
-    _feedInfo = feed_that_all(origUrl)
-    feedInfo = _feedInfo[0]
-    informer("feedInfo collected.")
-
-    webdriver = get_webdriver()  # initialize webdriver only once and not every scrapper
-    finUrls = _feedInfo[1]  # this is hack - no list needed
-    maternalUrlByAlexa = maternal_url_extractor(finUrls, webdriver)
-
-    maternalInfo = maternal_that_all(maternalUrlByAlexa, webdriver)
-
-    total.update({"feedInfo": feedInfo})
-    total.update(maternalInfo)
-    total.update({"origURL": origUrl})
-    total.update({"maternalURL": maternalUrlByAlexa})
-
-    resID = push_to_db(total)
-    informer("Collection data took: {0}".format(time.time() - startTime) + " seconds", level=2)
-
-    return resID
+    def __init__(self, maternal_scrapers = ["urlm", "websiteout", "ranks", "alexa"],
+                 wdriver=get_webdriver()):
+        self.driver = wdriver
+        self.load_scrappers(maternal_scrapers)
 
 
-def collect_maternal(maternalURL, _deal=None):
-    """Collect data for maternal URL
+    def load_scrappers(self, scrapers_names):
+        for name in scrapers_names:
+            setattr(self, name, scraper_prep(name, self.driver))
 
-    Only for testing
-    
-    Parameters
-    ----------
-    maternalURL : string
-        maternal URL
-    deal : list of strings
-        names of scrapers from which to get data from
-    
-    Returns
-    -------
-    dict
-        scrapped data
-    """
-    if not _deal:
-        _deal = ["websiteout", "urlm", "ranks", "alexa"]
+    def collect_maternal(self, finUrls):
+        total = {}
 
-    data = maternal_that_all(maternalURL, _deal)
-    return data
+        # alexa must be first, because she returns the
+        # true address
+        article_url = finUrls[0] # url of first article
+        self.alexa.get_maternal(article_url)
+        maternal_url = self.alexa.guessed_maternal_url
+        self.alexa.collect_that_all()
+        total.update({"alexa": self.alexa.scrapedData})
+
+        rest = {"urlm" : self.urlm,
+                "websitout": self.websiteout,
+                "ranks" : self.ranks}
+        for sname, scrpr in rest.items():
+            try:
+                scrpr.get_maternal(maternal_url)
+                scrpr.collect_that_all()
+                total.update({sname: scrpr.scrapedData})
+                informer("\nSucceded.", rewrite=True)
+                #sleep(ST)
+            except RuntimeError:
+                informer("\nNot successful.")
+                total.update({sname: None})
+
+        return total, maternal_url
+
+    def collect_for_orig(self, orig_url):
+
+        import time
+        startTime = time.time()
+
+        total = {}
+        feedInfo, finUrls = feed_that_all(orig_url)
+
+        maternalInfo, maternal_url = self.collect_maternal(finUrls)
+
+        total.update({"feedInfo": feedInfo})
+        total.update(maternalInfo)
+        total.update({"origURL": orig_url})
+        total.update({"maternalURL": maternal_url})
+
+        resID = push_to_db(total)
+        informer("Collecting data took: {0}".format(time.time() - startTime) + " seconds", level=2)
+
+        return resID

@@ -81,7 +81,7 @@ def push_to_db(inpObj, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
     informer("Saving to {0} database, {1} collection under ObjectID: ".format(dbName, collection)
              , str(insID))
 
-    client.disconnect()
+    client.close()
 
     return insID
 
@@ -116,7 +116,7 @@ def get_from_db(idOfO, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
 
     outData = db.find_one({'_id': idOfO}, {"_id": 0})
 
-    client.disconnect()
+    client.close()
 
     return outData
 
@@ -225,42 +225,6 @@ def find_objects_by_origurl(origUrl, dbName=lset.DB_NAME, collection=lset.DB_COL
                                           for obj in db.find({"origURL": origUrl}).sort('_id', -1)])
     return res
 
-
-def maternal_url_extractor(finalLinks, wdriver):
-    """ Try to find out most probable maternal URL
-    based on entries
-
-    Parameters
-    ----------
-    finalLinks : list
-        true finalUrls of entries
-
-    Returns
-    -------
-    string
-        maternal URL (in www.maternalurl.*)
-
-    Note
-    -----
-    Alexa is maybe better!
-
-    """
-
-    # beru adresu prvniho clanku
-    testUrl = finalLinks[0]
-
-    wdriver.get(r'http://www.alexa.com/')
-    inputField = wdriver.find_element_by_xpath('//*[@id="search-bar"]/form/input')
-    inputField.clear()
-    inputField.send_keys(testUrl)
-    inputField.submit()
-
-    text = wdriver.find_element_by_xpath('//*[@id="js-li-last"]/span[1]/a').text
-
-    informer("Alexa thinks that the maternal URL is: " + str("www." + text))
-    return 'www.' + text
-
-
 def get_webdriver(browser = lset.DEFAULT_DRIVER):
     """Initialize the webdriver
 
@@ -278,7 +242,9 @@ def get_webdriver(browser = lset.DEFAULT_DRIVER):
     from selenium import webdriver
 
     if browser == "phantomjs":
-        wdriver = webdriver.PhantomJS()
+        _service_args = ['--load-images=no']
+        wdriver = webdriver.PhantomJS(service_args=_service_args)
+
     elif browser == "phantomjsTOR":
         serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']
         wdriver = webdriver.PhantomJS(service_args=serviceArgs)
@@ -293,4 +259,16 @@ def get_webdriver(browser = lset.DEFAULT_DRIVER):
         profile.set_preference('network.proxy.socks_port', 9050)
         wdriver = webdriver.Firefox(profile)
 
+    wdriver.set_window_size(1366, 768)
     return wdriver
+
+def scraper_prep(scraper_name, webdriver):
+
+    from nourisher.collector.maternalSite import Websiteout, Urlm, RankerDist, Alexa
+    scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com"),
+                      "urlm": (Urlm, "www.urlm.co"),
+                      "ranks": (RankerDist, "www.google.com"),
+                      "alexa": (Alexa, "www.alexa.com/siteinfo")
+                      }
+    cls, baseurl = scrapers[scraper_name]
+    return cls(baseurl, webdriver)

@@ -201,7 +201,7 @@ def get_entries_info(links):
 
     # just for process checking
     counterI = 1
-    for plink in links[:2]:
+    for plink in links:
         # TODO: This is wrong - values are now mixed (not that anybody cares...)
         try:
             # this is because requests follow redirects,

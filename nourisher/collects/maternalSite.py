@@ -309,13 +309,6 @@ class Alexa(Scraper):
         log.debug("Alexa thinks that the maternal URL is: " + str("www." + text))
         self.guessed_maternal_url = "www." + text
 
-        try:
-            if self.check_unavailability():
-                log.debug("\nNo data from this scrapper.")
-                raise RuntimeError("No available data from this Scraper")
-        except NoSuchElementException:
-            pass
-
     def check_unavailability(self):
 
         status = self.driver.find_element_by_xpath('//*[@id="no-enough-data"]/div/div/span[1]/span/strong').text
@@ -327,6 +320,13 @@ class Alexa(Scraper):
             return False
 
     def collect_that_all(self):
+
+        try:
+            if self.check_unavailability():
+                log.debug("\nNo data from this scrapper.")
+                raise RuntimeError("No available data from Alexa")
+        except NoSuchElementException:
+            pass
 
         total = {}
         singles = self.collect_textual_singles(self.alexa_singles)

@@ -2,7 +2,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from collections import defaultdict
-from nourisher import settings as setl, utiliser
+from nourisher.settings import ARTICLES_LIMIT
 
 
 def publication_frequency(publishedTimes):
@@ -204,7 +204,7 @@ def get_entries_info(links):
 
     # just for process checking
     counterI = 1
-    for plink in links:
+    for plink in links[:ARTICLES_LIMIT]:
         # TODO: This is wrong - values are now mixed (not that anybody cares...)
         try:
             # this is because requests follow redirects,
@@ -221,9 +221,12 @@ def get_entries_info(links):
 
             dtb["sourceURL"].append(art.source_url)
 
-            # TODO: Not needed
-            # art.nlp()
-            # dtb["articleKeywords"].append( art.keywords )
+            #art.nlp()
+            #dtb["articleKeywords"].append( art.keywords )
+
+            dtb["guessed_language"].append( art.extractor.language )
+
+            dtb["count_images"].append( art.imgs )
 
             pageHtml = art.html
             pageSoup = BeautifulSoup(pageHtml)

@@ -19,27 +19,34 @@ def get_db_driver(db_name=lset.DB_NAME, ip=lset.DB_IP, port=lset.DB_PORT):
 
     return db
 
-def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_name):
+def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_name, random_order=False):
 
     log.debug("Trying to get some source URL... ")
-    document = db_driver[source_collection_name].find_one()  # potrebuji vyextrahovat orig_URL a id_
+
+    if not random_order:
+        document = db_driver[source_collection_name].find_one()  # potrebuji vyextrahovat orig_URL a id_
+    else:
+        from random import randint
+        random_record_ix = randint(0, db_driver[source_collection_name].count())
+        document = db_driver[source_collection_name].find()[random_record_ix]
 
     if document is None:
         log.debug("No URL has been found. Setting to False")
         return False
 
     # check lock file
-    lock_existence = db_driver[lock_collection_name].find_one(document["id_"])
+    lock_existence = db_driver[lock_collection_name].find_one(document["_id"])
 
     check = 0
     while (lock_existence is not None):
         from random import randint
         random_record_ix = randint(0, db_driver[source_collection_name].count())
         document = db_driver[source_collection_name].find()[random_record_ix]
-        lock_existence = db_driver[lock_collection_name].find(document["id_"])
+        lock_existence = db_driver[lock_collection_name].find_one(document["_id"])
         check += 1
 
-        raise RuntimeError("It seems there is something wrong in this loop.")
+        if check >= 10:
+            raise RuntimeError("It seems there is something wrong in this loop.")
 
     #doc = document["orig_url"], document["id_"]
     log.debug("URL found: {}. Creating lock record.".format(document["orig_url"]))

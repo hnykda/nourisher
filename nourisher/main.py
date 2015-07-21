@@ -26,8 +26,8 @@ def parse_arguments():
     parser.add_argument("-a", "--articles_limit", type=int, default=50, help="Limit maximum processed articles (not implemented yet!)")
     parser.add_argument("-c", "--cleaning", action="store_true", help="Turn on cleaning (not implemented yet!)")
     parser.add_argument("-s", "--sleep", type=int, default=60, help="How many seconds we should wait between consequent collections")
-    parser.add_argument("-m", "--mode", choices= ["remote", "local"], help="Activate local or remote mode", default="local")
     parser.add_argument("-n", "--database_name", type=str, required=True, help="Name of main database")
+    parser.add_argument("-r", "--random", action="store_true", help="If sources should be processed in random order")
     parser.add_argument("-S", "--sources_collection", type=str, default="sources", help="Collection name with sources")
     parser.add_argument("-L", "--lock_collection", type=str, default="locks", help="Collection name for lock files")
     parser.add_argument("-D", "--data_collection", type=str, default="data", help="Collection name for output data")
@@ -48,7 +48,8 @@ def main():
     log.debug("Log level set to {}".format(log.level))
 
     try:
-        # from nourisher import settings
+        from nourisher import settings
+        settings.ARTICLES_LIMIT = args.articles_limit
         # settings.DB_COLLECTION = args.collection
         # settings.DB_NAME = args.dbname
         # settings.DB_PORT = args.port
@@ -59,13 +60,13 @@ def main():
         collector = Collector(wdriver_name=args.browser)
 
         from nourisher.utiliser import fetch_doc_url_and_lock, get_db_driver
-        db_driver = get_db_driver(args.dbname, args.ip, args.port)
+        db_driver = get_db_driver(args.database_name, args.ip, args.port)
 
         from nourisher.nourish import Nourisher
 
-        document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection)  # initial fetch
+        document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)  # initial fetch
 
-        counter = 0
+        counter = 1
         while document:
             url = document["orig_url"]
 
@@ -82,7 +83,7 @@ def main():
                 db_driver[args.data_collection].insert(document)
 
                 log.debug("Removing source URL from sources collection")
-                db_driver[args.sources_collection].remove({"id_" : document["id_"]})
+                db_driver[args.sources_collection].remove({"_id" : document["_id"]})
                 time.sleep(args.sleep)
 
             except KeyboardInterrupt as ex:
@@ -101,13 +102,13 @@ def main():
 
                 time.sleep(args.sleep)
             finally:
-                log.info("It took:" + str(time.time() - now) + "s.\n----------\n")
+                log.info("Whole processing took: " + str(time.time() - now) + "s.\n----------\n")
 
                 log.debug("Deleting lock file.")
-                db_driver[args.lock_collection].remove({"id_" : document["id_"]})
+                db_driver[args.lock_collection].remove({"_id" : document["_id"]})
 
             counter += 1
-            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection)
+            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
 
     except KeyboardInterrupt as ex:
         log.warning("Termined by user.")

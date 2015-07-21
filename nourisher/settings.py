@@ -23,6 +23,8 @@ DB_COLLECTION = "feeds"  # Name of collection in database
 # should be used for scrapping. Possible values in maternaSite.Scraper
 DEFAULT_DRIVER = "phantomjs"
 
+ARTICLES_LIMIT = 25
+
 ### VERBOSITY ###
 #VERBOSITY = 1  # Verbosity of std output (currently implemented 0, 1, 2)
 

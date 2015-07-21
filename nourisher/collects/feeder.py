@@ -226,7 +226,7 @@ def get_entries_info(links):
 
             dtb["guessed_language"].append( art.extractor.language )
 
-            dtb["count_images"].append( art.imgs )
+            dtb["count_images"].append( len(art.imgs) )
 
             pageHtml = art.html
             pageSoup = BeautifulSoup(pageHtml)

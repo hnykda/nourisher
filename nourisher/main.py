@@ -39,11 +39,6 @@ def parse_arguments():
 
     return parser.parse_args()
 
-#TODO:
-# * Sbirani clanku by stalo za to zkusit vylepsit - udelat pokus s readability, goose, newspaper3k
-# * dodelat uhadnuti jazyka
-# * Cisteni dat nefunguje. zaslouzilo by to rewrite
-
 def main():
 
     args = parse_arguments()

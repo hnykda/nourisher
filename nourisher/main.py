@@ -88,27 +88,25 @@ def main():
 
                 log.debug("Removing source URL from sources collection")
                 db_driver[args.sources_collection].remove({"_id" : document["_id"]})
-                time.sleep(args.sleep)
-
             except KeyboardInterrupt as ex:
                 raise KeyboardInterrupt
             except Exception as ex:
-                log.error("Cannot process.")
-                log.error(sys.exc_info())
+                log.error("Cannot process. Error: \n", exc_info=True)
                 tracb = traceback.format_exc()
-                log.error(tracb)
 
                 document["error_log"] = tracb
-                document.pop("_id")  # chyby se muzou objevit nekolikrat u stejneho _id, tudiz musi mit sve vlastni
+                idecko = document.pop("_id")  # chyby se muzou objevit nekolikrat u stejneho _id (pri ruznem procesovani), tudiz musi mit sve vlastni
                 db_driver[args.error_collection].insert(document)
 
-                time.sleep(args.sleep)
-            finally:
-                log.info("Whole processing took: " + str(time.time() - now) + "s.\n----------\n")
+                # this is because of finally block - removing the lock file
+                document["_id"] = idecko
 
+            finally:
                 log.debug("Deleting lock file.")
                 db_driver[args.lock_collection].remove({"_id" : document["_id"]})
 
+                log.info("Whole processing took: {}s. Now sleeping for {}s".format(str(time.time() - now), args.sleep))
+                time.sleep(args.sleep)
             counter += 1
             document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
     except KeyboardInterrupt as ex:

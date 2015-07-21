@@ -7,6 +7,9 @@ import traceback
 import sys
 
 import logging
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING)
+
 from logging.config import fileConfig
 
 import os
@@ -89,9 +92,6 @@ def main():
 
             except KeyboardInterrupt as ex:
                 raise KeyboardInterrupt
-            except ConnectionError as ex:
-                log.error("Connection error. Exiting.")
-                sys.exit(1)
             except Exception as ex:
                 log.error("Cannot process.")
                 log.error(sys.exc_info())
@@ -99,6 +99,7 @@ def main():
                 log.error(tracb)
 
                 document["error_log"] = tracb
+                document.pop("_id")  # chyby se muzou objevit nekolikrat u stejneho _id, tudiz musi mit sve vlastni
                 db_driver[args.error_collection].insert(document)
 
                 time.sleep(args.sleep)
@@ -110,13 +111,8 @@ def main():
 
             counter += 1
             document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
-
     except KeyboardInterrupt as ex:
-        log.warning("Termined by user.")
-    except:
-        print(sys.exc_info())
-        tracb = traceback.format_exc()
-        print(tracb)
+        log.warning("Terminated by user.")
 
 if __name__ == "__main__":
     main()

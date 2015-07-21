@@ -108,7 +108,7 @@ def main():
                     import sys
                     sys.exit(0)
 
-                time.sleep(randint(args.sleep, 2*args.sleep))
+                time.sleep(randint(args.sleep, 2 * args.sleep))
             counter += 1
             document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
     except KeyboardInterrupt as ex:

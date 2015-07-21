@@ -73,7 +73,7 @@ class Scraper:
         # what happens if no informations are available
         try:
             if self.check_unavailability():
-                log.debug("\nNo data from this scrapper.")
+                log.debug("\nNo data from scrapper: {}".format(self.__class__.__name__))
                 raise RuntimeError("No available data from this Scraper")
         except NoSuchElementException:
             pass

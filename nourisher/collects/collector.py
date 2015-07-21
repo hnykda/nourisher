@@ -27,9 +27,14 @@ class Collector():
         article_url = finUrls[0] # url of first article
         self.alexa.get_maternal(article_url)
         maternal_url = self.alexa.guessed_maternal_url
-        log.debug("Alexa sbira data.")
-        self.alexa.collect_that_all()
-        total.update({"alexa": self.alexa.scrapedData})
+
+        try:
+            log.debug("Alexa sbira data.")
+            self.alexa.collect_that_all()
+            total.update({"alexa": self.alexa.scrapedData})
+        except RuntimeError:
+            log.debug("Alexa nic nema.")
+            total.update({"alexa" : None})
 
         rest = {"urlm" : self.urlm,
                 "websiteout": self.websiteout,

@@ -24,11 +24,11 @@ DB_COLLECTION = "feeds"  # Name of collection in database
 DEFAULT_DRIVER = "phantomjs"
 
 ### VERBOSITY ###
-VERBOSITY = 1  # Verbosity of std output (currently implemented 0, 1, 2)
+#VERBOSITY = 1  # Verbosity of std output (currently implemented 0, 1, 2)
 
 def get_setings():
     """Print current settings"""
-    log.debug(DB_COLLECTION + " " + str(DB_PORT) + " " + DB_IP + " " +  DB_NAME + " " + DEFAULT_DRIVER + " " + str(VERBOSITY ))
+    log.debug(DB_COLLECTION + " " + str(DB_PORT) + " " + DB_IP + " " +  DB_NAME + " " + DEFAULT_DRIVER)
 
 # class SETTER:
 #     ### DATABASE ###

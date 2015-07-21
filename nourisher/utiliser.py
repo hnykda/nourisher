@@ -12,6 +12,44 @@ Here are some utilities that might be useful
 from nourisher import settings as lset
 from pymongo import MongoClient
 
+def get_db_driver(db_name=lset.DB_NAME, ip=lset.DB_IP, port=lset.DB_PORT):
+
+    client = MongoClient(ip, port)
+    db = client[db_name]
+
+    return db
+
+def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_name):
+
+    log.debug("Trying to get some source URL... ")
+    document = db_driver[source_collection_name].find_one()  # potrebuji vyextrahovat orig_URL a id_
+
+    if document is None:
+        log.debug("No URL has been found. Setting to False")
+        return False
+
+    # check lock file
+    lock_existence = db_driver[lock_collection_name].find_one(document["id_"])
+
+    check = 0
+    while (lock_existence is not None):
+        from random import randint
+        random_record_ix = randint(0, db_driver[source_collection_name].count())
+        document = db_driver[source_collection_name].find()[random_record_ix]
+        lock_existence = db_driver[lock_collection_name].find(document["id_"])
+        check += 1
+
+        raise RuntimeError("It seems there is something wrong in this loop.")
+
+    #doc = document["orig_url"], document["id_"]
+    log.debug("URL found: {}. Creating lock record.".format(document["orig_url"]))
+    db_driver[lock_collection_name].insert(document)
+    log.debug("Lock record created.")
+
+    log.info("Number of unprocessed URLs: {}".format(db_driver[source_collection_name].count()))
+    return document
+
+
 def push_to_db(inpObj, dbName=lset.DB_NAME, collection=lset.DB_COLLECTION,
                ip=lset.DB_IP, port=lset.DB_PORT):
     """ Saves inpObj to MongoDB and returns it's _id
@@ -185,7 +223,7 @@ def find_objects_by_origurl(origUrl, dbName=lset.DB_NAME, collection=lset.DB_COL
     #                                      for obj in db.find({"origURL": origUrl}).sort('_id', -1)])
     return res
 
-def get_webdriver(browser = lset.DEFAULT_DRIVER):
+def get_webdriver(browser):
     """Initialize the webdriver
 
     Parameters

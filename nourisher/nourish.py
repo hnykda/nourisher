@@ -119,9 +119,10 @@ class Nourisher:
 
         total = collector.collect_for_orig(self.origFeedUrl)
 
-        resID = push_to_db(total)
-        self.dataID = resID
+        #self.dataID = push_to_db(total)
         self.data = total
+
+        return self.data
 
     @staticmethod
     def collect_maternal(maternalURL, _deal=None):

@@ -2,16 +2,15 @@ import logging
 log = logging.getLogger(__name__)
 
 from .feeder import feed_that_all
-
+import time
 from ..utiliser import scraper_prep, get_webdriver
 
 class Collector():
     """ Wrapper for collecting
     """
 
-    def __init__(self, maternal_scrapers = ["urlm", "websiteout", "ranks", "alexa"],
-                 wdriver=get_webdriver()):
-        self.driver = wdriver
+    def __init__(self, wdriver_name, maternal_scrapers = ["urlm", "websiteout", "ranks", "alexa"]):
+        self.driver = get_webdriver(wdriver_name)
         self.load_scrappers(maternal_scrapers)
 
 
@@ -51,7 +50,6 @@ class Collector():
 
     def collect_for_orig(self, orig_url):
 
-        import time
         startTime = time.time()
 
         total = {}
@@ -63,6 +61,7 @@ class Collector():
         total.update(maternalInfo)
         total.update({"origURL": orig_url})
         total.update({"maternalURL": maternal_url})
+        total.update({"datetime_of_collection" : time.strftime("%Y-%m-%d %H:%M:%S")})
 
         log.info("Collecting data took: {0}".format(time.time() - startTime) + " seconds")
         return total

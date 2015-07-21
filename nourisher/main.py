@@ -1,18 +1,16 @@
-#
-
 __author__ = 'dan'
 
 import time
 import traceback
-import sys
+from random import randint
 
 import logging
-logging.getLogger("urllib3").setLevel(logging.WARNING)
-logging.getLogger("requests").setLevel(logging.WARNING)
-
 from logging.config import fileConfig
-
 import os
+
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING
+                                       )
 curdir = os.path.dirname(os.path.realpath(__file__))
 fileConfig(curdir + '/logging_config.ini')
 log = logging.getLogger()
@@ -30,7 +28,7 @@ def parse_arguments():
     parser.add_argument("-a", "--articles_limit", type=int, default=50, help="Limit maximum processed articles (not implemented yet!)")
     parser.add_argument("-c", "--cleaning", action="store_true", help="Turn on cleaning (not implemented yet!)")
     parser.add_argument("-u", "--url", type=str, default=None, help="Process this specific url from database.")
-    parser.add_argument("-s", "--sleep", type=int, default=60, help="How many seconds we should wait between consequent collections")
+    parser.add_argument("-s", "--sleep", type=int, default=60, help="Time in seconds between consequent collections. It's in interval (sleep, 2*sleep)")
     parser.add_argument("-n", "--database_name", type=str, required=True, help="Name of main database")
     parser.add_argument("-r", "--random", action="store_true", help="If sources should be processed in random order")
     parser.add_argument("-S", "--sources_collection", type=str, default="sources", help="Collection name with sources")
@@ -110,7 +108,7 @@ def main():
                     import sys
                     sys.exit(0)
 
-                time.sleep(args.sleep)
+                time.sleep(randint(args.sleep, 2*args.sleep))
             counter += 1
             document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
     except KeyboardInterrupt as ex:

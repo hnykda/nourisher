@@ -305,7 +305,7 @@ def get_entries_info(links):
                 requests.exceptions.ConnectionError) as ex:
             import traceback
 
-            log.warning("\nError when parsing an article", ex)
+            log.warning("\nError when parsing an article", exc_info=True)
             print(traceback.format_exc())
     # utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
     log.debug("Number of parsed articles: {0}".format(len(dtb['finalUrl'])))

@@ -306,8 +306,9 @@ class Alexa(Scraper):
 
         text = self.selx('//*[@id="js-li-last"]/span[1]/a')
 
-        log.debug("Alexa thinks that the maternal URL is: " + str("www." + text))
-        self.guessed_maternal_url = "www." + text
+        url = "www." + text
+        log.debug("Alexa thinks that the maternal URL is: {}".format(url))
+        self.guessed_maternal_url = url
 
     def check_unavailability(self):
 
@@ -323,7 +324,7 @@ class Alexa(Scraper):
 
         try:
             if self.check_unavailability():
-                log.debug("\nNo data from this scrapper.")
+                # log.debug("\nNo data from this scrapper.")
                 raise RuntimeError("No available data from Alexa")
         except NoSuchElementException:
             pass

@@ -29,6 +29,7 @@ def parse_arguments():
     parser.add_argument("-l", "--log_level", type=str, help="Verbosity (not implemented yet!)")
     parser.add_argument("-a", "--articles_limit", type=int, default=50, help="Limit maximum processed articles (not implemented yet!)")
     parser.add_argument("-c", "--cleaning", action="store_true", help="Turn on cleaning (not implemented yet!)")
+    parser.add_argument("-u", "--url", type=str, default=None, help="Process this specific url from database.")
     parser.add_argument("-s", "--sleep", type=int, default=60, help="How many seconds we should wait between consequent collections")
     parser.add_argument("-n", "--database_name", type=str, required=True, help="Name of main database")
     parser.add_argument("-r", "--random", action="store_true", help="If sources should be processed in random order")
@@ -63,7 +64,10 @@ def main():
 
         from nourish import Nourisher
 
-        document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)  # initial fetch
+        if args.url is None:
+            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)  # initial fetch
+        else:
+            document = db_driver[args.sources_collection].find_one({"orig_url" : args.url})
 
         counter = 1
         while document:
@@ -101,11 +105,18 @@ def main():
                 db_driver[args.lock_collection].remove({"_id" : document["_id"]})
 
                 log.info("Whole processing took: {}s. Now sleeping for {}s".format(str(time.time() - now), args.sleep))
+
+                if args.url is not None:
+                    import sys
+                    sys.exit(0)
+
                 time.sleep(args.sleep)
             counter += 1
             document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
     except KeyboardInterrupt as ex:
         log.warning("Terminated by user.")
+    except SystemExit as ex:
+        log.inf("Finished. Exiting")
 
 if __name__ == "__main__":
     main()

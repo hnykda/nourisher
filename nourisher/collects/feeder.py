@@ -72,8 +72,8 @@ def extract_feed_info(url):
 
     # when we started parsing?
 
-    # atributy, co mě u feedu zajímají
-    # prvni uroven feedparser objectu, bozo je je kvalita formátování feedu
+    # atributy, co me u feedu zajimaji
+    # prvni uroven feedparser objectu, bozo je je kvalita formatovani feedu
     iafl = ["version", "status", "bozo", "href"]
     # feed uroven
     iaf = ["title", "subtitle", "info",

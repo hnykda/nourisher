@@ -2,7 +2,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from collections import defaultdict
-from nourisher.settings import ARTICLES_LIMIT
+from settings import ARTICLES_LIMIT
 
 
 def publication_frequency(publishedTimes):

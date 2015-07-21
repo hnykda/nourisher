@@ -1,16 +1,17 @@
-
+#
 
 __author__ = 'dan'
 
 import time
 import traceback
 import sys
-sys.path.append("../")
 
 import logging
 from logging.config import fileConfig
 
-fileConfig('./logging_config.ini')
+import os
+curdir = os.path.dirname(os.path.realpath(__file__))
+fileConfig(curdir + '/logging_config.ini')
 log = logging.getLogger()
 
 def parse_arguments():
@@ -48,7 +49,7 @@ def main():
     log.debug("Log level set to {}".format(log.level))
 
     try:
-        from nourisher import settings
+        import settings
         settings.ARTICLES_LIMIT = args.articles_limit
         # settings.DB_COLLECTION = args.collection
         # settings.DB_NAME = args.dbname
@@ -56,13 +57,13 @@ def main():
         # settings.DB_IP = args.ip
         # settings.DEFAULT_DRIVER = args.browser
 
-        from nourisher.collects.collector import Collector
+        from collects.collector import Collector
         collector = Collector(wdriver_name=args.browser)
 
-        from nourisher.utiliser import fetch_doc_url_and_lock, get_db_driver
+        from utiliser import fetch_doc_url_and_lock, get_db_driver
         db_driver = get_db_driver(args.database_name, args.ip, args.port)
 
-        from nourisher.nourish import Nourisher
+        from nourish import Nourisher
 
         document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)  # initial fetch
 

@@ -1,7 +1,7 @@
 import logging
 log = logging.getLogger(__name__)
 
-from nourisher.utiliser import get_from_db, push_to_db
+from utiliser import get_from_db, push_to_db
 
 class Nourisher:
     """Top-holder for everything next
@@ -143,7 +143,7 @@ class Nourisher:
         if not _deal:
             _deal = ["websiteout", "urlm", "ranks", "alexa"]
 
-        from nourisher.collects.collector import collect_maternal
+        from collects.collector import collect_maternal
 
         data = collect_maternal(maternalURL, _deal)
 

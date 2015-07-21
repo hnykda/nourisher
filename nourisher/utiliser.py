@@ -9,7 +9,7 @@ Created on Dec 20, 2014
 Here are some utilities that might be useful
 """
 
-from nourisher import settings as lset
+import settings as lset
 from pymongo import MongoClient
 
 def get_db_driver(db_name=lset.DB_NAME, ip=lset.DB_IP, port=lset.DB_PORT):
@@ -237,7 +237,7 @@ def get_webdriver(browser):
     ------------
     browser: string, optinal
 
-        Defaults to nourisher.settings.DEFAULT_DRIVER
+        Defaults to settings.DEFAULT_DRIVER
 
         One of ["firefox", "firefoxTOR", "phatnomjs", "phantomjsTOR", "chromium"]
 
@@ -269,7 +269,7 @@ def get_webdriver(browser):
 
 def scraper_prep(scraper_name, webdriver):
 
-    from nourisher.collects.maternalSite import Websiteout, Urlm, RankerDist, Alexa
+    from collects.maternalSite import Websiteout, Urlm, RankerDist, Alexa
     scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com"),
                       "urlm": (Urlm, "www.urlm.co"),
                       "ranks": (RankerDist, "www.google.com"),

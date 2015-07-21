@@ -3,7 +3,7 @@ log = logging.getLogger(__name__)
 
 from .feeder import feed_that_all
 import time
-from ..utiliser import scraper_prep, get_webdriver
+from utiliser import scraper_prep, get_webdriver
 
 class Collector():
     """ Wrapper for collecting

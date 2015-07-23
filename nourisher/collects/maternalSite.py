@@ -301,8 +301,12 @@ class Alexa(Scraper):
         self.driver.get(r'http://www.alexa.com/')
         inputField = self.fex('//*[@id="search-bar"]/form/input')
         inputField.clear()
+        sleep(ST)
         inputField.send_keys(orig_url)
+        sleep(ST)
+        log.debug("Clearing input field and passing orig url: {}".format(orig_url))
         inputField.submit()
+        sleep(ST)
 
         text = self.selx('//*[@id="js-li-last"]/span[1]/a')
 

@@ -305,8 +305,6 @@ def get_entries_info(links):
         except (
                 TypeError, ArticleException, UnicodeDecodeError,
                 requests.exceptions.ConnectionError) as ex:
-            import traceback
-
             log.debug("\nError when parsing an article", exc_info=True)
     log.debug("Number of parsed articles: {0}".format(len(dtb['finalUrl'])))
     return dict(dtb)

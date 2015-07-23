@@ -4,17 +4,6 @@ import time
 import traceback
 from random import randint
 
-import logging
-from logging.config import fileConfig
-import os
-
-logging.getLogger("urllib3").setLevel(logging.WARNING)
-logging.getLogger("requests").setLevel(logging.WARNING
-                                       )
-curdir = os.path.dirname(os.path.realpath(__file__))
-fileConfig(curdir + '/logging_config.ini')
-log = logging.getLogger()
-
 def parse_arguments():
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
@@ -24,7 +13,8 @@ def parse_arguments():
     parser.add_argument( "-d", "--debug", action="store_true", help = "Turn on debug mode." )
     parser.add_argument("-p", "--port", type=int, default=5432, help="Port of DB")
     parser.add_argument("-i", "--ip", type=str, default="127.0.0.1", help="IP of DB")
-    parser.add_argument("-l", "--log_level", type=str, help="Verbosity (not implemented yet!)")
+    parser.add_argument("-l", "--log_level", type=int, choices=[10,20,30,40,50], default=20, help="Verbosity of logging to console. Debug ~ 10, Critical ~ 50. In logfile, there is always DEBUG.")
+    parser.add_argument("-o", "--output_logfile", type=str, default="nour.log", help="Path to logfile. If not specified, then ")
     parser.add_argument("-a", "--articles_limit", type=int, default=50, help="Limit maximum processed articles (not implemented yet!)")
     parser.add_argument("-c", "--cleaning", action="store_true", help="Turn on cleaning (not implemented yet!)")
     parser.add_argument("-u", "--url", type=str, default=None, help="Process this specific url from database.")
@@ -38,12 +28,37 @@ def parse_arguments():
 
     return parser.parse_args()
 
+def prepare_logging(level, logfile):
+
+    import logging
+
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("requests").setLevel(logging.WARNING)
+
+    logFormatter = logging.Formatter("%(asctime)s %(name)-8s %(levelname)-4s %(message)s", datefmt="%Y%m%d %H:%M:%S")
+    log = logging.getLogger()
+
+    fileHandler = logging.FileHandler(logfile)
+    fileHandler.setFormatter(logFormatter)
+    fileHandler.setLevel(10)  # file always set to 10
+    log.addHandler(fileHandler)
+
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(logFormatter)
+    consoleHandler.setLevel(level)
+    log.addHandler(consoleHandler)
+
+    log.setLevel(0)
+
+    log.debug("Console, respective logfile log level set to {}, {}".format(consoleHandler.level, fileHandler.level))
+
+    return log
+
 def main():
 
     args = parse_arguments()
-    if args.debug:
-        log.setLevel(logging.DEBUG)
-    log.debug("Log level set to {}".format(log.level))
+
+    log = prepare_logging(args.log_level, args.output_logfile)
 
     try:
         import settings
@@ -86,6 +101,7 @@ def main():
                 log.debug("Removing source URL from sources collection")
                 db_driver[args.sources_collection].remove({"_id" : document["_id"]})
             except KeyboardInterrupt as ex:
+                log.warning("Keyboard interrupted.")
                 raise KeyboardInterrupt
             except Exception as ex:
                 log.error("Cannot process. Error: \n", exc_info=True)

@@ -114,7 +114,7 @@ def main():
     except KeyboardInterrupt as ex:
         log.warning("Terminated by user.")
     except SystemExit as ex:
-        log.inf("Finished. Exiting")
+        log.info("Finished. Exiting")
 
 if __name__ == "__main__":
     main()

@@ -211,8 +211,7 @@ def get_entries_info(links):
             # hence it ends up on true address
             artURL = requests.get(plink).url
             dtb["finalUrl"].append(artURL)
-            log.debug("Parsing link {0}/{1}: ".format(counterI, len(links)) + str(artURL), level=1,
-                              rewrite=True)
+            log.debug("Parsing link {0}/{1}: ".format(counterI, len(links)) + str(artURL))
             counterI += 1
 
             art = nwsp.Article(artURL)

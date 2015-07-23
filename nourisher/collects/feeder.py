@@ -194,6 +194,7 @@ def get_entries_info(links):
     """
 
     import newspaper as nwsp
+    from newspaper.article import ArticleException
     from bs4 import BeautifulSoup
     from lxml.etree import tostring
     import requests
@@ -215,8 +216,10 @@ def get_entries_info(links):
             counterI += 1
 
             art = nwsp.Article(artURL, fetch_images=False)
+
             art.download()
             art.parse()
+
 
             dtb["sourceURL"].append(art.source_url)
 
@@ -300,13 +303,11 @@ def get_entries_info(links):
                     # dtb["rawHtmlOfPage"].append( str( pageSoup ) )
 
         except (
-                TypeError, nwsp.article.ArticleException, UnicodeDecodeError,
+                TypeError, ArticleException, UnicodeDecodeError,
                 requests.exceptions.ConnectionError) as ex:
             import traceback
 
-            log.warning("\nError when parsing an article", exc_info=True)
-            print(traceback.format_exc())
-    # utiliser.informer( "Parsed articles: ", dtb['finalUrl'], level = 2 )
+            log.debug("\nError when parsing an article", exc_info=True)
     log.debug("Number of parsed articles: {0}".format(len(dtb['finalUrl'])))
     return dict(dtb)
 

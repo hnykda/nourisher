@@ -18,13 +18,16 @@ class Collector():
         for name in scrapers_names:
             setattr(self, name, scraper_prep(name, self.driver))
 
-    def collect_maternal(self, finUrls):
+    def collect_maternal(self, finUrls, origUrl):
         total = {}
 
         # alexa must be first, because she returns the
         # true address
         log.debug("Nechavama alexu uhadnout adresu.")
-        article_url = finUrls[0] # url of first article
+        if len(finUrls[0]) >= 1:
+            article_url = finUrls[0] # url of first article
+        else:
+            article_url = origUrl # if no articles present, try the original one
         self.alexa.get_maternal(article_url)
         maternal_url = self.alexa.guessed_maternal_url
 
@@ -60,7 +63,7 @@ class Collector():
         total = {}
         feedInfo, finUrls = feed_that_all(orig_url)
 
-        maternalInfo, maternal_url = self.collect_maternal(finUrls)
+        maternalInfo, maternal_url = self.collect_maternal(finUrls, orig_url)
 
         total.update({"feedInfo": feedInfo})
         total.update(maternalInfo)

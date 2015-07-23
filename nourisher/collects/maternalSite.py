@@ -562,13 +562,18 @@ class RankerDist(Scraper):
         return res
 
     def get_compete(self):
+        from selenium.common.exceptions import WebDriverException
+
         self.driver.get('http://moonsy.com/compete-rank/')
         sleep(1)
         self.fex('//*[@id="domain"]').clear()
         sleep(1)
         self.fex('//*[@id="domain"]').send_keys(self.maternalURL)
         sleep(1)
-        self.fex('//*[@id="form1"]/input[3]').click()
+        try:
+            self.fex('//*[@id="form1"]/input[3]').submit()
+        except WebDriverException:
+            raise RuntimeError
         sleep(1)
 
         try:

@@ -52,13 +52,13 @@ def prepare_logging(level, logfile, stdoutput):
     else:
         fileHandler = logging.FileHandler(stdoutput)
         fileHandler.setFormatter(logFormatter)
-        fileHandler.setLevel(10)  # file always set to 10
+        fileHandler.setLevel(level)  # file always set to 10
         log.addHandler(fileHandler)
 
 
     log.setLevel(0)
 
-    log.debug("Standard logile, respective debug logfile log level set to {}, {}".format(consoleHandler.level, fileHandler.level))
+    #log.debug("Standard logile, respective debug logfile log level set to {}, {}".format(consoleHandler.level, fileHandler.level))
 
     return log
 

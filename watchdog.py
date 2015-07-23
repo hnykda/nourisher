@@ -1,13 +1,22 @@
 import subprocess
 from time import sleep
-import sys
 
-command=sys.argv[1]
-watch_time = sys.argv[2]
-logfile_path = sys.argv[3]
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+parser = ArgumentParser(description="Watchdog.", formatter_class=ArgumentDefaultsHelpFormatter)
+
+parser.add_argument( "-a", "--argus", type=str, help = "Arguments for main function WITHOUT logfile path!" )
+parser.add_argument("-l", "--logfile", type=str, help="Path to logfile")
+parser.add_argument("-w", "--watch_time", type=str, help="Watchtime")
+parser.add_argument("-m", "--main_path", type=str, default="nourisher/nourisher/main.py", help="Path to main.py")
+
+args = parser.parse_args()
+
+command = "python " + args.main_path + " " + args.argus + " --output_logfile {}".format(args.logfile)
+
 
 def get_size():
-    si = len(open(logfile_path, "r").readlines())    
+    si = len(open(args.logfile, "r").readlines())
     #print("Aktualni delka: {}".format(si))
     return si
 
@@ -49,7 +58,7 @@ try:
 
         #print("Spim")
 
-        sleep(int(watch_time))
+        sleep(args.watch_time)
 
 except KeyboardInterrupt:
     killer(pid)

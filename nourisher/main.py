@@ -13,6 +13,7 @@ def parse_arguments():
     parser.add_argument( "-d", "--debug", action="store_true", help = "Turn on debug mode." )
     parser.add_argument("-p", "--port", type=int, default=5432, help="Port of DB")
     parser.add_argument("-i", "--ip", type=str, default="127.0.0.1", help="IP of DB")
+    parser.add_argument("-w", "--watchdog", type=int, default=150, help="If specified, spawns watchdog in bash. Watchdog periodically chechks if logfile is getting bigger. If not, the process is restarted.")
     parser.add_argument("-l", "--log_level", type=int, choices=[10,20,30,40,50], default=20, help="Verbosity of logging to console. Debug ~ 10, Critical ~ 50. In logfile, there is always DEBUG.")
     parser.add_argument("-o", "--output_logfile", type=str, default="nour.log", help="Path to logfile. If not specified, then ")
     parser.add_argument("-a", "--articles_limit", type=int, default=50, help="Limit maximum processed articles (not implemented yet!)")
@@ -57,7 +58,6 @@ def prepare_logging(level, logfile):
 def main():
 
     args = parse_arguments()
-
     log = prepare_logging(args.log_level, args.output_logfile)
 
     try:

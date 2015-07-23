@@ -61,5 +61,7 @@ try:
         sleep(args.watch_time)
 
 except KeyboardInterrupt:
-    killer(pid)
     print("Preruseno uzivatelem")
+
+finally:
+    killer(pid)

@@ -13,9 +13,9 @@ def parse_arguments():
     parser.add_argument( "-d", "--debug", action="store_true", help = "Turn on debug mode." )
     parser.add_argument("-p", "--port", type=int, default=5432, help="Port of DB")
     parser.add_argument("-i", "--ip", type=str, default="127.0.0.1", help="IP of DB")
-    parser.add_argument("-w", "--watchdog", type=int, default=150, help="If specified, spawns watchdog in bash. Watchdog periodically chechks if logfile is getting bigger. If not, the process is restarted.")
-    parser.add_argument("-l", "--log_level", type=int, choices=[10,20,30,40,50], default=20, help="Verbosity of logging to console. Debug ~ 10, Critical ~ 50. In logfile, there is always DEBUG.")
-    parser.add_argument("-o", "--output_logfile", type=str, default="nour.log", help="Path to logfile. If not specified, then ")
+    parser.add_argument("-l", "--log_level", type=int, choices=[10,20,30,40,50], default=20, help="Log level of standard_output. Debug ~ 10, Critical ~ 50. In logfile, there is always DEBUG.")
+    parser.add_argument("--stdout", type=str, default="nour.log", help="Path to standard logfile. If 'stdout', then output is to console")
+    parser.add_argument("-o", "--output_logfile", type=str, default="debug.log", help="Path to debug logfile (used by watchdog).")
     parser.add_argument("-a", "--articles_limit", type=int, default=50, help="Limit maximum processed articles (not implemented yet!)")
     parser.add_argument("-c", "--cleaning", action="store_true", help="Turn on cleaning (not implemented yet!)")
     parser.add_argument("-u", "--url", type=str, default=None, help="Process this specific url from database.")
@@ -29,7 +29,7 @@ def parse_arguments():
 
     return parser.parse_args()
 
-def prepare_logging(level, logfile):
+def prepare_logging(level, logfile, stdoutput):
 
     import logging
 
@@ -44,21 +44,28 @@ def prepare_logging(level, logfile):
     fileHandler.setLevel(10)  # file always set to 10
     log.addHandler(fileHandler)
 
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    consoleHandler.setLevel(level)
-    log.addHandler(consoleHandler)
+    if stdoutput == "stdout":
+        consoleHandler = logging.StreamHandler()
+        consoleHandler.setFormatter(logFormatter)
+        consoleHandler.setLevel(level)
+        log.addHandler(consoleHandler)
+    else:
+        fileHandler = logging.FileHandler(stdoutput)
+        fileHandler.setFormatter(logFormatter)
+        fileHandler.setLevel(10)  # file always set to 10
+        log.addHandler(fileHandler)
+
 
     log.setLevel(0)
 
-    log.debug("Console, respective logfile log level set to {}, {}".format(consoleHandler.level, fileHandler.level))
+    log.debug("Standard logile, respective debug logfile log level set to {}, {}".format(consoleHandler.level, fileHandler.level))
 
     return log
 
 def main():
 
     args = parse_arguments()
-    log = prepare_logging(args.log_level, args.output_logfile)
+    log = prepare_logging(args.log_level, args.output_logfile, args.stdout)
 
     try:
         import settings

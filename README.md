@@ -11,7 +11,7 @@ source activate
 git clone https://github.com/kotrfa/nourisher.git
 pip install -r nourisher/requirements.txt
 ssh -fN -L 11995:localhost:11994 hnykdan1@kmlinux.fjfi.cvut.cz
-python nourisher/nourisher/main.py -i localhost -p 11995 -n testsber --random
+python nourisher/main.py -i localhost -p 11995 -n testsber --random -d
 ```
 
 další dependencies:

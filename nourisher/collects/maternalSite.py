@@ -562,6 +562,9 @@ class RankerDist(Scraper):
         return res
 
     def get_compete(self):
+        # resignuju
+        return {"rCompete": None}
+
         from selenium.common.exceptions import WebDriverException
 
         self.driver.get('http://moonsy.com/compete-rank/')

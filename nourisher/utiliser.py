@@ -247,8 +247,15 @@ def get_webdriver(browser):
     from selenium import webdriver
 
     if browser == "phantomjs":
+        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+        user_agent = (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36"
+        )
+        dcap = dict(DesiredCapabilities.PHANTOMJS)
+        dcap["phantomjs.page.settings.userAgent"] = user_agent
+
         _service_args = ['--load-images=no', "--webdriver-loglevel=ERROR"]
-        wdriver = webdriver.PhantomJS(service_args=_service_args, service_log_path='/tmp/ghostdriver.log')
+        wdriver = webdriver.PhantomJS(service_args=_service_args, service_log_path='/tmp/ghostdriver.log', desired_capabilities=dcap)
 
     elif browser == "phantomjsTOR":
         serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']

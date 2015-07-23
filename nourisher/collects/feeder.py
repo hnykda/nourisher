@@ -214,7 +214,7 @@ def get_entries_info(links):
             log.debug("Parsing link {0}/{1}: ".format(counterI, len(links)) + str(artURL))
             counterI += 1
 
-            art = nwsp.Article(artURL)
+            art = nwsp.Article(artURL, fetch_images=False)
             art.download()
             art.parse()
 
@@ -225,7 +225,7 @@ def get_entries_info(links):
 
             dtb["guessed_language"].append( art.extractor.language )
 
-            dtb["count_images"].append( len(art.imgs) )
+            dtb["count_images"].append(0)
 
             pageHtml = art.html
             pageSoup = BeautifulSoup(pageHtml)

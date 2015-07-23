@@ -12,6 +12,7 @@ git clone https://github.com/kotrfa/nourisher.git
 pip install -r nourisher/requirements.txt
 ssh -fN -L 11995:localhost:11994 hnykdan1@kmlinux.fjfi.cvut.cz
 python nourisher/main.py -i localhost -p 11995 -n testsber --random -d
+git pull; rm -rf ../*.log; python watchdog.py -a "-i localhost -p 11995 -n testsber --stdout ../nour.log -l 20 -r" -w 300 -m nourisher/main.py -l ../out.log 
 ```
 
 další dependencies:

@@ -6,8 +6,8 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 parser = ArgumentParser(description="Watchdog.", formatter_class=ArgumentDefaultsHelpFormatter)
 
 parser.add_argument( "-a", "--argus", type=str, help = "Arguments for main function WITHOUT logfile path!" )
-parser.add_argument("-l", "--logfile", type=str, help="Path to logfile")
-parser.add_argument("-w", "--watch_time", type=str, help="Watchtime")
+parser.add_argument("-l", "--logfile", type=str, required=True, help="Path to logfile")
+parser.add_argument("-w", "--watch_time", type=int, help="Watchtime")
 parser.add_argument("-m", "--main_path", type=str, default="nourisher/nourisher/main.py", help="Path to main.py")
 
 args = parser.parse_args()
@@ -31,7 +31,7 @@ def run_that():
 
 pid = run_that()
 
-with open(logfile_path, "w") as of:
+with open(args.logfile, "w") as of:
     of.write(" ")
 
 def killer(pid):

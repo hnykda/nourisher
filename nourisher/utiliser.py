@@ -253,7 +253,7 @@ def get_webdriver(browser):
         )
         dcap = dict(DesiredCapabilities.PHANTOMJS)
         dcap["phantomjs.page.settings.userAgent"] = user_agent
-        dcap['phantomjs.page.settings.resourceTimeout'] = 10000
+        dcap['phantomjs.page.settings.resourceTimeout'] = 60000
 
         _service_args = ['--load-images=no', "--webdriver-loglevel=ERROR"]
         wdriver = webdriver.PhantomJS(service_args=_service_args, service_log_path='/tmp/ghostdriver.log', desired_capabilities=dcap)

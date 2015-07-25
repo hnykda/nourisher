@@ -135,7 +135,8 @@ def main():
 
                 time.sleep(randint(args.sleep, 2 * args.sleep))
             counter += 1
-            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)
+            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection,
+                                              args.error_collection, args.random, args.ignore_error_check)
     except KeyboardInterrupt as ex:
         log.warning("Terminated by user.")
     except SystemExit as ex:

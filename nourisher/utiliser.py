@@ -19,7 +19,8 @@ def get_db_driver(db_name=lset.DB_NAME, ip=lset.DB_IP, port=lset.DB_PORT):
 
     return db
 
-def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_name, random_order=False):
+def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_name, error_collection_name,
+                           random_order, ignore_error_check):
 
     log.debug("Trying to get some source URL... ")
 
@@ -36,20 +37,27 @@ def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_na
 
     # check lock file
     lock_existence = db_driver[lock_collection_name].find_one(document["_id"])
+    # check if error presents
+    error_existence = True
+    if not ignore_error_check:
+        log.debug("Checkuji pro error.")
+        error_existence = db_driver[error_collection_name].find_one({"orig_url" : document["orig_url"]})
+        log.debug("Nalezen error record? Vysledek hledani: {}".format(error_existence))
 
     check = 0
-    while (lock_existence is not None):
+    while (lock_existence is not None) or (error_existence is not None):
         from random import randint
         random_record_ix = randint(0, db_driver[source_collection_name].count())
         document = db_driver[source_collection_name].find()[random_record_ix]
         lock_existence = db_driver[lock_collection_name].find_one(document["_id"])
+        error_existence = db_driver[error_collection_name].find_one({"orig_url" : document["orig_url"]})
         check += 1
+        log.debug("Existuje lock a nebo zdroj jiz v minulosti vyhodil chybu.")
 
         if check >= 10:
             raise RuntimeError("It seems there is something wrong in this loop.")
 
-    #doc = document["orig_url"], document["id_"]
-    log.debug("URL found: {}. Creating lock record.".format(document["orig_url"]))
+    log.debug("Appropriate URL found: {}. Creating lock record.".format(document["orig_url"]))
     db_driver[lock_collection_name].insert(document)
     log.debug("Lock record created.")
 

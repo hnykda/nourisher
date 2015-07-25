@@ -26,6 +26,7 @@ def parse_arguments():
     parser.add_argument("-L", "--lock_collection", type=str, default="locks", help="Collection name for lock files")
     parser.add_argument("-D", "--data_collection", type=str, default="data", help="Collection name for output data")
     parser.add_argument("-E", "--error_collection", type=str, default="error", help="Collection name for error urls and their logs")
+    parser.add_argument("-e", "--ignore_error_check", action="store_true", default=False, help="If True, then no check is done for URL if it throws an error in  past.")
 
     return parser.parse_args()
 
@@ -85,7 +86,8 @@ def main():
         from nourish import Nourisher
 
         if args.url is None:
-            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection, args.random)  # initial fetch
+            document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection,
+                                              args.error_collection, args.random, args.ignore_error_check)  # initial fetch
         else:
             document = db_driver[args.sources_collection].find_one({"orig_url" : args.url})
 

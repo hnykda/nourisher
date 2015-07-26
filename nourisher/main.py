@@ -27,6 +27,7 @@ def parse_arguments():
     parser.add_argument("-D", "--data_collection", type=str, default="data", help="Collection name for output data")
     parser.add_argument("-E", "--error_collection", type=str, default="error", help="Collection name for error urls and their logs")
     parser.add_argument("-e", "--ignore_error_check", action="store_true", default=False, help="If True, then no check is done for URL if it throws an error in  past.")
+    parser.add_argument("-x", "--xvfb", action="store_true", default=False, help="If True, run in xvfb mode - then even on headless server X browsers can be used.")
     parser.add_argument("-R", "--restart_driver", type=int, help="How often should be driver reinitialized. (good for clearing cache and fighting phantomjs memory consumption)")
 
     return parser.parse_args()
@@ -69,6 +70,13 @@ def main():
     args = parse_arguments()
     log = prepare_logging(args.log_level, args.output_logfile, args.stdout)
 
+    if args.xvfb:
+        from xvfbwrapper import Xvfb
+
+        vdisplay = Xvfb()
+        vdisplay.start()
+
+
     try:
         import settings
         settings.ARTICLES_LIMIT = args.articles_limit
@@ -90,7 +98,7 @@ def main():
             document = fetch_doc_url_and_lock(db_driver, args.sources_collection, args.lock_collection,
                                               args.error_collection, args.random, args.ignore_error_check)  # initial fetch
         else:
-            document = db_driver[args.sources_collection].find_one({"orig_url" : args.url})
+            document = db_driver["orig_sources"].find_one({"orig_url" : args.url})
 
         counter = 1
         while document:
@@ -106,14 +114,17 @@ def main():
                 nour = Nourisher(url)
                 data = nour.collect_all(collector)
 
-                log.debug("Updating document by data")
-                document["data_raw"] = data
+                if args.url is None:
+                    log.debug("Updating document by data")
+                    document["data_raw"] = data
 
-                log.debug("Adding document to data collection")
-                db_driver[args.data_collection].insert(document)
+                    log.debug("Adding document to data collection")
+                    db_driver[args.data_collection].insert(document)
 
-                log.debug("Removing source URL from sources collection")
-                db_driver[args.sources_collection].remove({"_id" : document["_id"]})
+                    log.debug("Removing source URL from sources collection")
+                    db_driver[args.sources_collection].remove({"_id" : document["_id"]})
+                else:
+                    log.info("Data collected, but URL switch is ON so I discard them and end.")
             except KeyboardInterrupt as ex:
                 log.warning("Keyboard interrupted.")
                 raise KeyboardInterrupt

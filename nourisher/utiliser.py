@@ -270,7 +270,10 @@ def get_webdriver(browser):
         serviceArgs = ['--proxy=localhost:9050', '--proxy-type=socks5']
         wdriver = webdriver.PhantomJS(service_args=serviceArgs)
     elif browser == "firefox":
-        wdriver = webdriver.Firefox()
+        from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+        firefoxProfile = FirefoxProfile()
+        firefoxProfile.set_preference('permissions.default.image', 2)
+        wdriver = webdriver.Firefox(firefox_profile=firefoxProfile)
     elif browser == "chromium":
         wdriver = webdriver.Chrome('chromedriver')
     elif browser == "firefoxTOR":
@@ -281,6 +284,7 @@ def get_webdriver(browser):
         wdriver = webdriver.Firefox(profile)
 
     wdriver.set_window_size(1366, 768)
+    wdriver.set_page_load_timeout(30)
     return wdriver
 
 def scraper_prep(scraper_name, webdriver):

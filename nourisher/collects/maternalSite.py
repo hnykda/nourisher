@@ -298,7 +298,7 @@ class Alexa(Scraper):
                 url address of !feed!
         """
 
-        self.driver.get(r'http://www.alexa.com/')
+        self.driver.get(r'http://www.alexa.com')
         inputField = self.fex('//*[@id="search-bar"]/form/input')
         inputField.clear()
         sleep(ST)

@@ -27,6 +27,7 @@ def parse_arguments():
     parser.add_argument("-D", "--data_collection", type=str, default="data", help="Collection name for output data")
     parser.add_argument("-E", "--error_collection", type=str, default="error", help="Collection name for error urls and their logs")
     parser.add_argument("-e", "--ignore_error_check", action="store_true", default=False, help="If True, then no check is done for URL if it throws an error in  past.")
+    parser.add_argument("-R", "--restart_driver", type=int, help="How often should be driver reinitialized. (good for clearing cache and fighting phantomjs memory consumption)")
 
     return parser.parse_args()
 
@@ -98,6 +99,10 @@ def main():
             now = time.time()
             log.info(str(counter) + ". Processing: " + url)
             try:
+                if args.restart_driver and (counter % args.restart_driver == 0):
+                    collector.restart_driver()
+                    log.debug("Restarting driver.")
+
                 nour = Nourisher(url)
                 data = nour.collect_all(collector)
 

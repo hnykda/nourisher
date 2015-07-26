@@ -10,6 +10,9 @@ class Collector():
     """
 
     def __init__(self, wdriver_name, maternal_scrapers = ["urlm", "websiteout", "ranks", "alexa"]):
+        
+        self.wdriver_name = wdriver_name
+
         self.driver = get_webdriver(wdriver_name)
         self.load_scrappers(maternal_scrapers)
 
@@ -73,3 +76,7 @@ class Collector():
 
         log.info("Collecting data took: {0}".format(time.time() - startTime) + " seconds")
         return total
+
+    def restart_driver(self):
+        self.driver.quit()
+        self.driver = get_webdriver(self.wdriver_name)

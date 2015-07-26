@@ -27,7 +27,7 @@ class Collector():
         # alexa must be first, because she returns the
         # true address
         log.debug("Nechavama alexu uhadnout adresu.")
-        if len(finUrls[0]) >= 1:
+        if finUrls != []:
             article_url = finUrls[0] # url of first article
         else:
             article_url = origUrl # if no articles present, try the original one

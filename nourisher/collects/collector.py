@@ -56,6 +56,7 @@ class Collector():
             except RuntimeError:
                 log.debug("Scrapper neuspel")
                 total.update({sname: None})
+            scrpr.driver.quit()
 
         return total, maternal_url
 

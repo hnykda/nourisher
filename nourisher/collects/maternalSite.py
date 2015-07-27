@@ -299,6 +299,7 @@ class Alexa(Scraper):
         """
 
         self.driver.get(r'http://www.alexa.com')
+        sleep(ST)
         inputField = self.fex('//*[@id="search-bar"]/form/input')
         inputField.clear()
         sleep(ST)

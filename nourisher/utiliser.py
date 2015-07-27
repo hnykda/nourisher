@@ -54,7 +54,7 @@ def fetch_doc_url_and_lock(db_driver, source_collection_name, lock_collection_na
         check += 1
         log.debug("Existuje lock a nebo zdroj jiz v minulosti vyhodil chybu.")
 
-        if check >= 10:
+        if check >= 100:
             raise RuntimeError("It seems there is something wrong in this loop.")
 
     log.debug("Appropriate URL found: {}. Creating lock record.".format(document["orig_url"]))

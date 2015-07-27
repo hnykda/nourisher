@@ -301,8 +301,12 @@ class Alexa(Scraper):
             orig_url : str
                 url address of !feed!
         """
+        from selenium.common.exceptions import TimeoutException
+        try:
+            self.driver.get(r'http://www.alexa.com')
+        except TimeoutException:
+            log.debug("Alexa se nestihla nacist do skonceni timeoutu. Pokracuji s tim, co je nacteno doted.")
         
-        self.driver.get(r'http://www.alexa.com')
         sleep(ST)
 
         inputField = self.fex('//*[@id="search-bar"]/form/input')

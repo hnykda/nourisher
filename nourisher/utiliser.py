@@ -271,11 +271,11 @@ def get_webdriver(browser):
         wdriver = webdriver.PhantomJS(service_args=serviceArgs)
     elif browser == "firefox":
         from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-        firefoxProfile = FirefoxProfile()
+        firefox_profile = FirefoxProfile()
         firefox_profile.set_preference('permissions.default.stylesheet', 2)
         firefox_profile.set_preference('permissions.default.image', 2)
         firefox_profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', 'false')
-        wdriver = webdriver.Firefox(firefox_profile=firefoxProfile)
+        wdriver = webdriver.Firefox(firefox_profile=firefox_profile)
     elif browser == "chromium":
         wdriver = webdriver.Chrome('chromedriver')
     elif browser == "firefoxTOR":

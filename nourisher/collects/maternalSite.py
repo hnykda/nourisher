@@ -1,11 +1,10 @@
 import logging
 log = logging.getLogger(__name__)
 
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from time import sleep
 
 ST = 0.5
-
 
 class Scraper:
     """ This is common interface for all scrapers,
@@ -60,18 +59,23 @@ class Scraper:
             driver which should be used for scrapping
         """
 
-        #self.driver = wdriver
-        from selenium.webdriver import PhantomJS
         from utiliser import get_webdriver
-
         self.driver = get_webdriver("phantomjs")
         self.baseURL = _baseURL
+
+    def _get_page(self, url):
+
+        try:
+            self.driver.get(url)
+        except TimeoutException:
+            log.debug("Timeout while loading webpage. Continuing as is now.")
+
 
     def get_maternal(self, _maternalURL):
 
         self.maternalURL = _maternalURL
         addr = r'http://' + self.baseURL + "/" + _maternalURL
-        self.driver.get(addr)
+        self._get_page(addr)
         log.debug("Going to {}".format(addr))
 
         # what happens if no informations are available
@@ -301,12 +305,8 @@ class Alexa(Scraper):
             orig_url : str
                 url address of !feed!
         """
-        from selenium.common.exceptions import TimeoutException
-        try:
-            self.driver.get(r'http://www.alexa.com')
-        except TimeoutException:
-            log.debug("Alexa se nestihla nacist do skonceni timeoutu. Pokracuji s tim, co je nacteno doted.")
-        
+        self._get_page(r'http://www.alexa.com')
+
         sleep(ST)
 
         inputField = self.fex('//*[@id="search-bar"]/form/input')

@@ -60,7 +60,11 @@ class Scraper:
             driver which should be used for scrapping
         """
 
-        self.driver = wdriver
+        #self.driver = wdriver
+        from selenium.webdriver import PhantomJS
+        from utiliser import get_webdriver
+
+        self.driver = get_webdriver("phantomjs")
         self.baseURL = _baseURL
 
     def get_maternal(self, _maternalURL):
@@ -74,7 +78,7 @@ class Scraper:
         try:
             if self.check_unavailability():
                 log.debug("\nNo data from scrapper: {}".format(self.__class__.__name__))
-                raise RuntimeError("No available data from this Scraper")
+                raise RuntimeError("No available data from this Scraper {}".format(self.__class__.__name__))
         except NoSuchElementException:
             pass
 
@@ -297,9 +301,10 @@ class Alexa(Scraper):
             orig_url : str
                 url address of !feed!
         """
-
+        
         self.driver.get(r'http://www.alexa.com')
         sleep(ST)
+
         inputField = self.fex('//*[@id="search-bar"]/form/input')
         inputField.clear()
         sleep(ST)

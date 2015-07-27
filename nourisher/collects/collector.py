@@ -13,7 +13,7 @@ class Collector():
         
         self.wdriver_name = wdriver_name
 
-        self.driver = get_webdriver(wdriver_name)
+        #self.driver = get_webdriver(wdriver_name)
         self.load_scrappers(maternal_scrapers)
 
 

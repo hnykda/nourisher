@@ -272,7 +272,9 @@ def get_webdriver(browser):
     elif browser == "firefox":
         from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
         firefoxProfile = FirefoxProfile()
-        firefoxProfile.set_preference('permissions.default.image', 2)
+        firefox_profile.set_preference('permissions.default.stylesheet', 2)
+        firefox_profile.set_preference('permissions.default.image', 2)
+        firefox_profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', 'false')
         wdriver = webdriver.Firefox(firefox_profile=firefoxProfile)
     elif browser == "chromium":
         wdriver = webdriver.Chrome('chromedriver')
@@ -285,9 +287,10 @@ def get_webdriver(browser):
 
     wdriver.set_window_size(1366, 768)
     wdriver.set_page_load_timeout(30)
+    wdriver.implicitly_wait(2)
     return wdriver
 
-def scraper_prep(scraper_name, webdriver):
+def scraper_prep(scraper_name, webdriver_name):
 
     from collects.maternalSite import Websiteout, Urlm, RankerDist, Alexa
     scrapers = {"websiteout": (Websiteout, "www.websiteoutlook.com"),
@@ -296,4 +299,4 @@ def scraper_prep(scraper_name, webdriver):
                       "alexa": (Alexa, "www.alexa.com/siteinfo")
                       }
     cls, baseurl = scrapers[scraper_name]
-    return cls(baseurl, webdriver)
+    return cls(baseurl, webdriver_name)

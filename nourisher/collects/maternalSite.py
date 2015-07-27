@@ -44,7 +44,7 @@ class Scraper:
     scrapedData = None
     driver = None
 
-    def __init__(self, _baseURL, wdriver):
+    def __init__(self, _baseURL, wdriver_name):
         """ Init
 
         Parameters
@@ -60,7 +60,7 @@ class Scraper:
         """
 
         from utiliser import get_webdriver
-        self.driver = get_webdriver("phantomjs")
+        self.driver = get_webdriver(wdriver_name)
         self.baseURL = _baseURL
 
     def _get_page(self, url):

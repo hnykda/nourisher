@@ -19,7 +19,7 @@ class Collector():
 
     def load_scrappers(self, scrapers_names):
         for name in scrapers_names:
-            setattr(self, name, scraper_prep(name, self.driver))
+            setattr(self, name, scraper_prep(name, self.wdriver_name))
 
     def collect_maternal(self, finUrls, origUrl):
         total = {}
